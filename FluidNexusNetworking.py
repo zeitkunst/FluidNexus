@@ -9,6 +9,7 @@ import md5
 # Adding paths to find the modules
 sys.path.append('.')
 sys.path.append(os.getcwd())
+sys.path.append('C:\\System\\Apps\\Python\\my\\')
 sys.path.append('E:\\System\\Apps\\Python\\my\\')
 sys.path.append('C:\\Python')
 sys.path.append('E:\\Python')
@@ -24,10 +25,10 @@ try:
 
     # @SEMI-HACK@
     # At the moment, set global variable that determines where our data is      going to live
-    availableDrives = e32.drive_list()
-    if 'E:' in availableDrives:
+    try:
+        os.listdir('E:')
         dataPath = u'E:\\System\\Data\\FluidNexusData'
-    else:
+    except OSError:
         dataPath = u'C:\\System\\Data\\FluidNexusData'
 
     # Setup our data path
@@ -36,14 +37,14 @@ try:
 
     # Setup logging and redirect standard input and output
     log = Logger(dataPath + u'\\FluidNexus.log', prefix = 'FluidNexus Networking: ')
-    sys.stderr = sys.stdout = log
+    #sys.stderr = sys.stdout = log
 
     onPhone = True
 except ImportError:
     from s60Compat import e32
     dataPath = '.'
     log = Logger(dataPath + u'\\FluidNexus.log', prefix = 'FluidNexusServer: ')
-    sys.stderr = sys.stdout = log
+    #sys.stderr = sys.stdout = log
 
     onPhone = False
 
@@ -51,6 +52,9 @@ except ImportError:
 class FluidNexusServer(object):
     numberConnections = 1
     connections = []
+    ownerHashLength = 32
+    timestampLength = 4
+    cellIDLength = None
 
     def __init__(self, serviceName = u'FluidNexus', database = None):
         # Save our database object 
@@ -78,7 +82,7 @@ class FluidNexusServer(object):
 
         self.messageHashes = []
 
-        for item in database:
+        for item in self.database:
             # @TODO@ This can break if we change the database schema
 
             # Get the last item (the hash)
@@ -89,7 +93,9 @@ class FluidNexusServer(object):
             return
 
         # @HACK@
-        # For some reason we have to do this convoluted process below, otherwise sockets get reused or don't advertise properly.  This is true even though the new socket objects are different objects when they get made in the integrated loop.  Should probably figure out why this is at some point...
+        # For some reason we have to do this convoluted process below, otherwise sockets get reused or don't advertise properly.  
+        # Meaning, we have to create the sockets beforehand, and then loop through them to advertise with the desired hashes.
+        # This seems strange, because we create the sockets anew before we advertise them, so it seems like some kind of race condition.
 
         # Get the number of hashes to advertise
         numAdvertise = len(self.messageHashes)
@@ -113,10 +119,51 @@ class FluidNexusServer(object):
     def acceptCallback(self, connectionTuple):
         """This is called when the server socket receives a connection."""
         self.connections.append(connectionTuple)
-        
+
+        print "here"
+
+        # Get client info
+        clientSocket = connectionTuple[0]
+        clientAddress = connectionTuple[1]
+
+        #####################################################
+        #  Read header information
+        #  ASSUME BIG ENDIAN BYTE ORDER!
+        #####################################################
+
+        # VERSION: 1 byte
+        version = clientSocket.recv(1)
+        print version
+
+        # @TODO@
+        # In the future, split here based on different versions
+
+        # TITLE LENGTH: 2 bytes
+        titleLength = clientSocket.recv(2)
+
+        # MESSAGE LENGTH: 4 bytes
+        # Note: this is to eventually support unicode text
+        messageLength = clientSocket.recv(4)
+
+        #####################################################
+        #  Start reading data!
+        #  ASSUME BIG ENDIAN BYTE ORDER!
+        #####################################################
+        timestamp = clientSocket.recv(self.timestampLength)
+        # Skip cellID for now
+        #cellID = clientSocket.recv(self.cellIDLength)
+        ownerHash = clientSocket.recv(self.ownerHashLength)
+        title = clientSocket.recv(titleLength)
+        message = clientSocket.recv(messageLength)
+
+        # Finish up
+        clientSocket.close()
+
     def run(self):
         """Main loop for the server."""
-        pass
+
+        while 1:
+            self.serverSocket.accept(self.acceptCallback)
 
 class FluidNexusServerOld:
     """This thread accepts connections and appropriate data.
@@ -240,5 +287,6 @@ if __name__ == """__main__""":
 
         server = FluidNexusServer(database = database)
         server.initMessageAdvertisements()
+        server.run()
     except:
         log.print_exception_trace()

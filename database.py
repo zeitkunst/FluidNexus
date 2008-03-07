@@ -1,5 +1,6 @@
 # Standard library imports
 import sys
+import time
 import os
 import md5
 
@@ -11,6 +12,7 @@ sys.path.append('E:\\System\\Apps\\Python\\my\\')
 sys.path.append('C:\\Python')
 sys.path.append('E:\\Python')
 
+sys.path.append('C:\\System\\Apps\\Python\\my\\')
 from logger import Logger
 
 # Series 60 specific imports
@@ -22,9 +24,16 @@ try:
     # @SEMI-HACK@
     # At the moment, set global variable that determines where our data is going to live
     availableDrives = e32.drive_list()
-    if 'E:' in availableDrives:
+    #if 'E:' in availableDrives:
+    #    dataPath = u'E:\\System\\Data\\FluidNexusData'
+    #else:
+    #    dataPath = u'C:\\System\\Data\\FluidNexusData'
+ 
+    try:
+        os.listdir("E:")
         dataPath = u'E:\\System\\Data\\FluidNexusData'
-    else:
+    except OSError:
+        # there is no memory card
         dataPath = u'C:\\System\\Data\\FluidNexusData'
 
     # Setup our data path
@@ -33,7 +42,7 @@ try:
 
     # Setup logging and redirect standard input and output
     log = Logger(dataPath + u'\\FluidNexus.log', prefix = 'database: ')
-    sys.stderr = sys.stdout = log
+    #sys.stderr = sys.stdout = log
 
     onPhone = True
 except ImportError:
@@ -44,12 +53,19 @@ except ImportError:
 
     onPhone = False
 
+################################################################################
+############        DATABASE CLASS                                ##############
+############  Stores every data in system                         #º############
+################################################################################
 
 class FluidNexusDatabase:
     """Provide a light wrapper around the standard database functions.  We could probably make this more robust and make it an actual wrapper around both e32db and sqlite, but not right now...
 
     @TODO@ Make this a wrapper around pysqlite as well"""
 
+################################################################################
+################         Constructor                   #########################
+################################################################################
     def __init__(self, databaseDir = dataPath, databaseName = 'FluidNexus.db'):
         """Initialization method that makes sure the database file and directory exist, and creates/opens the database file, and prepares the database view."""
 
@@ -79,6 +95,9 @@ class FluidNexusDatabase:
             self.db.create(unicode(os.path.join(databaseDir, databaseName)))
             self.db.open(unicode(os.path.join(databaseDir, databaseName)))
 
+################################################################################
+###############         Setup                        ###########################
+################################################################################
     def setupDatabase(self):
         """This sets up the database with the necessary table structure and some dummy data.
 
@@ -94,22 +113,10 @@ class FluidNexusDatabase:
         except SymbianError:
             pass
 
-        try:
-            self.db.execute(unicode('drop table FluidNexusOutgoing'))
-        except SymbianError:
-            pass
-
-        try:
-            self.db.execute(unicode('drop table FluidNexusStigmergy'))
-        except SymbianError:
-            pass
-
-
-        ######################################
         # Create the data table
         ######################################
         # This table saves the data that we have accepted and can browse
-        self.db.execute(unicode('create table FluidNexusData (id counter, source varchar(18), time timestamp, type integer, title varchar(40), data long varchar, hash varchar(32))'))
+        self.db.execute(unicode('create table FluidNexusData (id counter, source varchar(18), time bigint, type integer, title varchar(40), data long varchar, hash varchar(32), cellID varchar(20), mine bit)'))
 
         # Insert some dummy data
         # This is from text messages listed in the TxTMob CHI paper
@@ -128,23 +135,13 @@ class FluidNexusDatabase:
         hash = unicode(md5.md5(title + data).hexdigest())
         self.db.execute(unicode("insert into FluidNexusData (source, type, title, data, hash) values ('00:02:EE:6B:86:09', 0, '%s', '%s', '%s')" % (title, data, hash)))
 
-        ######################################
-        # Create the outgoing table
-        ######################################
-        # This table saves the data that we would like to send to other devices
-        self.db.execute(unicode('create table FluidNexusOutgoing (id counter, source varchar(18), time timestamp, type integer, title varchar(40), data long varchar, hash varchar(32))'))
-
-        ######################################
-        # Create the stigmergy table
-        ######################################
-        # This table saves the hashes of the recently accepted data items
-        self.db.execute(unicode('create table FluidNexusStigmergy (id counter, dataHash varchar(32))'))
-        # For testing purposes, input the last hash value that we had
-        self.db.execute(unicode("insert into FluidNexusStigmergy (dataHash) values ('%s')" % (hash)))
-
         print 'finished populating the database'
 
-    def query(self, SQLQuery):
+
+################################################################################
+###################   do a query  (private method)   ###########################
+################################################################################
+    def __query(self, SQLQuery):
         """Run the SQL query, preparing ourselves for returning the results."""
 
         # If we have a select statement, prepare the view
@@ -157,6 +154,9 @@ class FluidNexusDatabase:
         else:
             self.affectedRows = self.db.execute(unicode(SQLQuery))
 
+################################################################################
+##################       Recover row        ####################################
+################################################################################
     def next(self):
         row = []
 
@@ -177,7 +177,65 @@ class FluidNexusDatabase:
     def __iter__(self):
         return self
 
+################################################################################
+#################        Outgoing messages  ####################################
+################################################################################
+    def outgoing(self):
+        """ queries about the outgoing messages, the ones witch are mine"""
+        self.__query ('select * from FluidNexusData where mine = 1')
+
+################################################################################
+#################        All messages       ####################################
+################################################################################
+    def all(self):
+        """ queries about all the messages in system """
+        self.__query ('select * from FluidNexusData')
+
+################################################################################
+#################     services  offering    ####################################
+################################################################################
+    def services(self):
+        """ it makes the old stigmergy work 
+             returns id & hash for the last msgs, ordered by date
+             newer before"""
+        self.__query ('select id, hash  from FluidNexusData order by time DESC')
+
+################################################################################
+#################     Add a self made mesage   #################################
+################################################################################
+    def add_new(self, source, type, title, data, hash, cellID):
+        """ creates a new message created by user 
+            this computes actual time and fills the mine field as 1
+              - source: the source's MAC address hash
+              - type:   kind of data stored
+              - title:  title
+              - data:   data itself
+              - hash:   message hash
+              - cellID: cell ID where we are"""
+        now = time.time()
+        sql = unicode("insert into FluidNexusData (source,time,type,title,data,hash,cellID, mine) values ('%s', %d, %d, '%s', '%s', '%s', '%s', 1)" %  (source, now, type, title, data, hash, cellID))
+        self.db.execute(sql)
+
+################################################################################
+#################     Add a recived mesage     #################################
+################################################################################
+    def add_recived(self, source, time, type, title, data, hash, cellID):
+        """ stores a message
+            fills the mine field as 0
+              - source: the source's MAC address hash
+              - type:   kind of data stored
+              - title:  title
+              - data:   data itself
+              - hash:   message hash
+              - cellID: cell ID where we are"""
+        sql = unicode("insert into FluidNexusData (source,time,type,title,data,hash,cellID, mine) values ('%s', %d, %d, '%s', '%s', '%s', '%s', 0)" %  (source, time, type, title, data, hash, cellID))
+        self.db.execute(sql)
+
+################################################################################
+#################        DEBUG LIB          ####################################
+################################################################################
 if __name__ == "__main__":
     # Run this script standalone to reset the database
     database = FluidNexusDatabase()
     database.setupDatabase()
+    database.add_new ('source', 23,'title','data','hash','cell')
