@@ -159,7 +159,6 @@ class FluidNexusDatabase:
 ################################################################################
     def next(self):
         row = []
-
         if self.numRows < 1:
             # We actually returned nothing
             raise StopIteration
@@ -234,7 +233,7 @@ class FluidNexusDatabase:
 ################################################################################
 #################     remove  message       ####################################
 ################################################################################
-    def remove_message (self, id):
+    def remove_by_id (self, id):
         """ removes a message by id, returns number of affected records"""
         sql = unicode("delete from FluidNexusData where id = %d" % (id))
         rows = self.db.execute(sql)
@@ -243,11 +242,25 @@ class FluidNexusDatabase:
 ################################################################################
 #################     remove  message          #################################
 ################################################################################
-    def remove_message (self, hash):
+    def remove_by_hash (self, hash):
         """ removes a message by hash, returns number of affected records"""
-        sql = unicode("delete from FluidNexusData where hash = %s" % (hash))
+        sql = unicode("delete from FluidNexusData where hash = '%s'" % (hash))
         rows = self.db.execute(sql)
         return rows
+
+################################################################################
+#################     ask database about a hash º##############################
+################################################################################
+    def look_for_hash (self, hash):
+        """ look in database for a hash, 
+                returns this entry id if found
+                returns -1 if not"""
+        sql = unicode("select id from FluidNexusData where hash = '%s'" % (hash))
+        rows = self.db.execute(sql)
+        if rows == 0:
+            return False
+        else:
+            return True
 
 ################################################################################
 #################        DEBUG LIB          ####################################
