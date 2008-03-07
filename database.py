@@ -232,6 +232,24 @@ class FluidNexusDatabase:
         self.db.execute(sql)
 
 ################################################################################
+#################     remove  message       ####################################
+################################################################################
+    def remove_message (self, id):
+        """ removes a message by id, returns number of affected records"""
+        sql = unicode("delete from FluidNexusData where id = %d" % (id))
+        rows = self.db.execute(sql)
+        return rows
+
+################################################################################
+#################     remove  message          #################################
+################################################################################
+    def remove_message (self, hash):
+        """ removes a message by hash, returns number of affected records"""
+        sql = unicode("delete from FluidNexusData where hash = %s" % (hash))
+        rows = self.db.execute(sql)
+        return rows
+
+################################################################################
 #################        DEBUG LIB          ####################################
 ################################################################################
 if __name__ == "__main__":
