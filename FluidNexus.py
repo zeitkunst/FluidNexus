@@ -239,7 +239,8 @@ class DataStoreView(ViewBase):
         # when we have selected them
 
         # Get all items from the database
-        self.database.query('select * from FluidNexusOutgoing')
+        #self.database.query('select * from FluidNexusOutgoing')
+        self.database.outgoing()
         listItems = []
         
         for item in database:
@@ -442,7 +443,8 @@ if __name__ == "__main__":
     #database.setupDatabase()
 
     # Get all items from the database
-    database.query('select * from FluidNexusData')
+    #database.query('select * from FluidNexusData')
+    database.all()
     listItems = []
 
     for item in database:

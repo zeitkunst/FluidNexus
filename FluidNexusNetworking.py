@@ -41,7 +41,7 @@ try:
 
     onPhone = True
 except ImportError:
-    from s60Compat import e32
+    #from s60Compat import e32
     dataPath = '.'
     log = Logger(dataPath + u'\\FluidNexus.log', prefix = 'FluidNexusServer: ')
     #sys.stderr = sys.stdout = log
@@ -49,12 +49,20 @@ except ImportError:
     onPhone = False
 
 
+########################################################################
+#  acceptCallback
+########################################################################
+ownerHashLength = 32
+timestampLength = 13
+cellIDLength = None
+
+########################################################################
+#  FluidNexusServer
+########################################################################
 class FluidNexusServer(object):
     numberConnections = 1
     connections = []
-    ownerHashLength = 32
-    timestampLength = 4
-    cellIDLength = None
+    currentlyAccepting = False
 
     def __init__(self, serviceName = u'FluidNexus', database = None):
         # Save our database object 
@@ -78,7 +86,8 @@ class FluidNexusServer(object):
         """Initialize the advertisement of hashes."""
 
         # @TODO@ Use the correct database here :-)
-        self.database.query('select * from FluidNexusStigmergy')
+        #self.database.query('select * from FluidNexusStigmergy')
+        self.database.services()
 
         self.messageHashes = []
 
@@ -116,54 +125,69 @@ class FluidNexusServer(object):
             s.listen(1)
             socket.bt_advertise_service(unicode(':' + hash), s, True, socket.RFCOMM)
 
-    def acceptCallback(self, connectionTuple):
+    def acceptCallback(self, clientData):
         """This is called when the server socket receives a connection."""
-        self.connections.append(connectionTuple)
-
         print "here"
-
+        print clientData
+    
         # Get client info
-        clientSocket = connectionTuple[0]
-        clientAddress = connectionTuple[1]
-
+        clientSocket = clientData[0]
+        clientAddress = clientData[1]
+        
         #####################################################
         #  Read header information
         #  ASSUME BIG ENDIAN BYTE ORDER!
         #####################################################
-
+        
         # VERSION: 1 byte
-        version = clientSocket.recv(1)
+        version = clientSocket.recv(2)
         print version
-
+        
         # @TODO@
         # In the future, split here based on different versions
-
+        
         # TITLE LENGTH: 2 bytes
-        titleLength = clientSocket.recv(2)
-
+        titleLength = clientSocket.recv(3)
+        print titleLength
+    
         # MESSAGE LENGTH: 4 bytes
         # Note: this is to eventually support unicode text
-        messageLength = clientSocket.recv(4)
-
+        messageLength = clientSocket.recv(6)
+        print messageLength
+    
         #####################################################
         #  Start reading data!
         #  ASSUME BIG ENDIAN BYTE ORDER!
         #####################################################
-        timestamp = clientSocket.recv(self.timestampLength)
+        timestamp = clientSocket.recv(timestampLength)
+        print timestamp
         # Skip cellID for now
-        #cellID = clientSocket.recv(self.cellIDLength)
-        ownerHash = clientSocket.recv(self.ownerHashLength)
-        title = clientSocket.recv(titleLength)
-        message = clientSocket.recv(messageLength)
-
+        #cellID = clientSocket.recv(cellIDLength)
+        ownerHash = clientSocket.recv(ownerHashLength)
+        print ownerHash
+        title = clientSocket.recv(int(titleLength))
+        print title
+        message = clientSocket.recv(int(messageLength))
+        print message
+        
         # Finish up
         clientSocket.close()
+        self.currentlyAccepting = False
 
     def run(self):
         """Main loop for the server."""
+        # @TODO@
+        # Figure out how to accept connections continuously
+        self.serverSocket.accept(self.acceptCallback)
+#        while 1:
+#            if not self.currentlyAccepting:
+#                self.currentlyAccepting = True
+#                print "trying to call the accept."
+#                self.serverSocket.accept(self.acceptCallback)
+            #clientSocket, clientAddress = self.serverSocket.accept()
+            #print clientSocket
 
-        while 1:
-            self.serverSocket.accept(self.acceptCallback)
+
 
 class FluidNexusServerOld:
     """This thread accepts connections and appropriate data.
@@ -201,7 +225,8 @@ class FluidNexusServerOld:
 
     def initMessageAdvertisements(self):
         # @TODO@ Use the correct database here :-)
-        self.database.query('select * from FluidNexusStigmergy')
+        #self.database.query('select * from FluidNexusStigmergy')
+        self.database.services()
 
         hashes = []
 
@@ -280,6 +305,20 @@ class FluidNexusServerOld:
             self.database.query("insert into FluidNexusStigmergy (dataHash) values ('%s')" % (hash))
 
             clientSocket.close()
+
+class FluidNexusClient(object):
+    def __init__(self):
+        # Nothing here right now...
+        pass
+    
+    def run(self):
+        allDevices = lightblue.finddevices()
+        phones = []
+
+        for device in allDevices:
+            foo, isPhone, bar = lightblue.splitclass(device[1])
+            if isPhone == 2:
+                phones.append(device)
 
 if __name__ == """__main__""":
     try:
