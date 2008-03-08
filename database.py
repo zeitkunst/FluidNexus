@@ -84,8 +84,6 @@ class FluidNexusDatabase:
 
         #databaseDir = os.path.join(pythonDir, databaseDir)
 
-        print 'before making the directory'
-
         if not os.path.isdir(databaseDir):
             os.makedirs(databaseDir)
 
@@ -155,6 +153,13 @@ class FluidNexusDatabase:
             self.affectedRows = self.db.execute(unicode(SQLQuery))
 
 ################################################################################
+###################   return number of rows          ###########################
+################################################################################
+    def getNumRows(self):
+        """Return the number of affected rows."""
+        return getNumRows
+
+################################################################################
 ##################       Recover row        ####################################
 ################################################################################
     def next(self):
@@ -182,6 +187,14 @@ class FluidNexusDatabase:
     def outgoing(self):
         """ queries about the outgoing messages, the ones witch are mine"""
         self.__query ('select * from FluidNexusData where mine = 1')
+
+################################################################################
+#################        Non-outgoing messages  ################################
+################################################################################
+    def non_outgoing(self):
+        """ queries about the outgoing messages, the ones witch are mine"""
+        self.__query ('select * from FluidNexusData where mine = 0')
+
 
 ################################################################################
 #################        All messages       ####################################
@@ -255,12 +268,29 @@ class FluidNexusDatabase:
         """ look in database for a hash, 
                 returns this entry id if found
                 returns -1 if not"""
-        sql = unicode("select id from FluidNexusData where hash = '%s'" % (hash))
-        rows = self.db.execute(sql)
-        if rows == 0:
+        sql = unicode("select id from FluidNexusData where hash = '%s'" % unicode(hash))
+        rows = self.__query(sql)
+        if self.getNumRows == 0:
             return False
         else:
-            return True
+            id = None 
+            for item in self:
+                id = item
+            return id
+
+################################################################################
+#################    return item based on hash      ############################
+################################################################################
+    def returnItemBasedOnHash(self, hash):
+        """ look in database for a hash, 
+                returns this entry id if found
+                returns -1 if not"""
+        sql = unicode("select * from FluidNexusData where hash = '%s'" % unicode(hash))
+        rows = self.__query(sql)
+        row = None
+        for item in self:
+            row = item
+        return row
 
 ################################################################################
 #################        DEBUG LIB          ####################################
