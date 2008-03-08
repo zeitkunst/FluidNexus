@@ -22,6 +22,7 @@ try:
     import appuifw
     import e32
     import e32db
+    import graphics
 
     # @SEMI-HACK@
     # At the moment, set global variable that determines where our data is      going to live
@@ -165,7 +166,8 @@ class ViewBase:
             appuifw.app.menu = currentView[3]
             appuifw.app.screen = currentView[4]
             appuifw.app.title = currentView[5]
-
+            print "current view="+currentView[5]
+            
     def getViewState(self):
         """Return the view state as a tuple."""
         return (appuifw.app.body, appuifw.app.exit_key_handler, appuifw.app.focus, appuifw.app.menu, appuifw.app.screen, appuifw.app.title)
@@ -265,21 +267,18 @@ class DataStoreView(ViewBase):
 
     def createTextView(self, dataItem):
         # Start setting up our new view
-        # @TODO@
-        # This should probably be a canvas, to prevent editing, but that'll have to wait...
-        textBox = appuifw.Text()
+        
+        appuifw.app.body = textCanvas= appuifw.Canvas()
+        textCanvas.text ((10,20), unicode(dataItem[4]), font=(None, None, graphics.FONT_BOLD))
+        self.writeTextAcrossLines (10,36, 8, 14, textCanvas, dataItem[5])
 
-        textBox.style = appuifw.STYLE_BOLD
-        textBox.add(unicode(dataItem[4] + '\n\n'))
-
-        textBox.style = 0
-        textBox.add(unicode(dataItem[5]))
-
-        appuifw.app.body = textBox
         appuifw.app.exit_key_handler = self.textViewCallback
         appuifw.app.title = dataItem[4]
         self.pushView(self.getViewState())
-        self.show()
+        
+        #it can't call app.body = canvas another time otherwise it breaks
+        #self.show()
+        
         #print self.entries[index]
 
         # The form method...doesn't work as I would like it, as it cuts off all text that is longer than one line
@@ -290,6 +289,22 @@ class DataStoreView(ViewBase):
 #        form.execute()
 #        print dir(form)
 
+    def writeTextAcrossLines (self, startX, startY, wordSpacing, lineSpacing, grObj, txt):
+        #grObj.text ((startX, startY), unicode(txt))
+        words = txt.split(' ')
+        text_x = startX
+        text_y = startY
+        for w in words:
+            text_end = text_x + grObj.measure_text(w)[1]    
+            if (text_end < grObj.size[0]):
+                grObj.text ((text_x,text_y),unicode(w))
+                text_x = text_end + wordSpacing
+            else:
+                text_y = text_y + lineSpacing
+		text_x = startX
+                grObj.text ((text_x,text_y),unicode(w))
+                text_x = text_x + wordSpacing + grObj.measure_text(w)[1] 
+                
     def textViewCallback(self):
         # Return back to our old view
         self.popView()
