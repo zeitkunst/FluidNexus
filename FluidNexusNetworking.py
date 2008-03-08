@@ -174,6 +174,9 @@ class FluidNexusServer(object):
         clientSocket.close()
         self.currentlyAccepting = False
 
+        print "starting new accept thread"
+        self.serverSocket.accept(self.acceptCallback)
+
     def run(self):
         """Main loop for the server."""
         # @TODO@
@@ -225,7 +228,6 @@ class FluidNexusServerOld:
 
     def initMessageAdvertisements(self):
         # @TODO@ Use the correct database here :-)
-        #self.database.query('select * from FluidNexusStigmergy')
         self.database.services()
 
         hashes = []
