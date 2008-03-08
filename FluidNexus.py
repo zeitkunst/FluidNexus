@@ -218,7 +218,9 @@ class DataStoreView(ViewBase):
             data = unicode(formData[1][2])
     
             hash = unicode(md5.md5(title + data).hexdigest())
-            returnValue = self.database.query("insert into FluidNexusOutgoing (source, type, title, data, hash) values ('00:02:EE:6B:86:09', 0, '%s', '%s', '%s')" % (title, data, hash))
+            self.database.add_new('source', 23, title, data, hash, 'cell')
+            returnValue = 1
+            #returnValue = self.database.query("insert into FluidNexusOutgoing (source, type, title, data, hash) values ('00:02:EE:6B:86:09', 0, '%s', '%s', '%s')" % (title, data, hash))
         except:
             log.print_exception_trace()
 
