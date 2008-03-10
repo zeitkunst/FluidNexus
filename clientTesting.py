@@ -84,7 +84,13 @@ class FluidNexusClient(object):
         message = data[5]
 
         clientSocket = socket.socket(socket.AF_BT, socket.SOCK_STREAM)
-        clientSocket.connect((phone[0], port))
+
+        try:
+            clientSocket.connect((phone[0], port))
+        except Exception, e:
+            clientSocket.close()
+            return
+
         clientSocket.send(FLUID_NEXUS_VERSION)
         time.sleep(1)
         clientSocket.send("%03d" % len(title))
