@@ -114,7 +114,7 @@ class FluidNexusDatabase:
         # Create the data table
         ######################################
         # This table saves the data that we have accepted and can browse
-        self.db.execute(unicode('create table FluidNexusData (id counter, source varchar(18), time bigint, type integer, title varchar(40), data long varchar, hash varchar(32), cellID varchar(20), mine bit)'))
+        self.db.execute(unicode('create table FluidNexusData (id counter, source varchar(32), time bigint, type integer, title varchar(40), data long varchar, hash varchar(32), cellID varchar(20), mine bit)'))
 
         # Insert some dummy data
         # This is from text messages listed in the TxTMob CHI paper
@@ -226,12 +226,12 @@ class FluidNexusDatabase:
               - cellID: cell ID where we are"""
         now = time.time()
         sql = unicode("insert into FluidNexusData (source,time,type,title,data,hash,cellID, mine) values ('%s', %d, %d, '%s', '%s', '%s', '%s', 1)" %  (source, now, type, title, data, hash, cellID))
-        self.db.execute(sql)
+        self.__query(sql)
 
 ################################################################################
 #################     Add a recived mesage     #################################
 ################################################################################
-    def add_recived(self, source, time, type, title, data, hash, cellID):
+    def add_received(self, source, time, type, title, data, hash, cellID):
         """ stores a message
             fills the mine field as 0
               - source: the source's MAC address hash
@@ -240,8 +240,12 @@ class FluidNexusDatabase:
               - data:   data itself
               - hash:   message hash
               - cellID: cell ID where we are"""
-        sql = unicode("insert into FluidNexusData (source,time,type,title,data,hash,cellID, mine) values ('%s', %d, %d, '%s', '%s', '%s', '%s', 0)" %  (source, time, type, title, data, hash, cellID))
-        self.db.execute(sql)
+        #sql = unicode("insert into FluidNexusData (source,time,type,title,data,hash,cellID, mine) values ('%s', %d, %d, '%s', '%s', '%s', '%s', 0)" %  (unicode(source), int(time), (type), unicode(title), unicode(data), unicode(hash), unicode(cellID)))
+        try:
+            sql = "insert into FluidNexusData (source, time, type, title, data, hash, cellID, mine) values ('%s', %u, %d, '%s', '%s', '%s', '%s', 0)" % (source, int(time), int(type), title, data, hash, cellID)
+            numRows = self.__query(sql)
+        except Exception, e:
+            print e
 
 ################################################################################
 #################     remove  message       ####################################
@@ -249,7 +253,7 @@ class FluidNexusDatabase:
     def remove_by_id (self, id):
         """ removes a message by id, returns number of affected records"""
         sql = unicode("delete from FluidNexusData where id = %d" % (id))
-        rows = self.db.execute(sql)
+        rows = self.__query(sql)
         return rows
 
 ################################################################################
@@ -258,7 +262,7 @@ class FluidNexusDatabase:
     def remove_by_hash (self, hash):
         """ removes a message by hash, returns number of affected records"""
         sql = unicode("delete from FluidNexusData where hash = '%s'" % (hash))
-        rows = self.db.execute(sql)
+        rows = self.__query(sql)
         return rows
 
 ################################################################################

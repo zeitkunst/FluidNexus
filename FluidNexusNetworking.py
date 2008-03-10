@@ -4,6 +4,7 @@ import os
 import socket
 import select
 import md5
+import time
 
 # @HACK@
 # Adding paths to find the modules
@@ -37,7 +38,7 @@ try:
 
     # Setup logging and redirect standard input and output
     log = Logger(dataPath + u'\\FluidNexus.log', prefix = 'FluidNexus Networking: ')
-    #sys.stderr = sys.stdout = log
+    sys.stderr = sys.stdout = log
 
     onPhone = True
 except ImportError:
@@ -125,6 +126,17 @@ class FluidNexusServer(object):
             s.listen(1)
             socket.bt_advertise_service(unicode(':' + hash), s, True, socket.RFCOMM)
 
+    def advertiseNewHash(self, hash):
+        """Advertise a new hash that we have just received."""
+        
+        print hash
+        newSocket = socket.socket(socket.AF_BT, socket.SOCK_STREAM)
+        self.advertisingSockets[hash] = newSocket
+        tempPort = socket.bt_rfcomm_get_available_server_channel(newSocket)
+        newSocket.bind(("", tempPort))
+        newSocket.listen(1)
+        socket.bt_advertise_service(unicode(':' + hash), newSocket, True, socket.RFCOMM)
+
     def acceptCallback(self, clientData):
         """This is called when the server socket receives a connection."""
         print "here"
@@ -169,13 +181,20 @@ class FluidNexusServer(object):
         print title
         message = clientSocket.recv(int(messageLength))
         print message
-        
-        # Finish up
-        clientSocket.close()
-        self.currentlyAccepting = False
 
-        print "starting new accept thread"
-        self.serverSocket.accept(self.acceptCallback)
+
+        # Finish up
+        # @TODO@
+        # Add the correct owner bluetooth ID hash
+        self.database.add_received(ownerHash, timestamp, 0, title, message, md5.md5(title + message).hexdigest(), '0')
+        self.advertiseNewHash(md5.md5(title + message).hexdigest())
+        try:
+            self.currentlyAccepting = False
+            self.serverSocket.accept(self.acceptCallback)
+            print "after starting new accept thread"
+            #clientSocket.close()
+        except Exception, e:
+            print e
 
     def run(self):
         """Main loop for the server."""
@@ -228,6 +247,7 @@ class FluidNexusServerOld:
 
     def initMessageAdvertisements(self):
         # @TODO@ Use the correct database here :-)
+        #self.database.query('select * from FluidNexusStigmergy')
         self.database.services()
 
         hashes = []
