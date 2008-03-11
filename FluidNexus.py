@@ -229,7 +229,7 @@ class DataStoreView(ViewBase):
     def addOutgoingCallback(self):
         formData = [(u'Title', 'text'),
                     (u'Text', 'text')]
-        flags = appuifw.FFormEditModeOnly
+        flags = appuifw.FFormEditModeOnly | appuifw.FFormDoubleSpaced
         form = appuifw.Form(formData, flags)
         form.save_hook = self.saveOutgoingData
         oldTitle = appuifw.app.title
