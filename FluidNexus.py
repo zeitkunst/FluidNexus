@@ -50,6 +50,36 @@ except ImportError:
 
     onPhone = False
 
+options = { "language": "es"}
+
+### localization stuff -- first version -- all in-code, spanish only
+if options['language'] == "es":
+    # Spanish texts
+    es_texts = {
+        u"Add Outgoing"             : u"Nuevo mensaje",
+        u"View Outgoing"            : u"Ver mensajes",
+        u"Outgoing Items"           : u"Buzón de salida",
+        u"Send FluidNexus"          : u"Enviar FluidNexus",
+        u"Settings"                 : u"Opciones",
+        u"Title"                    : u"Título",
+        u"Text"                     : u"Texto",
+        u"Error"                     : u"error",
+        u"Delete"                   : u"Borrar",
+        u"None"                     : u"Ninguno",
+        u"Do you really want to delete this item?" : u"¿Estás seguro que quieres borrarlo?",
+        u"FluidNexus"               : u"FluidNexus",
+        u"Nothing to show..."       : u"Nada a enseñar",
+        u"Feature not implemented yet"          : u"Función aún no disponible"
+    }
+    def _(s):
+        return es_texts.get(s, s)
+else:
+    # Fall back to English texts.
+    def _(s):
+        return s
+
+
+
 views = []
 
 # @TODO@
@@ -192,13 +222,13 @@ class DataStoreView(ViewBase):
         # Save our database object
         self.database = database
 
-        self.menuItems = [(u"Add Outgoing", self.addOutgoingCallback),
-                          (u"View Outgoing", self.viewOutgoingCallback),
-                          (u"Send FluidNexus", self.sendFluidNexusCallback),
-                          (u"Settings", self.settingsCallback)]
+        self.menuItems = [(_(u"Add Outgoing"), self.addOutgoingCallback),
+                          (_(u"View Outgoing"), self.viewOutgoingCallback),
+                          (_(u"Send FluidNexus"), self.sendFluidNexusCallback),
+                          (_(u"Settings"), self.settingsCallback)]
 
     def sendFluidNexusCallback(self):
-        appuifw.note(u"Feature not implemented yet", "error")
+        appuifw.note(_(u"Feature not implemented yet"), _(u"error"))
 
     def exitCallback(self):
         print 'trying to exit'
@@ -227,13 +257,13 @@ class DataStoreView(ViewBase):
         return True
 
     def addOutgoingCallback(self):
-        formData = [(u'Title', 'text'),
-                    (u'Text', 'text')]
+        formData = [(_(u'Title'), 'text'),
+                    (_(u'Text'), 'text')]
         flags = appuifw.FFormEditModeOnly | appuifw.FFormDoubleSpaced
         form = appuifw.Form(formData, flags)
         form.save_hook = self.saveOutgoingData
         oldTitle = appuifw.app.title
-        appuifw.app.title = u'Add Outgoing'
+        appuifw.app.title = _(u'Add Outgoing')
         form.execute()
         appuifw.app.title = oldTitle
 
@@ -254,7 +284,7 @@ class DataStoreView(ViewBase):
         self.createListView(listItems)
 
     def settingsCallback(self):
-        appuifw.note(u"Feature not implemented yet", "error")
+        appuifw.note(_(u"Feature not implemented yet"), "error")
 
     def listCallback(self):
         # @TODO@
@@ -317,7 +347,7 @@ class DataStoreView(ViewBase):
         self.listItems = listItems
 
         appuifw.app.screen = 'normal'
-        appuifw.app.title = u'FluidNexus'
+        appuifw.app.title = _(u'FluidNexus')
         appuifw.app.exit_key_handler = self.exitCallback
 
         if listItems is None:
@@ -344,7 +374,7 @@ class DataStoreView(ViewBase):
         # * Add menu options for deleting of outgoing items
 
         if ((listItems is None) or (listItems == [])):
-            appuifw.note(u'Nothing to show...', 'error')
+            appuifw.note(_(u'Nothing to show...'), 'error')
             return
 
         entries = []
@@ -358,11 +388,11 @@ class DataStoreView(ViewBase):
         # Add menu item to edit the outgoing item
         # We will need ability to delete old item from database
         # And then insert this item into the database (since the hash will have changed)
-        outgoingMenuItems = [(u"Delete", self.deleteOutgoingCallback)]
+        outgoingMenuItems = [(_(u"Delete"), self.deleteOutgoingCallback)]
 
         listbox = appuifw.Listbox(entries, self.outgoingListCallback)
         appuifw.app.body = listbox
-        appuifw.app.title = u'Outgoing Items'
+        appuifw.app.title = _(u'Outgoing Items')
         appuifw.app.menu = outgoingMenuItems
         appuifw.app.exit_key_handler = self.textViewCallback
         self.pushView(self.getViewState())
@@ -372,7 +402,7 @@ class DataStoreView(ViewBase):
         index = appuifw.app.body.current()
         dataItem = self.outgoingListItems[index]
 
-        answer = appuifw.query(u"Do you really want to delete this item?", "query")
+        answer = appuifw.query(_(u"Do you really want to delete this item?"), "query")
 
         if answer:
             hash = dataItem[6]
@@ -387,7 +417,7 @@ class DataStoreView(ViewBase):
                                 item[5][0:20] + u' ...'))
 
             if entries == []:
-                entries.append((u'None', u'None'))
+                entries.append((_(u'None'), _(u'None')))
 
             appuifw.app.body = appuifw.Listbox(entries, self.outgoingListCallback)
 
@@ -423,7 +453,7 @@ class FluidNexus:
 
     def setup(self):
         appuifw.app.screen = 'normal'
-        appuifw.app.title = u'FluidNexus'
+        appuifw.app.title = _(u'FluidNexus')
         appuifw.app.exit_key_handler = self.exitCallback
         self.lock.wait()
 
