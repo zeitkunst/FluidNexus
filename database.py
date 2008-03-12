@@ -42,7 +42,7 @@ try:
 
     # Setup logging and redirect standard input and output
     log = Logger(dataPath + u'\\FluidNexus.log', prefix = 'database: ')
-    #sys.stderr = sys.stdout = log
+    sys.stderr = sys.stdout = log
 
     onPhone = True
 except ImportError:
@@ -225,7 +225,7 @@ class FluidNexusDatabase:
               - hash:   message hash
               - cellID: cell ID where we are"""
         now = time.time()
-        sql = unicode("insert into FluidNexusData (source,time,type,title,data,hash,cellID, mine) values ('%s', %d, %d, '%s', '%s', '%s', '%s', 1)" %  (source, now, type, title, data, hash, cellID))
+        sql = unicode("insert into FluidNexusData (source,time,type,title,data,hash,cellID, mine) values ('%s', %d, %d, '%s', '%s', '%s', '%s', 1)" %  (source, now, type, title, data, hash, str(cellID)))
         self.__query(sql)
 
 ################################################################################

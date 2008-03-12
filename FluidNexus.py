@@ -4,6 +4,7 @@ import socket
 import sys
 import os
 import md5
+import sysinfo
 
 # @HACK@
 # Adding paths to find the modules
@@ -15,6 +16,7 @@ sys.path.append('E:\\Python')
 
 from logger import Logger
 from database import FluidNexusDatabase
+from FluidNexusNetworking import FluidNexusServer, FluidNexusClient
 
 # Series 60 specific imports
 try:
@@ -50,7 +52,7 @@ except ImportError:
 
     onPhone = False
 
-options = { "language": "es"}
+options = { "language": "en"}
 
 ### localization stuff -- first version -- all in-code, spanish only
 if options['language'] == "es":
@@ -226,6 +228,21 @@ class DataStoreView(ViewBase):
                           (_(u"View Outgoing"), self.viewOutgoingCallback),
                           (_(u"Send FluidNexus"), self.sendFluidNexusCallback),
                           (_(u"Settings"), self.settingsCallback)]
+        
+
+    def runServer(self):
+        self.server = FluidNexusServer(database = self.database)
+        self.server.initMessageAdvertisements()
+
+        while self.running:
+            self.server.run()
+
+    def runClient(self):
+        self.client = FluidNexusClient(database = database)
+
+        while self.running:
+            self.client.runLightblue()
+
 
     def sendFluidNexusCallback(self):
         appuifw.note(_(u"Feature not implemented yet"), _(u"error"))
@@ -246,9 +263,16 @@ class DataStoreView(ViewBase):
             print formData
             title = unicode(formData[0][2])
             data = unicode(formData[1][2])
-    
+            s60Version = e32.pys60_version_info
+
+            if s60Version[0] == 3:
+                cellID = 'None'
+            else:
+                import location
+                cellID = str(location.gsm_location())
             hash = unicode(md5.md5(title + data).hexdigest())
-            self.database.add_new('source', 23, title, data, hash, 'cell')
+            print "adding new item"
+            self.database.add_new(unicode(md5.md5(sysinfo.imei()).hexdigest()), 0, title, data, hash, unicode(cellID))
             returnValue = 1
             #returnValue = self.database.query("insert into FluidNexusOutgoing (source, type, title, data, hash) values ('00:02:EE:6B:86:09', 0, '%s', '%s', '%s')" % (title, data, hash))
         except:
@@ -366,7 +390,11 @@ class DataStoreView(ViewBase):
         self.pushView(self.getViewState())
         self.running = True
         self.show()
-        #self.lock.wait()
+        log.write('creating server process')
+        e32.start_server('E:\\System\\Apps\\Python\\my\\FluidNexusServer.py')
+        log.write('creating client process')
+        e32.start_server('E:\\System\\Apps\\Python\\my\\FluidNexusClient.py')
+        self.lock.wait()
 
     def createListView(self, listItems):
         # @TODO@
@@ -449,6 +477,8 @@ class FluidNexus:
         self.threads = []
 
     def exitCallback(self):
+        global serverThreadID
+        thread.exit_thread(serverThreadID)
         self.lock.signal()
 
     def setup(self):
@@ -497,6 +527,16 @@ if __name__ == "__main__":
     for item in database:
         listItems.append(item)
 
+    client = FluidNexusClient(database = database)
+#    def runClient():
+#        while 1:
+#            e32.ao_sleep(60)
+#            client.runLightblue()
+#            e32.ao_sleep(60)
+#
+#    log.write("before starting new thread")
+#    serverThreadID = thread.start_new_thread(runClient, ())
+#    log.write("after starting new thread")
     dataView = DataStoreView(database = database)
     dataView.setup(listItems = listItems)
     dataView.run()
