@@ -1,10 +1,12 @@
+import codecs
+
 class Logger: 
     def __init__(self, log_name, prefix = 'Foo: '): 
         self.logfile = log_name 
         self.prefix = prefix
 
     def write(self, obj): 
-        log_file = open(self.logfile, 'a') 
+        log_file = codecs.open(self.logfile, 'a', 'utf_8') 
         log_file.write(self.prefix + obj + '\n') 
         log_file.close() 
 
