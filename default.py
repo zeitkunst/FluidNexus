@@ -4,36 +4,37 @@ import socket
 import sys
 import os
 import md5
-import sysinfo
 
 # @HACK@
 # Adding paths to find the modules
 sys.path.append('.')
 sys.path.append(os.getcwd())
-sys.path.append('C:\\System\\Apps\\Python\\my\\')
 sys.path.append('E:\\System\\Apps\\Python\\my\\')
 sys.path.append('C:\\Python')
 sys.path.append('E:\\Python')
 
 from logger import Logger
 from database import FluidNexusDatabase
-from FluidNexusNetworking import FluidNexusServer, FluidNexusClient
-import appswitch
+
+options = dict()
 
 # Series 60 specific imports
 try:
+    global options
+  
     # On phone?
     import appuifw
     import e32
     import e32db
     import graphics
+    import codecs
 
     # @SEMI-HACK@
     # At the moment, set global variable that determines where our data is      going to live
-    try:
-        os.listdir('E:')
+    availableDrives = e32.drive_list()
+    if 'E:' in availableDrives:
         dataPath = u'E:\\System\\Data\\FluidNexusData'
-    except OSError:
+    else:
         dataPath = u'C:\\System\\Data\\FluidNexusData'
 
     # Setup our data path
@@ -43,7 +44,22 @@ try:
     # Setup logging and redirect standard input and output
     log = Logger(dataPath + u'\\FluidNexus.log', prefix = 'FluidNexus UI: ')
     sys.stderr = sys.stdout = log
-
+    
+    
+    # loadPreferences
+    global options
+    f = codecs.open(dataPath + u'\\FluidNexus.ini', 'r', 'utf_8')
+    
+    options_file = f.read()
+    options_lines = options_file.split('\n')
+    for options_line in options_lines:
+	options_list = options_line.split(':')
+	if options_list[0] != "":
+	    options[options_list[0]] = options_list[1]
+	
+    f.close()    
+    #options = { "language": "English", "viewMessages" : "True"}
+    
     onPhone = True
 except ImportError:
     from s60Compat import appuifw
@@ -54,37 +70,57 @@ except ImportError:
 
     onPhone = False
 
-options = { "language": "en"}
-
-### localization stuff -- first version -- all in-code, spanish only
-if options['language'] == "es":
-    # Spanish texts
-    es_texts = {
-        u"Add Outgoing"             : u"Nuevo mensaje",
-        u"View Outgoing"            : u"Ver mensajes",
-        u"Outgoing Items"           : u"Buzón de salida",
-        u"Send FluidNexus"          : u"Enviar FluidNexus",
-        u"Settings"                 : u"Opciones",
-        u"Title"                    : u"Título",
-        u"Text"                     : u"Texto",
-        u"Error"                     : u"error",
-        u"Delete"                   : u"Borrar",
-        u"None"                     : u"Ninguno",
-        u"Do you really want to delete this item?" : u"¿Estás seguro que quieres borrarlo?",
-        u"FluidNexus"               : u"FluidNexus",
-        u"Nothing to show..."       : u"Nada a enseñar",
-        u"Feature not implemented yet"          : u"Función aún no disponible"
-    }
-    def _(s):
-        return es_texts.get(s, s)
-else:
-    # Fall back to English texts.
-    def _(s):
-        return s
+except IOError, e:
+    #there is no file yet, create one with default preferences
+    global options
+    f = codecs.open(dataPath + u'\\FluidNexus.ini', 'w', 'utf_8')
+    newline = "\n"
+    settings  = "language:English" + newline
+    settings += "viewMessages:Yes" + newline
+    f.write(settings)
+    f.close()
+    options = { "language": "English", "viewMessages" : "True"}
+    
 
 
+### localization stuff -- reading from translations file
+global translation_dicts
+translation_dicts = dict()
+new_dict_set = dict()
+try:
+
+   f = codecs.open(dataPath + u'\\FN_translations.txt', 'r', 'utf_8')
+   translation_file = f.read()
+   translation_lines = translation_file.split("\n")
+   for line in translation_lines:
+     if line.startswith("---table"):
+        def_line = line.rstrip().split(",")
+        new_dict = dict()
+        translation_dicts[def_line[1]]= new_dict
+     else:
+        dict_line = line.split("\t")
+        new_dict[dict_line[0]] = dict_line[1]
+   #print translation_dicts
+
+except IOError, e:
+   print "Couldn't open translations file!"   	   
+   
+
+def _(s):
+    global options, translation_dicts
+    if options['language'] != u'English':
+	curr_dict = translation_dicts[options['language']]
+	if curr_dict.has_key(s):
+	   return curr_dict[s]
+	else:
+	    return s
+    else:
+	return s    
 
 views = []
+
+#declaring the options form so it's global and accessible from other places
+settingsForm = None
 
 # @TODO@
 # Add in new tables: 
@@ -226,27 +262,6 @@ class DataStoreView(ViewBase):
         # Save our database object
         self.database = database
 
-        self.menuItems = [(_(u"Add Outgoing"), self.addOutgoingCallback),
-                          (_(u"View Outgoing"), self.viewOutgoingCallback),
-                          (_(u"Send FluidNexus"), self.sendFluidNexusCallback),
-                          (_(u"Settings"), self.settingsCallback)]
-        
-        self.timerRunning = False
-        self.timer = e32.Ao_timer()
-
-    def runServer(self):
-        self.server = FluidNexusServer(database = self.database)
-        self.server.initMessageAdvertisements()
-
-        while self.running:
-            self.server.run()
-
-    def runClient(self):
-        self.client = FluidNexusClient(database = database)
-
-        while self.running:
-            self.client.runLightblue()
-
 
     def sendFluidNexusCallback(self):
         appuifw.note(_(u"Feature not implemented yet"), _(u"error"))
@@ -254,19 +269,6 @@ class DataStoreView(ViewBase):
     def exitCallback(self):
         print 'trying to exit'
         self.running = False
-        import appswitch
-        apps = appswitch.process_list()
-        processesToKill = []
-        for app in apps:
-            if app.find('python_launcher') == 1:
-                log.write(app)
-                processesToKill.append(app)
-
-        log.write(str(processesToKill))
-        for process in processesToKill:
-            appswitch.kill_process(process)
-        self.lock.signal()
-
 
     def saveOutgoingData(self, formData):
         # @TODO@
@@ -280,16 +282,9 @@ class DataStoreView(ViewBase):
             print formData
             title = unicode(formData[0][2])
             data = unicode(formData[1][2])
-            s60Version = e32.pys60_version_info
-
-            if s60Version[0] == 3:
-                cellID = 'None'
-            else:
-                import location
-                cellID = str(location.gsm_location())
+    
             hash = unicode(md5.md5(title + data).hexdigest())
-            print "adding new item"
-            self.database.add_new(unicode(md5.md5(sysinfo.imei()).hexdigest()), 0, title, data, hash, unicode(cellID))
+            self.database.add_new('source', 23, title, data, hash, 'cell')
             returnValue = 1
             #returnValue = self.database.query("insert into FluidNexusOutgoing (source, type, title, data, hash) values ('00:02:EE:6B:86:09', 0, '%s', '%s', '%s')" % (title, data, hash))
         except:
@@ -325,7 +320,71 @@ class DataStoreView(ViewBase):
         self.createListView(listItems)
 
     def settingsCallback(self):
-        appuifw.note(_(u"Feature not implemented yet"), "error")
+        
+        global translation_dicts
+        
+        languages = translation_dicts.keys()
+        
+        index_languages = 0
+        
+        for language in languages:
+           if language == options['language']:
+              break
+           else:
+              index_languages = index_languages + 1
+        
+        #if no language found, index will be length + 1 -- and we put english there
+        languages.append(u'English')
+        
+        yesno = [_(u"yes"),_(u"no")]
+        
+        index_yesno = 0
+        if options['viewMessages'] == "no":
+           index_yesno = 1
+           
+        entries = [(_(u'Language'), 'combo', (languages,index_languages)),
+                   (_(u'Show incoming messages?'), 'combo', (yesno,index_yesno))]
+        flags = appuifw.FFormEditModeOnly | appuifw.FFormDoubleSpaced
+        settingsForm = appuifw.Form(entries)
+        settingsForm.flags = flags
+        settingsForm.save_hook = self.saveSettings
+        oldTitle = appuifw.app.title
+        appuifw.app.title = _(u'Settings')
+	settingsForm.execute()
+        appuifw.app.title = oldTitle
+
+    def saveSettings (self, formData):
+	global options
+
+
+	options['language'] = unicode(formData[0][2][0][formData[0][2][1]])
+        options['viewMessages'] = unicode(formData[1][2][0][formData[1][2][1]])
+
+	print "printng language"
+	#print formData[0][2][0][formData[0][2][1]]
+	
+	
+    	try:
+
+           f = codecs.open(dataPath + u'\\FluidNexus.ini', 'w+', 'utf_8')
+	   newline = "\n"
+   	   settings  = "language:" + unicode(formData[0][2][0][formData[0][2][1]]) + newline
+	   settings += "viewMessages:" + unicode(formData[1][2][0][formData[1][2][1]])
+	   f.write(settings)
+	   f.close()
+           
+           #this way i get english
+           #print formData[0][2][0][1]
+           
+           #print unicode(formData[0][2][0][formData[0][2][1]])
+           
+        except IOError, e:
+	   log.print_exception_trace()
+	   appuifw.note(u"couldn't rewrite file", "info")
+
+	self.setup()
+
+        return True
 
     def listCallback(self):
         # @TODO@
@@ -337,7 +396,7 @@ class DataStoreView(ViewBase):
         dataItem = self.listItems[index]
 
         self.createTextView(dataItem)
-
+    
     def createTextView(self, dataItem):
         # Start setting up our new view
         
@@ -386,6 +445,12 @@ class DataStoreView(ViewBase):
         """Setup our view by creating the listbox"""
 
         self.listItems = listItems
+        
+        
+	self.menuItems = [(_(u"Add Outgoing"), self.addOutgoingCallback),
+	                  (_(u"View Outgoing"), self.viewOutgoingCallback),
+	                  (_(u"Send FluidNexus"), self.sendFluidNexusCallback),
+                          (_(u"Settings"), self.settingsCallback)]
 
         appuifw.app.screen = 'normal'
         appuifw.app.title = _(u'FluidNexus')
@@ -407,23 +472,7 @@ class DataStoreView(ViewBase):
         self.pushView(self.getViewState())
         self.running = True
         self.show()
-#        try:
-#            os.listdir('E:')
-#            log.write('creating server process')
-#            e32.start_server('E:\\System\\Apps\\Python\\my\\FluidNexusServer.py')
-#            log.write('creating client process')
-#            e32.start_server('E:\\System\\Apps\\Python\\my\\FluidNexusClient.py')
-#        except OSError:
-#            log.write('creating server process')
-#            e32.start_server('C:\\System\\Apps\\Python\\my\\FluidNexusServer.py')
-#            log.write('creating client process')
-#            e32.start_server('C:\\System\\Apps\\Python\\my\\FluidNexusClient.py')
-
-        log.write('creating server process')
-        e32.start_server('FluidNexusServer.py')
-        log.write('creating client process')
-        e32.start_server('FluidNexusClient.py')
-
+        #self.lock.wait()
 
     def createListView(self, listItems):
         # @TODO@
@@ -463,8 +512,7 @@ class DataStoreView(ViewBase):
 
         if answer:
             hash = dataItem[6]
-            #self.database.query("delete from FluidNexusOutgoing where hash = '%s'" % hash)
-            self.database.remove_by_hash(hash)
+            self.database.query("delete from FluidNexusOutgoing where hash = '%s'" % hash)
             # @TODO@
             # Make this update the view on the stack properly, so that when we return to this view from the textbox view we get the correct list
             self.outgoingListItems.pop(index)
@@ -495,28 +543,10 @@ class DataStoreView(ViewBase):
         """Check if we're the active view; if not, we should raise the object that we created to replace us."""
         return self.active
 
-    def timerCallback(self):
-        """Timer callback that checks for new data."""
-        if self.database.checkSignal():
-            # Update view
-            listItems = []
-            self.database.all()
-            for item in database:
-                listItems.append(item)
-            log.write(str(listItems))
-            self.database.clearSignal()
-        self.timerRunning = 0
-
     def run(self):
-        """Main Run thread."""
-        log.write('starting the main loop!')
         while self.running:
-            if not self.timerRunning:
-                log.write('starting timer')
-                self.timerRunning = True
-                self.timer.after(60, self.timerCallback)
             e32.ao_yield()
-        self.lock.wait()
+        self.lock.signal()
 
 class FluidNexus:
     def __init__(self):
@@ -525,17 +555,6 @@ class FluidNexus:
         self.threads = []
 
     def exitCallback(self):
-        log.write('using the correct exit callback')
-        import appswitch
-        apps = appswitch.process_list()
-        processesToKill = []
-        for app in apps:
-            print app
-            if app.find('python_launcher'):
-                processesToKill.append(app)
-
-        for process in processesToKill:
-            appswitch.kill_process(process)
         self.lock.signal()
 
     def setup(self):
@@ -573,6 +592,8 @@ class FluidNexus:
 if __name__ == "__main__":
     # Get the data from our database
     database = FluidNexusDatabase()
+    # @TODO@ Remove this line after we've gotten some things going :-)
+    #database.setupDatabase()
 
     # Get all items from the database
     #database.query('select * from FluidNexusData')
@@ -582,16 +603,6 @@ if __name__ == "__main__":
     for item in database:
         listItems.append(item)
 
-    client = FluidNexusClient(database = database)
-#    def runClient():
-#        while 1:
-#            e32.ao_sleep(60)
-#            client.runLightblue()
-#            e32.ao_sleep(60)
-#
-#    log.write("before starting new thread")
-#    serverThreadID = thread.start_new_thread(runClient, ())
-#    log.write("after starting new thread")
     dataView = DataStoreView(database = database)
     dataView.setup(listItems = listItems)
     dataView.run()
