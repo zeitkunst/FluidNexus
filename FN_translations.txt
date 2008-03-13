@@ -1,0 +1,32 @@
+---table,Español,es
+Add Outgoing	Nuevo mensaje
+View Outgoing	Ver mensajes de salida
+Outgoing Items	Buzón de salida
+Send FluidNexus	Enviar FluidNexus
+Settings	Opciones
+Title	Título
+Text	Texto
+Error	error
+Delete	Borrar
+None	Ninguno
+Do you really want to delete this item?	¿Estás seguro que deseas borrarlo?
+Show incoming items?	¿Exhibir mensajes de entrada?
+FluidNexus	FluidNexus
+Nothing to show...	Nada a enseñar
+Feature not implemented yet	Función aún no disponible
+---table,Portugês-Brasil,pt-br
+Add Outgoing	Nova mensagem
+View Outgoing	Ver mensagens de saída
+Outgoing Items	Caixa de saída
+Send FluidNexus	Enviar FluidNexus
+Settings	Opções
+Title	Título
+Text	Texto
+Error	erro
+Delete	Apagar
+None	Nenhum
+Do you really want to delete this item?	Tem certeza de que quer apagar?
+Show incoming items?	Exibir mensagens que chegam?
+FluidNexus	FluidNexus
+Nothing to show...	Nada a mostrar
+Feature not implemented yet	Função ainda não implementada
