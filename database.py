@@ -8,6 +8,7 @@ import md5
 # Adding paths to find the modules
 sys.path.append('.')
 sys.path.append(os.getcwd())
+sys.path.append('C:\\System\\Apps\\Python\\my\\')
 sys.path.append('E:\\System\\Apps\\Python\\my\\')
 sys.path.append('C:\\Python')
 sys.path.append('E:\\Python')
@@ -43,6 +44,7 @@ try:
     # Setup logging and redirect standard input and output
     log = Logger(dataPath + u'\\FluidNexus.log', prefix = 'database: ')
     sys.stderr = sys.stdout = log
+    #log = sys.stderr = sys.stdout
 
     onPhone = True
 except ImportError:
@@ -111,10 +113,19 @@ class FluidNexusDatabase:
         except SymbianError:
             pass
 
+        try:
+            self.db.execute(unicode('drop table FluidNexusSignal'))
+        except SymbianError:
+            pass
+
+
         # Create the data table
         ######################################
         # This table saves the data that we have accepted and can browse
         self.db.execute(unicode('create table FluidNexusData (id counter, source varchar(32), time bigint, type integer, title varchar(40), data long varchar, hash varchar(32), cellID varchar(20), mine bit)'))
+        self.db.execute(unicode('create table FluidNexusSignal (id counter, signal bit)'))
+        sql = unicode("insert into FluidNexusSignal (signal) values (0)")
+        self.__query(sql)
 
         # Insert some dummy data
         # This is from text messages listed in the TxTMob CHI paper
@@ -201,7 +212,7 @@ class FluidNexusDatabase:
 ################################################################################
     def all(self):
         """ queries about all the messages in system """
-        self.__query ('select * from FluidNexusData')
+        self.__query ('select * from FluidNexusData order by time DESC')
 
 ################################################################################
 #################     services  offering    ####################################
@@ -295,6 +306,38 @@ class FluidNexusDatabase:
         for item in self:
             row = item
         return row
+
+################################################################################
+#################    signal that new data exists    ############################
+################################################################################
+    def setSignal(self):
+        """signal that there is data"""
+        sql = unicode("update FluidNexusSignal set signal = 1 where id = 0")
+        rows = self.__query(sql)
+        return rows
+
+################################################################################
+#################    clear signal that new data exists   #######################
+################################################################################
+    def clearSignal(self):
+        """clear signal that there is data"""
+        sql = unicode("update FluidNexusSignal set signal = 0 where id = 0")
+        rows = self.__query(sql)
+        log.write(str(rows))
+        return rows
+
+################################################################################
+#################    check the signal               ############################
+################################################################################
+    def checkSignal(self):
+        """check the data signal"""
+        sql = unicode("select signal from FluidNexusSignal where id = 0")
+        self.__query(sql)
+        signalValue = 0
+        for item in self:
+            signalValue = item[0]
+        return signalValue
+
 
 ################################################################################
 #################        DEBUG LIB          ####################################

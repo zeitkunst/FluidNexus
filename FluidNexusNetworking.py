@@ -66,7 +66,7 @@ cellIDLength = None
 #  FluidNexusServer
 ########################################################################
 class FluidNexusServer(object):
-    numberConnections = 1
+    numberConnections = 2
     connections = []
     currentlyAccepting = False
 
@@ -159,7 +159,7 @@ class FluidNexusServer(object):
         # Get client info
         clientSocket = clientData[0]
         clientAddress = clientData[1]
-        
+
         #####################################################
         #  Read header information
         #  ASSUME BIG ENDIAN BYTE ORDER!
@@ -210,6 +210,12 @@ class FluidNexusServer(object):
             #clientSocket.close()
         except Exception, e:
             log.write(str(e))
+
+        #import audio
+        #f = 'Z:\\Nokia\\Sounds\\Digital\\Message.mid'
+        #s = audio.Sound.open(f); s.play()
+        #s.close()
+        self.database.setSignal()
 
     def run(self):
         """Main look with blocking accept."""
@@ -392,9 +398,7 @@ class FluidNexusClient(object):
 
         for phone in phones:
             log.write("Looking at phone %s" % str(phone))
-            self.mutex.acquire()
             services = lightblue.findservices(phone[0])
-            self.mutex.release()
             port = None
             for service in services:
                 if service[2] is not None and service[2] == 'FluidNexus':

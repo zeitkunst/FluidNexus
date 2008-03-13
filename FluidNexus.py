@@ -10,6 +10,7 @@ import sysinfo
 # Adding paths to find the modules
 sys.path.append('.')
 sys.path.append(os.getcwd())
+sys.path.append('C:\\System\\Apps\\Python\\my\\')
 sys.path.append('E:\\System\\Apps\\Python\\my\\')
 sys.path.append('C:\\Python')
 sys.path.append('E:\\Python')
@@ -17,6 +18,7 @@ sys.path.append('E:\\Python')
 from logger import Logger
 from database import FluidNexusDatabase
 from FluidNexusNetworking import FluidNexusServer, FluidNexusClient
+import appswitch
 
 # Series 60 specific imports
 try:
@@ -28,10 +30,10 @@ try:
 
     # @SEMI-HACK@
     # At the moment, set global variable that determines where our data is      going to live
-    availableDrives = e32.drive_list()
-    if 'E:' in availableDrives:
+    try:
+        os.listdir('E:')
         dataPath = u'E:\\System\\Data\\FluidNexusData'
-    else:
+    except OSError:
         dataPath = u'C:\\System\\Data\\FluidNexusData'
 
     # Setup our data path
@@ -229,6 +231,8 @@ class DataStoreView(ViewBase):
                           (_(u"Send FluidNexus"), self.sendFluidNexusCallback),
                           (_(u"Settings"), self.settingsCallback)]
         
+        self.timerRunning = False
+        self.timer = e32.Ao_timer()
 
     def runServer(self):
         self.server = FluidNexusServer(database = self.database)
@@ -250,6 +254,19 @@ class DataStoreView(ViewBase):
     def exitCallback(self):
         print 'trying to exit'
         self.running = False
+        import appswitch
+        apps = appswitch.process_list()
+        processesToKill = []
+        for app in apps:
+            if app.find('python_launcher') == 1:
+                log.write(app)
+                processesToKill.append(app)
+
+        log.write(str(processesToKill))
+        for process in processesToKill:
+            appswitch.kill_process(process)
+        self.lock.signal()
+
 
     def saveOutgoingData(self, formData):
         # @TODO@
@@ -390,11 +407,23 @@ class DataStoreView(ViewBase):
         self.pushView(self.getViewState())
         self.running = True
         self.show()
+#        try:
+#            os.listdir('E:')
+#            log.write('creating server process')
+#            e32.start_server('E:\\System\\Apps\\Python\\my\\FluidNexusServer.py')
+#            log.write('creating client process')
+#            e32.start_server('E:\\System\\Apps\\Python\\my\\FluidNexusClient.py')
+#        except OSError:
+#            log.write('creating server process')
+#            e32.start_server('C:\\System\\Apps\\Python\\my\\FluidNexusServer.py')
+#            log.write('creating client process')
+#            e32.start_server('C:\\System\\Apps\\Python\\my\\FluidNexusClient.py')
+
         log.write('creating server process')
-        e32.start_server('E:\\System\\Apps\\Python\\my\\FluidNexusServer.py')
+        e32.start_server('FluidNexusServer.py')
         log.write('creating client process')
-        e32.start_server('E:\\System\\Apps\\Python\\my\\FluidNexusClient.py')
-        self.lock.wait()
+        e32.start_server('FluidNexusClient.py')
+
 
     def createListView(self, listItems):
         # @TODO@
@@ -434,7 +463,8 @@ class DataStoreView(ViewBase):
 
         if answer:
             hash = dataItem[6]
-            self.database.query("delete from FluidNexusOutgoing where hash = '%s'" % hash)
+            #self.database.query("delete from FluidNexusOutgoing where hash = '%s'" % hash)
+            self.database.remove_by_hash(hash)
             # @TODO@
             # Make this update the view on the stack properly, so that when we return to this view from the textbox view we get the correct list
             self.outgoingListItems.pop(index)
@@ -465,10 +495,28 @@ class DataStoreView(ViewBase):
         """Check if we're the active view; if not, we should raise the object that we created to replace us."""
         return self.active
 
+    def timerCallback(self):
+        """Timer callback that checks for new data."""
+        if self.database.checkSignal():
+            # Update view
+            listItems = []
+            self.database.all()
+            for item in database:
+                listItems.append(item)
+            log.write(str(listItems))
+            self.database.clearSignal()
+        self.timerRunning = 0
+
     def run(self):
+        """Main Run thread."""
+        log.write('starting the main loop!')
         while self.running:
+            if not self.timerRunning:
+                log.write('starting timer')
+                self.timerRunning = True
+                self.timer.after(60, self.timerCallback)
             e32.ao_yield()
-        self.lock.signal()
+        self.lock.wait()
 
 class FluidNexus:
     def __init__(self):
@@ -477,8 +525,17 @@ class FluidNexus:
         self.threads = []
 
     def exitCallback(self):
-        global serverThreadID
-        thread.exit_thread(serverThreadID)
+        log.write('using the correct exit callback')
+        import appswitch
+        apps = appswitch.process_list()
+        processesToKill = []
+        for app in apps:
+            print app
+            if app.find('python_launcher'):
+                processesToKill.append(app)
+
+        for process in processesToKill:
+            appswitch.kill_process(process)
         self.lock.signal()
 
     def setup(self):
@@ -516,8 +573,6 @@ class FluidNexus:
 if __name__ == "__main__":
     # Get the data from our database
     database = FluidNexusDatabase()
-    # @TODO@ Remove this line after we've gotten some things going :-)
-    #database.setupDatabase()
 
     # Get all items from the database
     #database.query('select * from FluidNexusData')
