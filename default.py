@@ -270,6 +270,12 @@ class DataStoreView(ViewBase):
         print 'trying to exit'
         self.running = False
 
+        appname = appuifw.app.full_name()
+        if appname[-10:] != u"Python.app":
+            appuifw.app.set_exit()
+        else:
+            self.lock.signal()
+
     def saveOutgoingData(self, formData):
         # @TODO@
         # This will change if we change the design of the form
