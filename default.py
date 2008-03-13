@@ -16,12 +16,11 @@ sys.path.append('E:\\Python')
 from logger import Logger
 from database import FluidNexusDatabase
 
-options = dict()
+global options
+options = {}
 
 # Series 60 specific imports
 try:
-    global options
-  
     # On phone?
     import appuifw
     import e32
@@ -31,10 +30,11 @@ try:
 
     # @SEMI-HACK@
     # At the moment, set global variable that determines where our data is      going to live
-    availableDrives = e32.drive_list()
-    if 'E:' in availableDrives:
+    try:
+        os.listdir("E:")
         dataPath = u'E:\\System\\Data\\FluidNexusData'
-    else:
+    except OSError:
+        # there is no memory card
         dataPath = u'C:\\System\\Data\\FluidNexusData'
 
     # Setup our data path
@@ -47,7 +47,6 @@ try:
     
     
     # loadPreferences
-    global options
     f = codecs.open(dataPath + u'\\FluidNexus.ini', 'r', 'utf_8')
     
     options_file = f.read()
@@ -326,18 +325,16 @@ class DataStoreView(ViewBase):
         self.createListView(listItems)
 
     def settingsCallback(self):
-        
         global translation_dicts
-        
         languages = translation_dicts.keys()
         
         index_languages = 0
         
         for language in languages:
-           if language == options['language']:
-              break
-           else:
-              index_languages = index_languages + 1
+            if language == options['language']:
+                break
+            else:
+                index_languages = index_languages + 1
         
         #if no language found, index will be length + 1 -- and we put english there
         languages.append(u'English')
@@ -346,38 +343,34 @@ class DataStoreView(ViewBase):
         
         index_yesno = 0
         if options['viewMessages'] == "no":
-           index_yesno = 1
+            index_yesno = 1
            
         entries = [(_(u'Language'), 'combo', (languages,index_languages)),
-                   (_(u'Show incoming messages?'), 'combo', (yesno,index_yesno))]
+                (_(u'Show incoming messages?'), 'combo', (yesno,index_yesno))]
         flags = appuifw.FFormEditModeOnly | appuifw.FFormDoubleSpaced
         settingsForm = appuifw.Form(entries)
         settingsForm.flags = flags
         settingsForm.save_hook = self.saveSettings
         oldTitle = appuifw.app.title
         appuifw.app.title = _(u'Settings')
-	settingsForm.execute()
+        settingsForm.execute()
         appuifw.app.title = oldTitle
 
     def saveSettings (self, formData):
-	global options
-
-
-	options['language'] = unicode(formData[0][2][0][formData[0][2][1]])
+        global options
+        options['language'] = unicode(formData[0][2][0][formData[0][2][1]])
         options['viewMessages'] = unicode(formData[1][2][0][formData[1][2][1]])
 
-	print "printng language"
-	#print formData[0][2][0][formData[0][2][1]]
+        print "printng language"
+        #print formData[0][2][0][formData[0][2][1]]
 	
-	
-    	try:
-
-           f = codecs.open(dataPath + u'\\FluidNexus.ini', 'w+', 'utf_8')
-	   newline = "\n"
-   	   settings  = "language:" + unicode(formData[0][2][0][formData[0][2][1]]) + newline
-	   settings += "viewMessages:" + unicode(formData[1][2][0][formData[1][2][1]])
-	   f.write(settings)
-	   f.close()
+        try:
+            f = codecs.open(dataPath + u'\\FluidNexus.ini', 'w+', 'utf_8')
+            newline = "\n"
+            settings  = "language:" + unicode(formData[0][2][0][formData[0][2][1]]) + newline
+            settings += "viewMessages:" + unicode(formData[1][2][0][formData[1][2][1]])
+            f.write(settings)
+            f.close()
            
            #this way i get english
            #print formData[0][2][0][1]
@@ -385,10 +378,10 @@ class DataStoreView(ViewBase):
            #print unicode(formData[0][2][0][formData[0][2][1]])
            
         except IOError, e:
-	   log.print_exception_trace()
-	   appuifw.note(u"couldn't rewrite file", "info")
+            log.print_exception_trace()
+            appuifw.note(u"couldn't rewrite file", "info")
 
-	self.setup()
+        self.setup()
 
         return True
 
@@ -453,10 +446,10 @@ class DataStoreView(ViewBase):
         self.listItems = listItems
         
         
-	self.menuItems = [(_(u"Add Outgoing"), self.addOutgoingCallback),
-	                  (_(u"View Outgoing"), self.viewOutgoingCallback),
-	                  (_(u"Send FluidNexus"), self.sendFluidNexusCallback),
-                          (_(u"Settings"), self.settingsCallback)]
+        self.menuItems = [(_(u"Add Outgoing"), self.addOutgoingCallback),
+                        (_(u"View Outgoing"), self.viewOutgoingCallback),
+                        (_(u"Send FluidNexus"), self.sendFluidNexusCallback),
+                        (_(u"Settings"), self.settingsCallback)]
 
         appuifw.app.screen = 'normal'
         appuifw.app.title = _(u'FluidNexus')
@@ -518,7 +511,7 @@ class DataStoreView(ViewBase):
 
         if answer:
             hash = dataItem[6]
-            self.database.query("delete from FluidNexusOutgoing where hash = '%s'" % hash)
+            self.database.remove_by_hash(hash)
             # @TODO@
             # Make this update the view on the stack properly, so that when we return to this view from the textbox view we get the correct list
             self.outgoingListItems.pop(index)
