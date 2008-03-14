@@ -7,7 +7,7 @@ class Logger:
 
     def write(self, obj): 
         log_file = codecs.open(self.logfile, 'a', 'utf_8') 
-        log_file.write(self.prefix + obj + '\n') 
+        log_file.write(self.prefix + unicode(obj) + '\n') 
         log_file.close() 
 
     def writelines(self, obj): 

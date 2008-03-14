@@ -4,18 +4,20 @@ import socket
 import sys
 import os
 import md5
+import time
 
 # @HACK@
 # Adding paths to find the modules
 sys.path.append('.')
 sys.path.append(os.getcwd())
+sys.path.append('C:\\System\\Apps\\Python\\my\\')
 sys.path.append('E:\\System\\Apps\\Python\\my\\')
 sys.path.append('C:\\Python')
 sys.path.append('E:\\Python')
 
 from logger import Logger
 from database import FluidNexusDatabase
-
+from FluidNexusNetworking import FluidNexusServer, FluidNexusClient
 global options
 options = {}
 
@@ -144,72 +146,6 @@ settingsForm = None
 # for type values > 0, the data value will be a path to the file
 # files should be kept under the databaseDir directory
 
-
-class FluidNexusClientThread:
-    """This thread searches for open bluetooth services of the correct type and tries to send appropriate messages to them.
-
-    @TODO@  Need better description, name."""
-
-    def __init__(self):
-        self.lock = thread.allocate_lock()
-        self.counter = 0
-
-    def run(self):
-        # Dummy run program for right now
-        while 1:
-            self.lock.acquire()
-            e32.ao_sleep(1)
-            print "client thread %d" % self.counter
-            self.counter += 1
-            self.lock.release()
-
-class FluidNexusServerThread:
-    """This thread accepts connections and appropriate data.
-
-    @TODO@ Need better description, name."""
-
-
-    def __init__(self, serviceName = u'FluidNexus'):
-        self.lock = thread.allocate_lock()
-        self.counter = 0
-
-        self.serviceName = serviceName
-        self.serverSocket = socket.socket(socket.AF_BT, socket.SOCK_STREAM)
-        self.serverPort = socket.bt_rfcomm_get_available_server_channel(self.   serverSocket)
-        self.serverSocket.bind(("", self.serverPort))
-
-        socket.set_security(self.serverSocket,
-                            socket.AUTH)
-
-        # Only listen for one connection
-        self.serverSocket.listen(1)
-
-        # Advertise my service
-        socket.bt_advertise_service(serviceName,
-                                    self.serverSocket,
-                                    True,
-                                    socket.RFCOMM)
-        self.serverSocket.setblocking(False)
-
-    def acceptCallback(self, clientSocket, clientAddress):
-        print "in accept callback"
-        print clientAddress
-        clientSocket.close()
-
-    def run(self):
-        # Dummy run program for right now
-        while 1:
-            self.lock.acquire()
-            e32.ao_sleep(1)
-            print 'before accept'
-            clientSocket, clientAddress = self.serverSocket.accept()
-            print 'after accept'
-            print clientAddress
-            print "server thread %d" % self.counter
-            self.counter += 1
-            clientSocket.close()
-            self.lock.release()
-
 class ViewBase:
 
     def __init__(self):
@@ -239,7 +175,7 @@ class ViewBase:
             
     def getViewState(self):
         """Return the view state as a tuple."""
-        return (appuifw.app.body, appuifw.app.exit_key_handler, appuifw.app.focus, appuifw.app.menu, appuifw.app.screen, appuifw.app.title)
+        return [appuifw.app.body, appuifw.app.exit_key_handler, appuifw.app.focus, appuifw.app.menu, appuifw.app.screen, appuifw.app.title]
 
 
 class DataStoreView(ViewBase):
@@ -261,18 +197,33 @@ class DataStoreView(ViewBase):
         # Save our database object
         self.database = database
 
+        self.timer = e32.Ao_timer()
+        self.timerRunning = False
+
+        if dataPath[0] == 'C':
+            pythonPath = u'C:\\System\\Apps\\Python\\my'
+        elif dataPath[0] == 'E':
+            pythonPath = u'E:\\System\\Apps\\Python\\my'
+
+        log.write('starting server')
+        e32.start_server(pythonPath + u'\\FluidNexusServer.py')
+
+        log.write('starting client')
+        e32.start_server(pythonPath + u'\\FluidNexusClient.py')
 
     def sendFluidNexusCallback(self):
         appuifw.note(_(u"Feature not implemented yet"), _(u"error"))
 
     def exitCallback(self):
-        print 'trying to exit'
+        log.write('trying to exit')
         self.running = False
 
         appname = appuifw.app.full_name()
         if appname[-10:] != u"Python.app":
+            log.write('calling set_exit')
             appuifw.app.set_exit()
         else:
+            log.write('calling lock.signal')
             self.lock.signal()
 
     def saveOutgoingData(self, formData):
@@ -283,6 +234,7 @@ class DataStoreView(ViewBase):
         # really any way for me to tell that right now, as far as I know
         # If we don't watch for that, we might be saving many copies of the
         # same data while we're editing the form
+        global views
         try:
             print formData
             title = unicode(formData[0][2])
@@ -292,6 +244,15 @@ class DataStoreView(ViewBase):
             self.database.add_new('source', 23, title, data, hash, 'cell')
             returnValue = 1
             #returnValue = self.database.query("insert into FluidNexusOutgoing (source, type, title, data, hash) values ('00:02:EE:6B:86:09', 0, '%s', '%s', '%s')" % (title, data, hash))
+            self.database.all()
+            openingScreenItems = []
+            for item in self.database:
+                openingScreenItems.append((item[4], 
+                                item[5][0:20] + u' ...'))
+            if openingScreenItems == []:
+                openingScreenItems.append((_(u'None'), _(u'None')))
+            views[0][0] = appuifw.Listbox(openingScreenItems, self.listCallback)
+            appuifw.app.body = views[0][0]
         except:
             log.print_exception_trace()
 
@@ -504,6 +465,7 @@ class DataStoreView(ViewBase):
         self.show()
 
     def deleteOutgoingCallback(self):
+        global views
         index = appuifw.app.body.current()
         dataItem = self.outgoingListItems[index]
 
@@ -524,6 +486,16 @@ class DataStoreView(ViewBase):
             if entries == []:
                 entries.append((_(u'None'), _(u'None')))
 
+            self.database.all()
+            openingScreenItems = []
+            for item in self.database:
+                openingScreenItems.append((item[4], 
+                                item[5][0:20] + u' ...'))
+            if openingScreenItems == []:
+                openingScreenItems.append((_(u'None'), _(u'None')))
+            
+            views[0][0] = appuifw.Listbox(openingScreenItems, self.listCallback)
+
             appuifw.app.body = appuifw.Listbox(entries, self.outgoingListCallback)
 
             
@@ -535,15 +507,26 @@ class DataStoreView(ViewBase):
 
     def getView(self):
         """Return the view object."""
-
         return self.listbox
 
     def checkActive(self):
         """Check if we're the active view; if not, we should raise the object that we created to replace us."""
         return self.active
 
+    def timerCallback(self):
+        """What happens when our timer is called."""
+
+        if self.database.checkSignal():
+            log.write('signal exists')
+            self.database.clearSignal()
+        self.timerRunning = 0
+
     def run(self):
         while self.running:
+            if not self.timerRunning:
+                log.write('calling timer')
+                self.timer.after(30, self.timerCallback)
+                self.timerRunning = 1
             e32.ao_yield()
         self.lock.signal()
 
@@ -552,9 +535,6 @@ class FluidNexus:
         self.lock = e32.Ao_lock()
         self.views = []
         self.threads = []
-
-    def exitCallback(self):
-        self.lock.signal()
 
     def setup(self):
         appuifw.app.screen = 'normal'
@@ -578,21 +558,19 @@ class FluidNexus:
         if len(self.views) > 0:
             appuifw.app.body = self.views[-1].getView()
 
-    def run(self):
-        #if self.threads != []:
-        #    for threadName in self.threads:
-        #        thread.start_new_thread(threadName.run, ())
-        self.lock.wait()
-        while 1:
-            if False:
-                self.show()
 
 
 if __name__ == "__main__":
     # Get the data from our database
     database = FluidNexusDatabase()
-    # @TODO@ Remove this line after we've gotten some things going :-)
-    #database.setupDatabase()
+
+    # Check to see if the database file exists
+#    try:
+#        fp = codecs.open(dataPath + u'\\FluidNexus.db', 'r', 'utf_8')
+#        fp.close()
+#    except IOError, e:
+#        log.write(str(e))
+#        database.setupDatabase()
 
     # Get all items from the database
     #database.query('select * from FluidNexusData')
