@@ -1,3 +1,21 @@
+# Copyright (C) 2008, Nick Knouf, Bruno Vianna, and Luis Ayuso
+# 
+# This file is part of Fluid Nexus
+#
+# Fluid Nexus is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
 # Standard library imports
 import sys
 import os
@@ -21,7 +39,7 @@ sys.path.append('E:\\Python')
 from logger import Logger
 from database import FluidNexusDatabase
 
-FLUID_NEXUS_VERSION = '01'
+FLUID_NEXUS_PROTOCOL_VERSION = '01'
 
 # Series 60 specific imports
 try:
@@ -71,6 +89,8 @@ class FluidNexusServer(object):
     currentlyAccepting = False
 
     def __init__(self, serviceName = u'FluidNexus', database = None):
+        """Initialize the server be setting up the server socket and advertising the FluidNexus service."""
+
         log.write("Starting Fluid Nexus Server")
         # Save our database object 
         self.database = database
@@ -92,13 +112,14 @@ class FluidNexusServer(object):
         socket.set_security(self.serverSocket, 0)
 
     def __exit__(self):
+        """This method can probably be removed."""
         if running:
             running = 0
         app_lock.signal()
         log.write("goodbye!")
 
     def initMessageAdvertisements(self):
-        """Initialize the advertisement of hashes."""
+        """Initialize the advertisement of hashes that have been sent to us."""
 
         # @TODO@ Use the correct database here :-)
         #self.database.query('select * from FluidNexusStigmergy')
@@ -152,7 +173,7 @@ class FluidNexusServer(object):
         socket.bt_advertise_service(unicode(':' + hash), newSocket, True, socket.RFCOMM)
 
     def acceptCallback(self, clientData):
-        """This is called when the server socket receives a connection."""
+        """CANDIDATE FOR REMOVAL: We do everything in the run method right now, since we choose to block (as we're running in a separate process)."""
         log.write(str(clientData))
    
         self.mutex.acquire()
@@ -218,7 +239,7 @@ class FluidNexusServer(object):
         self.database.setSignal()
 
     def run(self):
-        """Main look with blocking accept."""
+        """Main loop with blocking accept."""
 
         clientData = self.serverSocket.accept()
 
@@ -294,6 +315,7 @@ class FluidNexusServer(object):
 
 class FluidNexusClient(object):
     def __init__(self, database = None):
+        """Initialize the client."""
         log.write("Starting Fluid Nexus Client")
         self.mutex = thread.allocate_lock()
         self.db = database
@@ -324,6 +346,8 @@ class FluidNexusClient(object):
         log.write("trying to open a client socket")
         clientSocket = socket.socket(socket.AF_BT, socket.SOCK_STREAM)
         log.write("writing to socket %s" % str(clientSocket)) 
+
+        # Connect to the other phone; perhaps we should consider grabbing some sort of lock to ensure that the connection happens
         try:
             log.write("trying to use client socket to connect")
             clientSocket.connect((phone[0], port))
@@ -334,7 +358,7 @@ class FluidNexusClient(object):
             return
         try:
             log.write("going through send process")
-            clientSocket.send(FLUID_NEXUS_VERSION)
+            clientSocket.send(FLUID_NEXUS_PROTOCOL_VERSION)
             clientTimer.after(1)
             clientSocket.send("%03d" % len(title))
             clientTimer.after(1)
@@ -386,6 +410,8 @@ class FluidNexusClient(object):
         return serverMessageHashes
 
     def runLightblue(self):
+        """Version of the run method that uses lightblue to find devices and services."""
+
         log.write("looking for devices")
         #allDevices = socket.bt_discover()
         allDevices = lightblue.finddevices()
@@ -440,6 +466,8 @@ class FluidNexusClient(object):
                     log.write("no data to send")
 
     def run(self):
+        """Version of the run method that does not use the lightblue library; does not work because "bt_discover" opens up a window, but doesn't return a list."""
+
         allDevices = socket.bt_discover()
         phones = []
 

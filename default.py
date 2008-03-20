@@ -1,3 +1,22 @@
+# Copyright (C) 2008, Nick Knouf, Bruno Vianna, and Luis Ayuso
+# 
+# This file is part of Fluid Nexus
+#
+# Fluid Nexus is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+
 # Standard library imports
 import thread
 import socket
@@ -83,7 +102,8 @@ except IOError, e:
     options = { "language": "English", "viewMessages" : "True"}
     
 
-
+# @TODO@
+# These methods should be moved into methods of one of our classes instead of being left here in a global context
 ### localization stuff -- reading from translations file
 global translation_dicts
 translation_dicts = dict()
@@ -123,25 +143,7 @@ views = []
 #declaring the options form so it's global and accessible from other places
 settingsForm = None
 
-# @TODO@
-# Add in new tables: 
-# * One that keeps track of the hashes that we're currently advertising on the services
-# * One that keeps track of inputed data that we're wanting to send out
-
-# For the database we should have the following table:
-# FluidNexus
-# with columns:
-# id counter
-# source varchar(18)
-# time timestamp
-# type integer
-# title varchar(40)
-# data long varchar
-# hash varchar(32)
-#
-#create table FluidNexus (id counter, source varchar(18), time timestamp, type integer, title varchar(40), data long varchar)
-
-# For the release we will get right of source and time (because we don't want tracking)
+# For the release we will get rid of source and time (because we don't want tracking)
 # Type is: text = 0, image, audio, video
 # for type values > 0, the data value will be a path to the file
 # files should be kept under the databaseDir directory
@@ -215,6 +217,7 @@ class DataStoreView(ViewBase):
         appuifw.note(_(u"Feature not implemented yet"), _(u"error"))
 
     def exitCallback(self):
+        """Called when we press the exit button in the main screen."""
         log.write('trying to exit')
         self.running = False
 
@@ -227,13 +230,10 @@ class DataStoreView(ViewBase):
             self.lock.signal()
 
     def saveOutgoingData(self, formData):
+        """Save the data that we have entered into the outgoing message form."""
+
         # @TODO@
         # This will change if we change the design of the form
-        # Also!  We need to have a way so that we aren't saving form items
-        # that are somehow saved during the process of editing...there isn't
-        # really any way for me to tell that right now, as far as I know
-        # If we don't watch for that, we might be saving many copies of the
-        # same data while we're editing the form
         global views
         try:
             print formData
@@ -259,6 +259,8 @@ class DataStoreView(ViewBase):
         return True
 
     def addOutgoingCallback(self):
+        """Create and manage the outgoing form."""
+
         formData = [(_(u'Title'), 'text'),
                     (_(u'Text'), 'text')]
         flags = appuifw.FFormEditModeOnly | appuifw.FFormDoubleSpaced
@@ -270,6 +272,8 @@ class DataStoreView(ViewBase):
         appuifw.app.title = oldTitle
 
     def viewOutgoingCallback(self):
+        """Create the view for viewing outgoing messages."""
+
         # @TODO@
         # Change the menu items to allow us to delete items from this database
         # when we have selected them
@@ -286,6 +290,8 @@ class DataStoreView(ViewBase):
         self.createListView(listItems)
 
     def settingsCallback(self):
+        """Called when we want to view and modify settings."""
+
         global translation_dicts
         languages = translation_dicts.keys()
         
@@ -318,6 +324,8 @@ class DataStoreView(ViewBase):
         appuifw.app.title = oldTitle
 
     def saveSettings (self, formData):
+        """Called when we want to save setings."""
+
         global options
         options['language'] = unicode(formData[0][2][0][formData[0][2][1]])
         options['viewMessages'] = unicode(formData[1][2][0][formData[1][2][1]])
@@ -347,6 +355,8 @@ class DataStoreView(ViewBase):
         return True
 
     def listCallback(self):
+        """Create a new text view for when we click on an item in a list view."""
+
         # @TODO@
         # Write new class that is a text view (or form view) that gives the full information about the selected data item
         # This new view should save the old views and then replace them with the new ones
@@ -358,6 +368,8 @@ class DataStoreView(ViewBase):
         self.createTextView(dataItem)
     
     def createTextView(self, dataItem):
+        """Create the text view with a textCanvas."""
+
         # Start setting up our new view
         
         appuifw.app.body = textCanvas= appuifw.Canvas()
@@ -382,6 +394,8 @@ class DataStoreView(ViewBase):
 #        print dir(form)
 
     def writeTextAcrossLines (self, startX, startY, wordSpacing, lineSpacing, grObj, txt):
+        """Split our text across multiple lines within the text view."""
+
         #grObj.text ((startX, startY), unicode(txt))
         words = txt.split(' ')
         text_x = startX
@@ -561,16 +575,18 @@ class FluidNexus:
 
 
 if __name__ == "__main__":
-    # Get the data from our database
-    database = FluidNexusDatabase()
 
-    # Check to see if the database file exists
-#    try:
-#        fp = codecs.open(dataPath + u'\\FluidNexus.db', 'r', 'utf_8')
-#        fp.close()
-#    except IOError, e:
-#        log.write(str(e))
-#        database.setupDatabase()
+    try:
+        # Check to see if the database file exists
+        foo = os.stat(dataPath + u'\\FluidNexus.db')
+
+        # Create our database object
+        database = FluidNexusDatabase()
+    except OSError, e:
+        # Create our database object
+        database = FluidNexusDatabase()
+        # Populate the database
+        database.setupDatabase()
 
     # Get all items from the database
     #database.query('select * from FluidNexusData')
