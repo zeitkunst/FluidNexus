@@ -254,7 +254,7 @@ class FluidNexusDatabase:
               - data:   data itself
               - hash:   message hash
               - cellID: cell ID where we are"""
-        now = time.time()
+        now = int(float(time.time()))
         sql = unicode("insert into FluidNexusData (source,time,type,title,data,hash,cellID, mine) values ('%s', %d, %d, '%s', '%s', '%s', '%s', 1)" %  (source, now, type, title, data, hash, str(cellID)))
         self.__query(sql)
 
@@ -272,7 +272,7 @@ class FluidNexusDatabase:
               - cellID: cell ID where we are"""
         #sql = unicode("insert into FluidNexusData (source,time,type,title,data,hash,cellID, mine) values ('%s', %d, %d, '%s', '%s', '%s', '%s', 0)" %  (unicode(source), int(time), (type), unicode(title), unicode(data), unicode(hash), unicode(cellID)))
         try:
-            sql = "insert into FluidNexusData (source, time, type, title, data, hash, cellID, mine) values ('%s', %u, %d, '%s', '%s', '%s', '%s', 0)" % (source, int(time), int(type), title, data, hash, cellID)
+            sql = "insert into FluidNexusData (source, time, type, title, data, hash, cellID, mine) values ('%s', %u, %d, '%s', '%s', '%s', '%s', 0)" % (source, int(float(time)), int(type), title, data, hash, cellID)
             numRows = self.__query(sql)
         except Exception, e:
             print e

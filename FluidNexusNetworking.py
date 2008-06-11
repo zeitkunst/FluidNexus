@@ -419,7 +419,10 @@ class FluidNexusClient(object):
 
         for device in allDevices:
             foo, isPhone, bar = self.splitclass(device[2])
-            if isPhone == 2:
+            # TODO
+            # This needs to be changed back to "2" after my Android testing
+            # is done
+            if isPhone == 1:
                 phones.append(device)
 
         for phone in phones:
