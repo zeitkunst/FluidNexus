@@ -185,14 +185,6 @@ class DataStoreView(ViewBase):
 
     def __init__(self, database = None):
         # TODO make this not a dummy store :-)
-        #self.entries = [(u"Police were here", u"A sample description"),
-        #                (u"What we need to do", u"Some text here"),
-        #                (u"Where were you?", u"Something about it")]
-                        #u"We have to go now",
-                        #u"Planning meeting monday",
-                        #u"Last time we met",
-                        #u"Where to go from here"]
-        #super(DataStoreView, self).__init__()
 
         self.lock = e32.Ao_lock()
 
@@ -207,6 +199,8 @@ class DataStoreView(ViewBase):
         elif dataPath[0] == 'E':
             pythonPath = u'E:\\System\\Apps\\Python\\my'
 
+        # @TODO@
+        # Update this to eventually not start servers (consumes too many resources)
         log.write('starting server')
         e32.start_server(pythonPath + u'\\FluidNexusServer.py')
 
@@ -242,11 +236,13 @@ class DataStoreView(ViewBase):
     
             hash = unicode(md5.md5(title + data).hexdigest())
             self.database.add_new('source', 23, title, data, hash, 'cell')
-            returnValue = 1
-            #returnValue = self.database.query("insert into FluidNexusOutgoing (source, type, title, data, hash) values ('00:02:EE:6B:86:09', 0, '%s', '%s', '%s')" % (title, data, hash))
+
             self.database.all()
             openingScreenItems = []
+            self.listItems = []
+
             for item in self.database:
+                self.listItems.append(item)
                 openingScreenItems.append((item[4], 
                                 item[5][0:20] + u' ...'))
             if openingScreenItems == []:
@@ -361,9 +357,13 @@ class DataStoreView(ViewBase):
         # Write new class that is a text view (or form view) that gives the full information about the selected data item
         # This new view should save the old views and then replace them with the new ones
         # on the "exit" key, the new view should restore the old views
+        global views
 
-        index = self.listbox.current()
+        index = views[0][0].current()
         dataItem = self.listItems[index]
+
+        log.write(index)
+        log.write(dataItem)
 
         self.createTextView(dataItem)
     
@@ -440,8 +440,8 @@ class DataStoreView(ViewBase):
                 self.entries.append((item[4], 
                                      item[5][0:20] + u' ...'))
 
-        self.listbox = appuifw.Listbox(self.entries, self.listCallback)
-        appuifw.app.body = self.listbox
+        
+        appuifw.app.body = appuifw.Listbox(self.entries, self.listCallback)
         appuifw.app.menu = self.menuItems
         self.pushView(self.getViewState())
         self.running = True
@@ -470,8 +470,7 @@ class DataStoreView(ViewBase):
         # And then insert this item into the database (since the hash will have changed)
         outgoingMenuItems = [(_(u"Delete"), self.deleteOutgoingCallback)]
 
-        listbox = appuifw.Listbox(entries, self.outgoingListCallback)
-        appuifw.app.body = listbox
+        appuifw.app.body = appuifw.Listbox(entries, self.outgoingListCallback)
         appuifw.app.title = _(u'Outgoing Items')
         appuifw.app.menu = outgoingMenuItems
         appuifw.app.exit_key_handler = self.textViewCallback
@@ -493,6 +492,7 @@ class DataStoreView(ViewBase):
             self.outgoingListItems.pop(index)
             
             entries = []
+            self.listItems = []
             for item in self.outgoingListItems:
                 entries.append((item[4], 
                                 item[5][0:20] + u' ...'))
@@ -503,6 +503,7 @@ class DataStoreView(ViewBase):
             self.database.all()
             openingScreenItems = []
             for item in self.database:
+                self.listItems.append(item)
                 openingScreenItems.append((item[4], 
                                 item[5][0:20] + u' ...'))
             if openingScreenItems == []:
@@ -544,34 +545,6 @@ class DataStoreView(ViewBase):
             e32.ao_yield()
         self.lock.signal()
 
-class FluidNexus:
-    def __init__(self):
-        self.lock = e32.Ao_lock()
-        self.views = []
-        self.threads = []
-
-    def setup(self):
-        appuifw.app.screen = 'normal'
-        appuifw.app.title = _(u'FluidNexus')
-        appuifw.app.exit_key_handler = self.exitCallback
-        self.lock.wait()
-
-    def addThread(self, threadName):
-        """Add a thread that we should start."""
-        self.threads.append(threadName)
-
-    def pushView(self, view):
-        self.views.append(view)
-
-    def popView(self):
-        if len(self.views) - 1 > 0:
-            self.views.pop()
-            self.show()
-
-    def show(self):
-        if len(self.views) > 0:
-            appuifw.app.body = self.views[-1].getView()
-
 
 
 if __name__ == "__main__":
@@ -589,7 +562,6 @@ if __name__ == "__main__":
         database.setupDatabase()
 
     # Get all items from the database
-    #database.query('select * from FluidNexusData')
     database.all()
     listItems = []
 
@@ -599,15 +571,3 @@ if __name__ == "__main__":
     dataView = DataStoreView(database = database)
     dataView.setup(listItems = listItems)
     dataView.run()
-
-    #FluidNexus = FluidNexus()
-    #FluidNexus.pushView(dataView)
-    #FluidNexus.setup()
-
-    # Get client and server objects
-    #client = FluidNexusClientThread()
-    #server = FluidNexusServerThread()
-    #FluidNexus.addThread(client)
-    #FluidNexus.addThread(server)
-
-    #FluidNexus.run()

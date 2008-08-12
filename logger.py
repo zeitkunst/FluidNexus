@@ -25,13 +25,25 @@ class Logger:
         self.prefix = prefix
 
     def write(self, obj): 
+        """General logfile write method.  In production code, we would probably just put 'pass' here to cut down on logfile size."""
+
         log_file = codecs.open(self.logfile, 'a', 'utf_8') 
         log_file.write(self.prefix + unicode(obj) + '\n') 
         log_file.close() 
 
-    def writelines(self, obj): 
+    def error(self, obj):
+        """Logfile method for major errors.  Use this method for errors that the user could read h/erself and/or send to the developer."""
+
+        log_file = codecs.open(self.logfile, 'a', 'utf_8') 
+        log_file.write(self.prefix + unicode(obj) + '\n') 
+        log_file.close() 
+
+    def writeLines(self, obj): 
         self.write(''.join(list)) 
-    
+
+    def writeErrorLines(self, obj): 
+        self.error(''.join(list)) 
+
     def flush(self): 
         pass 
 
