@@ -37,7 +37,6 @@ sys.path.append('E:\\Python')
 from logger import Logger
 from database import FluidNexusDatabase
 from FluidNexusNetworking import FluidNexusServer, FluidNexusClient
-global options
 options = {}
 
 # Series 60 specific imports
@@ -92,7 +91,6 @@ except ImportError:
 
 except IOError, e:
     #there is no file yet, create one with default preferences
-    global options
     f = codecs.open(dataPath + u'\\FluidNexus.ini', 'w', 'utf_8')
     newline = "\n"
     settings  = "language:English" + newline
@@ -105,7 +103,6 @@ except IOError, e:
 # @TODO@
 # These methods should be moved into methods of one of our classes instead of being left here in a global context
 ### localization stuff -- reading from translations file
-global translation_dicts
 translation_dicts = dict()
 new_dict_set = dict()
 try:
