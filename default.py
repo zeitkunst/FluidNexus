@@ -138,7 +138,6 @@ def _(s):
     else:
 	return s    
 
-views = []
 
 #declaring the options form so it's global and accessible from other places
 settingsForm = None
@@ -149,24 +148,22 @@ settingsForm = None
 # files should be kept under the databaseDir directory
 
 class ViewBase:
+    views = []
 
     def __init__(self):
         pass
 
     def pushView(self, view):
-        global views
-        views.append(view)
+        self.views.append(view)
 
     def popView(self):
-        global views
-        if len(views) - 1 > 0:
-            views.pop()
+        if len(self.views) - 1 > 0:
+            self.views.pop()
             self.show()
 
     def show(self):
-        global views
-        if len(views) > 0:
-            currentView = views[-1]
+        if len(self.views) > 0:
+            currentView = self.views[-1]
             appuifw.app.body = currentView[0]
             appuifw.app.exit_key_handler = currentView[1]
             appuifw.app.focus = currentView[2]
@@ -228,7 +225,6 @@ class DataStoreView(ViewBase):
 
         # @TODO@
         # This will change if we change the design of the form
-        global views
         try:
             print formData
             title = unicode(formData[0][2])
@@ -247,8 +243,8 @@ class DataStoreView(ViewBase):
                                 item[5][0:20] + u' ...'))
             if openingScreenItems == []:
                 openingScreenItems.append((_(u'None'), _(u'None')))
-            views[0][0] = appuifw.Listbox(openingScreenItems, self.listCallback)
-            appuifw.app.body = views[0][0]
+            self.views[0][0] = appuifw.Listbox(openingScreenItems, self.listCallback)
+            appuifw.app.body = self.views[0][0]
         except:
             log.print_exception_trace()
 
@@ -357,9 +353,8 @@ class DataStoreView(ViewBase):
         # Write new class that is a text view (or form view) that gives the full information about the selected data item
         # This new view should save the old views and then replace them with the new ones
         # on the "exit" key, the new view should restore the old views
-        global views
 
-        index = views[0][0].current()
+        index = self.views[0][0].current()
         dataItem = self.listItems[index]
 
         log.write(index)
@@ -478,7 +473,6 @@ class DataStoreView(ViewBase):
         self.show()
 
     def deleteOutgoingCallback(self):
-        global views
         index = appuifw.app.body.current()
         dataItem = self.outgoingListItems[index]
 
@@ -509,7 +503,7 @@ class DataStoreView(ViewBase):
             if openingScreenItems == []:
                 openingScreenItems.append((_(u'None'), _(u'None')))
             
-            views[0][0] = appuifw.Listbox(openingScreenItems, self.listCallback)
+            self.views[0][0] = appuifw.Listbox(openingScreenItems, self.listCallback)
 
             appuifw.app.body = appuifw.Listbox(entries, self.outgoingListCallback)
 
