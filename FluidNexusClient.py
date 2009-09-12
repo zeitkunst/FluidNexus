@@ -64,7 +64,7 @@ try:
 except ImportError:
     #from s60Compat import e32
     dataPath = '.'
-    log = Logger(dataPath + u'\\FluidNexus.log', prefix = 'FluidNexusServer: ')
+    log = Logger(os.path.join(dataPath, u'FluidNexus.log'), prefix = 'FluidNexusServer: ')
     #sys.stderr = sys.stdout = log
 
     onPhone = False

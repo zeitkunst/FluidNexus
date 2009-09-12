@@ -1,3 +1,4 @@
+# vim: set fileencoding=utf-8
 # Copyright (C) 2008, Nick Knouf, Bruno Vianna, and Luis Ayuso
 # 
 # This file is part of Fluid Nexus
@@ -64,19 +65,28 @@ try:
     log = Logger(dataPath + u'\\FluidNexus.log', prefix = 'database: ')
     sys.stderr = sys.stdout = log
     #log = sys.stderr = sys.stdout
-
+    
+    # For those extraneous errors floating around...
+    class OperationalError(Exception): pass
+    
     onPhone = True
 except ImportError:
-    from s60Compat import e32
+    #from s60Compat import e32
+    from pysqlite2 import dbapi2 as sqlite
+
+    from pysqlite2.dbapi2 import OperationalError
+    # For those extraneous errors floating around...
+    class SymbianError(Exception): pass
+
     dataPath = '.'
-    log = Logger(dataPath + u'\\FluidNexus.log', prefix = 'database: ')
+    log = Logger(os.path.join(dataPath, u'FluidNexus.log'), prefix = 'database: ')
     sys.stderr = sys.stdout = log
 
     onPhone = False
 
 ################################################################################
 ############        DATABASE CLASS                                ##############
-############  Stores every data in system                         #º############
+############  Stores every data in system                         ##############
 ################################################################################
 
 class FluidNexusDatabase:
@@ -87,13 +97,28 @@ class FluidNexusDatabase:
 ################################################################################
 ################         Constructor                   #########################
 ################################################################################
-    def __init__(self, databaseDir = dataPath, databaseName = 'FluidNexus.db'):
+    def __init__(self, databaseDir = dataPath, databaseType = "e32", databaseName = 'FluidNexus.db'):
         """Initialization method that makes sure the database file and directory exist, and creates/opens the database file, and prepares the database view."""
 
-        self.db = e32db.Dbms()
-        self.dbv = e32db.Db_view()
         self.databaseDir = databaseDir
         self.databaseName = databaseName
+        
+        if not os.path.isdir(databaseDir):
+            os.makedirs(databaseDir)
+
+        self.databaseType = databaseType
+
+        if (self.databaseType == "e32"):
+            self.db = e32db.Dbms()
+            self.dbv = e32db.Db_view()
+            try:
+                self.db.open(unicode(os.path.join(databaseDir, databaseName)))
+            except:
+                self.db.create(unicode(os.path.join(databaseDir, databaseName)))
+                self.db.open(unicode(os.path.join(databaseDir, databaseName)))
+        elif (self.databaseType == "pysqlite2"):
+            self.con = sqlite.connect(unicode(os.path.join(databaseDir, databaseName)), isolation_level=None)
+            self.db = self.con.cursor()
 
         # Counter for keeping track of our result set
         self.__counter = 0
@@ -105,14 +130,7 @@ class FluidNexusDatabase:
 
         #databaseDir = os.path.join(pythonDir, databaseDir)
 
-        if not os.path.isdir(databaseDir):
-            os.makedirs(databaseDir)
 
-        try:
-            self.db.open(unicode(os.path.join(databaseDir, databaseName)))
-        except:
-            self.db.create(unicode(os.path.join(databaseDir, databaseName)))
-            self.db.open(unicode(os.path.join(databaseDir, databaseName)))
 
 ################################################################################
 ###############         Setup                        ###########################
@@ -131,18 +149,27 @@ class FluidNexusDatabase:
             self.db.execute(unicode('drop table FluidNexusData'))
         except SymbianError:
             pass
+        except OperationalError:
+            pass
 
         try:
             self.db.execute(unicode('drop table FluidNexusSignal'))
         except SymbianError:
+            pass
+        except OperationalError:
             pass
 
 
         # Create the data table
         ######################################
         # This table saves the data that we have accepted and can browse
-        self.db.execute(unicode('create table FluidNexusData (id counter, source varchar(32), time bigint, type integer, title varchar(40), data long varchar, hash varchar(32), cellID varchar(20), mine bit)'))
-        self.db.execute(unicode('create table FluidNexusSignal (id counter, signal bit)'))
+        if (self.databaseType == "e32"):
+            self.db.execute(unicode('create table FluidNexusData (id counter, source varchar(32), time bigint, type integer, title varchar(40), data long varchar, hash varchar(32), cellID varchar(20), mine bit)'))
+            self.db.execute(unicode('create table FluidNexusSignal (id counter, signal bit)'))
+        elif (self.databaseType == "pysqlite2"):
+            self.db.execute(unicode("create table FluidNexusData (id integer primary key autoincrement, source varchar(32), time integer default '0', type integer default '0', title varchar(40), data varchar, hash varchar(32), cellID varchar(20) default '0', mine integer default '0')"))
+            self.db.execute(unicode("create table FluidNexusSignal (id integer primary key autoincrement, signal integer default '0')"))
+
         sql = unicode("insert into FluidNexusSignal (signal) values (0)")
         self.__query(sql)
 
@@ -174,11 +201,14 @@ class FluidNexusDatabase:
 
         # If we have a select statement, prepare the view
         if SQLQuery.lower().startswith('select'):
-            # Prepare for handling the select statement
-            self.dbv.prepare(self.db, unicode(SQLQuery))
-            # Position ourselves at the beginning of the rowset
-            self.dbv.first_line()
-            self.numRows = self.dbv.count_line()
+            if (self.databaseType == "e32"):
+                # Prepare for handling the select statement
+                self.dbv.prepare(self.db, unicode(SQLQuery))
+                # Position ourselves at the beginning of the rowset
+                self.dbv.first_line()
+                self.numRows = self.dbv.count_line()
+            elif (self.databaseType == "pysqlite2"):
+                self.db.execute(SQLQuery)
         else:
             self.affectedRows = self.db.execute(unicode(SQLQuery))
 
@@ -193,20 +223,24 @@ class FluidNexusDatabase:
 ##################       Recover row        ####################################
 ################################################################################
     def next(self):
-        row = []
-        if self.numRows < 1:
-            # We actually returned nothing
-            raise StopIteration
-        elif self.__counter < self.numRows:
-            self.dbv.get_line()
-            for column in range(self.dbv.col_count()):
-                row.append(self.dbv.col(column + 1))
-            self.dbv.next_line()
-            self.__counter += 1
-            return row
-        else:
-            self.__counter = 0
-            raise StopIteration
+        if (self.databaseType == "e32"):
+            row = []
+            if self.numRows < 1:
+                # We actually returned nothing
+                raise StopIteration
+            elif self.__counter < self.numRows:
+                self.dbv.get_line()
+                for column in range(self.dbv.col_count()):
+                    row.append(self.dbv.col(column + 1))
+                self.dbv.next_line()
+                self.__counter += 1
+                return row
+            else:
+                self.__counter = 0
+                raise StopIteration
+        elif (self.databaseType == "pysqlite2"):
+            return self.db.next()
+
 
     def __iter__(self):
         return self

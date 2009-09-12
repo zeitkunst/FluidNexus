@@ -67,7 +67,7 @@ try:
 except ImportError:
     #from s60Compat import e32
     dataPath = '.'
-    log = Logger(dataPath + u'\\FluidNexus.log', prefix = 'FluidNexusServer: ')
+    log = Logger(os.path.join(dataPath, u'FluidNexus.log'), prefix = 'FluidNexusNetworking: ')
     #sys.stderr = sys.stdout = log
 
     onPhone = False
@@ -88,7 +88,7 @@ class FluidNexusServer(object):
     connections = []
     currentlyAccepting = False
 
-    def __init__(self, serviceName = u'FluidNexus', database = None):
+    def __init__(self, serviceName = u'FluidNexus', database = None, library="e32"):
         """Initialize the server be setting up the server socket and advertising the FluidNexus service."""
 
         log.write("Starting Fluid Nexus Server")
@@ -100,16 +100,26 @@ class FluidNexusServer(object):
 
         self.mutex = thread.allocate_lock()
 
-        # Setup our server socket
-        self.serverSocket = socket.socket(socket.AF_BT, socket.SOCK_STREAM)
-        self.serverPort = socket.bt_rfcomm_get_available_server_channel(self.serverSocket)
-        self.serverSocket.bind(("", self.serverPort))
-        self.serverSocket.listen(self.numberConnections)
-        socket.bt_advertise_service(self.serviceName, self.serverSocket, True, socket.RFCOMM)
+        self.library = library
 
-        # Remove security protections
-        # @TODO@ Make sure this actually does what we want it to do!
-        socket.set_security(self.serverSocket, 0)
+        # Setup our server socket
+        if (self.library == "e32"):
+            self.serverSocket = socket.socket(socket.AF_BT, socket.SOCK_STREAM)
+            self.serverPort = socket.bt_rfcomm_get_available_server_channel(self.serverSocket)
+            self.serverSocket.bind(("", self.serverPort))
+            self.serverSocket.listen(self.numberConnections)
+            socket.bt_advertise_service(self.serviceName, self.serverSocket, True, socket.RFCOMM)
+
+            # Remove security protections
+            # @TODO@ Make sure this actually does what we want it to do!
+            socket.set_security(self.serverSocket, 0)
+
+        elif (self.library == "lightblue"):
+            self.serverSocket = lightblue.socket()
+            self.serverSocket.bind(("", 0))
+            self.serverSocket.listen(self.numberConnections)
+            lightblue.advertise(self.serviceName, self.serverSocket, lightblue.RFCOMM)
+
 
     def __exit__(self):
         """This method can probably be removed."""
@@ -148,29 +158,46 @@ class FluidNexusServer(object):
         # Create all of our advertisingSockets
         self.advertisingSockets = {}
         for counter in range(0, len(self.messageHashes)):
-            self.advertisingSockets[self.messageHashes[counter]] = socket.socket(socket.AF_BT, socket.SOCK_STREAM)
+            if (self.library == "e32"):
+                self.advertisingSockets[self.messageHashes[counter]] = socket.socket(socket.AF_BT, socket.SOCK_STREAM)
+            elif (self.library == "lightblue"):
+                self.advertisingSockets[self.messageHashes[counter]] = lightblue.socket()
 
         # Now, do what we need to with the sockets
         for item in self.advertisingSockets.items():
             hash = item[0]
             s = item[1]
             
-            tempPort = socket.bt_rfcomm_get_available_server_channel(s)
+            if (self.library == "e32"):
+                tempPort = socket.bt_rfcomm_get_available_server_channel(s)
+    
+                s.bind(("", tempPort))
+                s.listen(1)
+                socket.bt_advertise_service(unicode(':' + hash), s, True, socket.RFCOMM)
+            elif (self.library == "lightblue"):
+                s.bind(("", 0))
+                s.listen(1)
+                lightblue.advertise(unicode(':' + hash), s, lightblue.RFCOMM)
 
-            s.bind(("", tempPort))
-            s.listen(1)
-            socket.bt_advertise_service(unicode(':' + hash), s, True, socket.RFCOMM)
 
     def advertiseNewHash(self, hash):
         """Advertise a new hash that we have just received."""
         
         log.write(str(hash))
-        newSocket = socket.socket(socket.AF_BT, socket.SOCK_STREAM)
-        self.advertisingSockets[hash] = newSocket
-        tempPort = socket.bt_rfcomm_get_available_server_channel(newSocket)
-        newSocket.bind(("", tempPort))
-        newSocket.listen(1)
-        socket.bt_advertise_service(unicode(':' + hash), newSocket, True, socket.RFCOMM)
+        if (self.library == "e32"):
+            newSocket = socket.socket(socket.AF_BT, socket.SOCK_STREAM)
+            self.advertisingSockets[hash] = newSocket
+            tempPort = socket.bt_rfcomm_get_available_server_channel(newSocket)
+            newSocket.bind(("", tempPort))
+            newSocket.listen(1)
+            socket.bt_advertise_service(unicode(':' + hash), newSocket, True, socket.RFCOMM)
+        elif (self.library == "lightblue"):
+            newSocket = lightblue.socket()
+            self.advertisingSockets[hash] = newSocket
+            newSocket.bind(("", 0))
+            newSocket.listen(1)
+            lightblue.advertise(unicode(":" + hash), newSocket, lightblue.RFCOMM)
+
 
     def acceptCallback(self, clientData):
         """CANDIDATE FOR REMOVAL: We do everything in the run method right now, since we choose to block (as we're running in a separate process)."""
@@ -291,13 +318,16 @@ class FluidNexusServer(object):
         # Add the correct owner bluetooth ID hash
         self.database.add_received(ownerHash, timestamp, 0, title, message, md5.md5(title + message).hexdigest(), '0')
         self.advertiseNewHash(md5.md5(title + message).hexdigest())
-        try:
-            self.currentlyAccepting = False
-            self.serverSocket.accept(self.acceptCallback)
-            log.write("after starting new accept thread")
-            #clientSocket.close()
-        except Exception, e:
-            log.write(str(e))
+
+        # TODO
+        # Not sure why this is here...
+#        try:
+#            self.currentlyAccepting = False
+#            self.serverSocket.accept(self.acceptCallback)
+#            log.write("after starting new accept thread")
+#            #clientSocket.close()
+#        except Exception, e:
+#            log.write(str(e))
 
     def runOld(self):
         """Main loop for the server."""
@@ -376,6 +406,48 @@ class FluidNexusClient(object):
         except:
             log.write("unable to send to server")
 
+    # TODO
+    # Integrate this method with the standard sendData
+    def sendDataLightblue(self, data, phone, port):
+        """Send our data to the other phone!"""
+
+        messageTime = data[2]
+        title = data[4]
+        message = data[5]
+        log.write("trying to open a client socket")
+        clientSocket = lightblue.socket()
+        log.write("writing to socket %s" % str(clientSocket)) 
+
+        # Connect to the other phone; perhaps we should consider grabbing some sort of lock to ensure that the connection happens
+        try:
+            log.write("trying to use client socket to connect")
+            clientSocket.connect((phone[0], port))
+        except Exception, e:
+            log.write("unable to open client socket")
+            log.write(str(e))
+            clientSocket.close()
+            return
+        try:
+            log.write("going through send process")
+            clientSocket.send(FLUID_NEXUS_PROTOCOL_VERSION)
+            time.sleep(1)
+            clientSocket.send("%03d" % len(title))
+            time.sleep(1)
+            clientSocket.send("%06d" % len(message))
+            time.sleep(1)
+            clientSocket.send(str(messageTime))
+            time.sleep(1)
+            clientSocket.send(md5.md5(title + message).hexdigest())
+            time.sleep(1)
+            clientSocket.send(title)
+            time.sleep(1)
+            clientSocket.send(message)
+            time.sleep(1)
+            clientSocket.close()
+        except:
+            log.write("unable to send to server")
+
+
     def getOurMessageHashes(self):
         """Return a list of the messages marked as 'mine'."""
         ourMessageHashes = []
@@ -422,7 +494,7 @@ class FluidNexusClient(object):
             # TODO
             # This needs to be changed back to "2" after my Android testing
             # is done
-            if isPhone == 1:
+            if isPhone == 2:
                 phones.append(device)
 
         for phone in phones:
@@ -444,6 +516,7 @@ class FluidNexusClient(object):
                 notOurMessageHashes = self.getNotOurMessageHashes()
                 hashesToSend = []
 
+                log.write(str(notOurMessageHashes))
                 # First, check if any of our outgoing messages are already on
                 # the server
                 for hash in serverMessageHashes:
@@ -464,7 +537,7 @@ class FluidNexusClient(object):
                     for hash in hashesToSend:
                         data = self.db.returnItemBasedOnHash(hash)
                         log.write(str(data))
-                        self.sendData(data, phone, port)
+                        self.sendDataLightblue(data, phone, port)
                 else:
                     log.write("no data to send")
 
