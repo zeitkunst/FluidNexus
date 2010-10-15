@@ -17,24 +17,22 @@ class StartQT4(QtGui.QMainWindow):
 
     def setupView(self):
         self.database.all()
-
+        
+        # column 6 is the hash
         for item in self.database:
             a = QtGui.QTreeWidgetItem(self.ui.incomingMessagesList)
+            a.setText(0, item[6])
             a.setText(1, item[4])
-            a.setText(2, item[5])
+            a.setText(2, item[5][0:20] + "...")
 
+        self.ui.incomingMessagesList.hideColumn(0)
+        
     def incomingMessageClicked(self):
         currentItem = self.ui.incomingMessagesList.currentItem()
-
-        # HACK -- need better way of accessing items
-        allItems = []
-        self.database.all()
-        for item in self.database:
-            allItems.append(item)
-        
+        item = self.database.returnItemBasedOnHash(currentItem.data(0, 0).toString())
         te = self.ui.incomingMessageText
         te.clear()
-        te.setPlainText(currentItem.data(2, 0).toString())
+        te.setPlainText(item[5])
 
 if __name__ == "__main__":
     print "here"

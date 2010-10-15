@@ -1,0 +1,9 @@
+<RCC>
+  <qresource prefix="icons">
+    <file>icons/fluid_nexus_icon.png</file>
+  </qresource>
+  <qresource prefix="icon32x32">
+    <file>icons/32x32/menu_enable_outgoing.png</file>
+    <file>icons/32x32/menu_add.png</file>
+  </qresource>
+</RCC>
