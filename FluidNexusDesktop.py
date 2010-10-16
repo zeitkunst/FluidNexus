@@ -1,7 +1,19 @@
 import sys
 from PyQt4 import QtCore, QtGui
 from ui.FluidNexusDesktopUI import Ui_FluidNexus
+from ui.FluidNexusNewMessageUI import Ui_FluidNexusNewMessage
 from database import FluidNexusDatabase
+
+class FluidNexusNewMessageDialog(QtGui.QDialog):
+    def __init__(self, parent=None):
+        QtGui.QDialog.__init__(self, parent)
+        self.ui = Ui_FluidNexusNewMessage()
+        self.ui.setupUi(self)
+
+        self.connect(self.ui.cancelButton, QtCore.SIGNAL("clicked()"), self.closeDialog)
+
+    def closeDialog(self):
+        self.close()
 
 class StartQT4(QtGui.QMainWindow):
     def __init__(self, parent=None):
@@ -33,6 +45,10 @@ class StartQT4(QtGui.QMainWindow):
         te = self.ui.incomingMessageText
         te.clear()
         te.setPlainText(item[5])
+    
+    def showNewMessageWindow(self):
+        self.newMessageDialog = FluidNexusNewMessageDialog()
+        self.newMessageDialog.exec_()
 
 if __name__ == "__main__":
     print "here"
