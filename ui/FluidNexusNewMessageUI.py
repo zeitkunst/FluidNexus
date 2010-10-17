@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'FluidNexusNewMessage.ui'
 #
-# Created: Sun Oct 17 01:01:43 2010
+# Created: Sun Oct 17 13:05:45 2010
 #      by: PyQt4 UI code generator 4.7.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -42,6 +42,8 @@ class Ui_FluidNexusNewMessage(object):
         self.horizontalLayout_3.addWidget(self.saveButton)
         self.formLayout.setLayout(2, QtGui.QFormLayout.FieldRole, self.horizontalLayout_3)
         self.horizontalLayout.addLayout(self.formLayout)
+        self.label.setBuddy(self.newMessageTitle)
+        self.label_2.setBuddy(self.newMessageBody)
 
         self.retranslateUi(FluidNexusNewMessage)
         QtCore.QObject.connect(self.saveButton, QtCore.SIGNAL("clicked()"), FluidNexusNewMessage.saveButtonClicked)
@@ -49,8 +51,8 @@ class Ui_FluidNexusNewMessage(object):
 
     def retranslateUi(self, FluidNexusNewMessage):
         FluidNexusNewMessage.setWindowTitle(QtGui.QApplication.translate("FluidNexusNewMessage", "New Message", None, QtGui.QApplication.UnicodeUTF8))
-        self.label.setText(QtGui.QApplication.translate("FluidNexusNewMessage", "Title", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_2.setText(QtGui.QApplication.translate("FluidNexusNewMessage", "Message", None, QtGui.QApplication.UnicodeUTF8))
+        self.label.setText(QtGui.QApplication.translate("FluidNexusNewMessage", "&Title", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_2.setText(QtGui.QApplication.translate("FluidNexusNewMessage", "&Message", None, QtGui.QApplication.UnicodeUTF8))
         self.cancelButton.setText(QtGui.QApplication.translate("FluidNexusNewMessage", "Cancel", None, QtGui.QApplication.UnicodeUTF8))
         self.saveButton.setText(QtGui.QApplication.translate("FluidNexusNewMessage", "Save", None, QtGui.QApplication.UnicodeUTF8))
 

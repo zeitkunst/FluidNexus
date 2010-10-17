@@ -1,15 +1,23 @@
+#!/usr/bin/env python
+
+# Standard library imports
 import md5
+import os
+import pickle
+import stat
 import sys
+
+# External library imports
 from PyQt4 import QtCore, QtGui
+
+# My library imports
 from ui.FluidNexusDesktopUI import Ui_FluidNexus
 from ui.FluidNexusNewMessageUI import Ui_FluidNexusNewMessage
 from database import FluidNexusDatabase
+from FluidNexusNetworking import FluidNexusClient, FluidNexusServer
 
 # TODO
-# -- need to enable saving to database, loading of outgoing from database to treeview on restart
-# -- need to save enabled or not to local configuration by hash (probably pickled
-# -- need to save database to local directory in home
-# -- need to implement logging facility to local directory in home
+# -- need to check if database already exists in home directory; if not, populate it with basic info
 # -- need to implement networking in QThreads
 # -- need to modularize present code
 
@@ -19,6 +27,24 @@ DEFAULTS = {
         "name": "FluidNexus.db"
     }
 }
+
+# Strangely, the QTreeWidgetItemIterator doesn't provide a python iterable
+# So we have to create our own...or base our code on:
+# http://www.mail-archive.com/pyqt@riverbankcomputing.com/msg11348.html
+class TreeIter(QtGui.QTreeWidgetItemIterator):
+    def __init__(self, *args):
+        QtGui.QTreeWidgetItemIterator.__init__(self, *args)
+
+    def __iter__(self):
+        return self
+
+    def next(self):
+        value = self.value()
+        if value:
+            self.__iadd__(1)
+            return value
+        else:
+            raise StopIteration
 
 class FluidNexusNewMessageDialog(QtGui.QDialog):
     def __init__(self, parent=None):
@@ -40,23 +66,57 @@ class FluidNexusNewMessageDialog(QtGui.QDialog):
         self.emit(QtCore.SIGNAL("saveButtonClicked"), self.ui.newMessageTitle.text(), self.ui.newMessageBody.document().toPlainText())
         self.close()
 
+
+
+
 class FluidNexusDesktop(QtGui.QMainWindow):
     def __init__(self, parent=None):
         QtGui.QWidget.__init__(self, parent)
         self.ui = Ui_FluidNexus()
         self.ui.setupUi(self)
 
-        self.database = FluidNexusDatabase(databaseType = "pysqlite2")
-        self.database.setupDatabase()
-        self.setupView()
-
         self.statusBar().showMessage("Messages loaded.")
         
         self.settings = QtCore.QSettings("zeitkunst", "Fluid Nexus")
-        
-        self._setupSettings()
+       
+        # Setup the defaults
+        #self._setupDefaultSettings()
 
-    def _setupSettings(self):
+        # Setup location of the app-specific data
+        self._setupAppData()
+
+        # Setup a hash for enabled outgoing messages
+        enabledHash = self.settings.value("outgoing/enabled", "none").toString() 
+
+        if (enabledHash == "none"):
+            self.enabledHash = {}
+        else:
+            self.enabledHash = pickle.loads(str(enabledHash))
+
+        # Setup the database and the views
+        self.database = FluidNexusDatabase(databaseDir = self.dataDir, databaseType = "pysqlite2")
+        #self.database.setupDatabase()
+        self.setupTreeViews()
+
+
+        # Ensure files are readable only by user
+        # @HACK@
+        # Need to make this less brittle
+        os.chmod(os.path.join(self.dataDir, "FluidNexus.db"), stat.S_IREAD | stat.S_IWRITE)
+        try:
+            os.chmod(os.path.join(self.dataDir, "FluidNexus.log"), stat.S_IREAD | stat.S_IWRITE)
+        except OSError:
+            pass
+
+        # Setup clients and servers
+        self.client = FluidNexusClient(database = self.database)
+        #self.client.runLightblue()
+
+        self.server = FluidNexusServer(database = self.database, library="lightblue")
+        #self.server.initMessageAdvertisements()
+        #self.server.run()
+
+    def _setupDefaultSettings(self):
         self.settings.clear()
 
         for section in DEFAULTS.keys():
@@ -64,35 +124,169 @@ class FluidNexusDesktop(QtGui.QMainWindow):
                 name = section + "/" + key
                 self.settings.setValue(name, DEFAULTS[section][key])
 
+    def _setupAppData(self):
+        """ Setup the application data directory in the home directory."""
 
-    def setupView(self):
-        self.database.all()
+        homeDir = os.path.expanduser('~')
+
+        if sys.platform == "win32":
+            self.dataDir = os.path.join(homeDir, "FluidNexusData")
+        else:
+            self.dataDir = os.path.join(homeDir, ".FluidNexus")
         
-        # column 6 is the hash
+        if not os.path.isdir(self.dataDir):
+            os.makedirs(self.dataDir)
+
+        os.chmod(self.dataDir, stat.S_IREAD | stat.S_IWRITE | stat.S_IEXEC)
+
+    def setupTreeViews(self):
+        # Setup incoming
+        self.database.non_outgoing()
         for item in self.database:
             a = QtGui.QTreeWidgetItem(self.ui.incomingMessagesList)
+            # Hash
             a.setText(0, item[6])
+            # Title
             a.setText(1, item[4])
+            # Data
             a.setText(2, item[5][0:20] + "...")
 
         self.ui.incomingMessagesList.hideColumn(0)
-        
+
+        # Setup outgoing
+        self.database.outgoing()
+        for item in self.database:
+            a = QtGui.QTreeWidgetItem(self.ui.outgoingMessagesList)
+
+            hash = item[6]
+
+            if (self.enabledHash.has_key(hash)):
+                if (self.enabledHash[hash]):
+                    enabledIcon = QtGui.QIcon()
+                    enabledIcon.addPixmap(QtGui.QPixmap(":/icon32x32/icons/32x32/menu_enable_outgoing.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+                    a.setIcon(1, enabledIcon)
+                else:
+                    enabledIcon = QtGui.QIcon()
+                    a.setIcon(1, enabledIcon)
+            else:
+                enabledIcon = QtGui.QIcon()
+                a.setIcon(1, enabledIcon)
+
+            # Hash
+            a.setText(0, item[6])
+            # Title
+            a.setText(2, item[4])
+            # Data
+            a.setText(3, item[5][0:20] + "...")
+            # TODO
+            # Not working for some reason
+            a.font(2).setWeight(75)
+            a.font(3).setWeight(75)
+
+        self.ui.outgoingMessagesList.hideColumn(0)
+        self.ui.outgoingMessagesList.resizeColumnToContents(1)
+
+    def mainWindowDestroyed(self):
+        #self.settings.setValue(name, DEFAULTS[section][key])
+        items = TreeIter(self.ui.outgoingMessagesList)
+        for item in items:
+            currentItemIcon = item.icon(1)
+            hash
+            if (currentItemIcon.isNull()):
+                self.enabledHash[str(item.data(0, 0).toString())] = False
+            else:
+                self.enabledHash[str(item.data(0, 0).toString())] = True
+
+        self.settings.setValue("outgoing/enabled", pickle.dumps(self.enabledHash))
+        self.settings.sync()
+
+        self.database.close()
+        self.close()
+
     def incomingMessageClicked(self):
         currentItem = self.ui.incomingMessagesList.currentItem()
         item = self.database.returnItemBasedOnHash(currentItem.data(0, 0).toString())
         te = self.ui.incomingMessageText
         te.clear()
         te.setPlainText(item[5])
-    
+
+    def outgoingMessageClicked(self):
+        currentItem = self.ui.outgoingMessagesList.currentItem()
+        currentItemIcon = currentItem.icon(1)
+        if (currentItemIcon.isNull()):
+            pass
+
+        item = self.database.returnItemBasedOnHash(currentItem.data(0, 0).toString())
+        te = self.ui.outgoingMessageText
+        te.clear()
+        te.setPlainText(item[5])
+
+    def outgoingMessageItemActivated(self):
+        if (not self.ui.deleteOutgoingButton.isEnabled()):
+            self.ui.deleteOutgoingButton.setEnabled(True)
+
+        if (not self.ui.toggleOutgoingButton.isEnabled()):
+            self.ui.toggleOutgoingButton.setEnabled(True)
+
+    def toggleOutgoingMessage(self):
+        currentItem = self.ui.outgoingMessagesList.currentItem()
+        currentItemIcon = currentItem.icon(1)
+
+        if (currentItemIcon.isNull()):
+            enabledIcon = QtGui.QIcon()
+            enabledIcon.addPixmap(QtGui.QPixmap(":/icon32x32/icons/32x32/menu_enable_outgoing.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+            currentItem.setIcon(1, enabledIcon)
+            self.enabledHash[str(currentItem.data(0, 0).toString())] = True
+        else:
+            enabledIcon = QtGui.QIcon()
+            currentItem.setIcon(1, enabledIcon)
+            self.enabledHash[str(currentItem.data(0, 0).toString())] = False
+
+        self.settings.setValue("outgoing/enabled", pickle.dumps(self.enabledHash))
+        self.settings.sync()
+
+    def deleteOutgoingMessage(self):
+        # TODO
+        # Disable the delete button if nothing else is selected
+
+        # Get current item, delete from database
+        currentItem = self.ui.outgoingMessagesList.currentItem()
+        self.database.remove_by_hash(currentItem.data(0, 0).toString())
+
+        # Remove the selected items from the list
+        for twi in self.ui.outgoingMessagesList.selectedItems():
+            self.ui.outgoingMessagesList.removeItemWidget(twi, 0)
+        del twi # remove last reference
+
+        # Clear message text area
+        te = self.ui.outgoingMessageText
+        te.clear()
+
+        # Remove from hash and sync
+        # TODO
+        # Make this into a method, or raise a signal, or something of the sort
+        del self.enabledHash[str(currentItem.data(0, 0).toString())]
+        self.settings.setValue("outgoing/enabled", pickle.dumps(self.enabledHash))
+        self.settings.sync()
+
+        # Update status bar
+        self.statusBar().showMessage("'%s' deleted." % currentItem.data(2, 0).toString())
+
     def showNewMessageWindow(self):
         self.newMessageDialog = FluidNexusNewMessageDialog(parent = self)
         self.newMessageDialog.exec_()
 
     def newMessageSaveButtonClicked(self, title, body):
+        self.database.add_new("00:00", 0, title, body, md5.md5(title + body).hexdigest(), "00:00")
         outgoing = QtGui.QTreeWidgetItem(self.ui.outgoingMessagesList)
         outgoing.setText(0, md5.md5(title + body).hexdigest())
-        outgoing.setText(1, title)
-        outgoing.setText(2, body[0:20] + "...")
+        outgoing.setText(2, title)
+        outgoing.setText(3, body[0:20] + "...")
+        outgoing.font(2).setBold(True)
+        outgoing.font(3).setBold(True)
+        enabledIcon = QtGui.QIcon()
+        enabledIcon.addPixmap(QtGui.QPixmap(":/icon32x32/icons/32x32/menu_enable_outgoing.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        outgoing.setIcon(1, enabledIcon)
 
 
 if __name__ == "__main__":

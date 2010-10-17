@@ -79,8 +79,8 @@ except ImportError:
     class SymbianError(Exception): pass
 
     dataPath = '.'
-    log = Logger(os.path.join(dataPath, u'FluidNexus.log'), prefix = 'database: ')
-    sys.stderr = sys.stdout = log
+    #log = Logger(os.path.join(dataPath, u'FluidNexus.log'), prefix = 'database: ')
+    #sys.stderr = sys.stdout = log
 
     onPhone = False
 
@@ -99,6 +99,8 @@ class FluidNexusDatabase:
 ################################################################################
     def __init__(self, databaseDir = dataPath, databaseType = "e32", databaseName = 'FluidNexus.db'):
         """Initialization method that makes sure the database file and directory exist, and creates/opens the database file, and prepares the database view."""
+        self.log = Logger(os.path.join(databaseDir, u'FluidNexus.log'), prefix = 'database: ')
+        sys.stderr = sys.stdout = self.log
 
         self.databaseDir = databaseDir
         self.databaseName = databaseName
@@ -245,6 +247,8 @@ class FluidNexusDatabase:
     def __iter__(self):
         return self
 
+    def close(self):
+        self.db.close()
 ################################################################################
 #################        Outgoing messages  ####################################
 ################################################################################
@@ -376,7 +380,7 @@ class FluidNexusDatabase:
         """clear signal that there is data"""
         sql = unicode("update FluidNexusSignal set signal = 0 where id = 0")
         rows = self.__query(sql)
-        log.write(str(rows))
+        self.log.write(str(rows))
         return rows
 
 ################################################################################

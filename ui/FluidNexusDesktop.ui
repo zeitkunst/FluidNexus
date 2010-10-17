@@ -71,7 +71,7 @@
           <item>
            <layout class="QGridLayout" name="gridLayout_3">
             <item row="3" column="0">
-             <widget class="QPlainTextEdit" name="plainTextEdit_2">
+             <widget class="QPlainTextEdit" name="outgoingMessageText">
               <property name="readOnly">
                <bool>true</bool>
               </property>
@@ -81,6 +81,11 @@
              <layout class="QHBoxLayout" name="horizontalLayout_3">
               <item>
                <widget class="QToolButton" name="newMessageButton">
+                <property name="font">
+                 <font>
+                  <pointsize>8</pointsize>
+                 </font>
+                </property>
                 <property name="text">
                  <string>New Message</string>
                 </property>
@@ -95,7 +100,7 @@
                  </size>
                 </property>
                 <property name="toolButtonStyle">
-                 <enum>Qt::ToolButtonTextBesideIcon</enum>
+                 <enum>Qt::ToolButtonTextUnderIcon</enum>
                 </property>
                 <property name="autoRaise">
                  <bool>true</bool>
@@ -103,9 +108,17 @@
                </widget>
               </item>
               <item>
-               <widget class="QToolButton" name="enableOutgoingButton">
+               <widget class="QToolButton" name="toggleOutgoingButton">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>8</pointsize>
+                 </font>
+                </property>
                 <property name="text">
-                 <string>Enable Outgoing</string>
+                 <string>Toggle Outgoing</string>
                 </property>
                 <property name="icon">
                  <iconset resource="res/FluidNexus.qrc">
@@ -118,7 +131,38 @@
                  </size>
                 </property>
                 <property name="toolButtonStyle">
-                 <enum>Qt::ToolButtonTextBesideIcon</enum>
+                 <enum>Qt::ToolButtonTextUnderIcon</enum>
+                </property>
+                <property name="autoRaise">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QToolButton" name="deleteOutgoingButton">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>8</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Delete</string>
+                </property>
+                <property name="icon">
+                 <iconset resource="res/FluidNexus.qrc">
+                  <normaloff>:/icon32x32/icons/32x32/menu_delete.png</normaloff>:/icon32x32/icons/32x32/menu_delete.png</iconset>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>32</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="toolButtonStyle">
+                 <enum>Qt::ToolButtonTextUnderIcon</enum>
                 </property>
                 <property name="autoRaise">
                  <bool>true</bool>
@@ -144,7 +188,17 @@
              <widget class="QTreeWidget" name="outgoingMessagesList">
               <column>
                <property name="text">
-                <string>Enabled</string>
+                <string>Hash</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset>
+                 <normalon>:/icon32x32/icons/32x32/menu_enable_outgoing.png</normalon>
+                </iconset>
                </property>
               </column>
               <column>
@@ -218,6 +272,18 @@
     <string>About...</string>
    </property>
   </action>
+  <action name="actionDelete">
+   <property name="icon">
+    <iconset resource="res/FluidNexus.qrc">
+     <normaloff>:/icon32x32/icons/32x32/menu_delete.png</normaloff>:/icon32x32/icons/32x32/menu_delete.png</iconset>
+   </property>
+   <property name="text">
+    <string>Delete</string>
+   </property>
+   <property name="toolTip">
+    <string>Delete Message</string>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="res/FluidNexus.qrc"/>
@@ -240,30 +306,78 @@
    </hints>
   </connection>
   <connection>
+   <sender>actionQuit</sender>
+   <signal>triggered()</signal>
+   <receiver>FluidNexus</receiver>
+   <slot>mainWindowDestroyed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>199</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>outgoingMessagesList</sender>
+   <signal>clicked(QModelIndex)</signal>
+   <receiver>FluidNexus</receiver>
+   <slot>outgoingMessageClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>175</x>
+     <y>216</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>4</x>
+     <y>235</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>outgoingMessagesList</sender>
+   <signal>clicked(QModelIndex)</signal>
+   <receiver>FluidNexus</receiver>
+   <slot>outgoingMessageItemActivated()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>142</x>
+     <y>198</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>398</x>
+     <y>149</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>deleteOutgoingButton</sender>
+   <signal>clicked()</signal>
+   <receiver>FluidNexus</receiver>
+   <slot>deleteOutgoingMessage()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>255</x>
+     <y>103</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>397</x>
+     <y>100</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
    <sender>incomingMessagesList</sender>
    <signal>clicked(QModelIndex)</signal>
    <receiver>FluidNexus</receiver>
    <slot>incomingMessageClicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>134</x>
-     <y>164</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1</x>
-     <y>186</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionQuit</sender>
-   <signal>triggered()</signal>
-   <receiver>FluidNexus</receiver>
-   <slot>close()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
+     <x>199</x>
+     <y>194</y>
     </hint>
     <hint type="destinationlabel">
      <x>199</x>
@@ -272,18 +386,18 @@
    </hints>
   </connection>
   <connection>
-   <sender>actionNewMessage</sender>
-   <signal>triggered()</signal>
+   <sender>toggleOutgoingButton</sender>
+   <signal>clicked()</signal>
    <receiver>FluidNexus</receiver>
-   <slot>incomingMessageClicked()</slot>
+   <slot>toggleOutgoingMessage()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
+     <x>179</x>
+     <y>106</y>
     </hint>
     <hint type="destinationlabel">
-     <x>199</x>
-     <y>299</y>
+     <x>3</x>
+     <y>75</y>
     </hint>
    </hints>
   </connection>
@@ -291,5 +405,11 @@
  <slots>
   <slot>incomingMessageClicked()</slot>
   <slot>showNewMessageWindow()</slot>
+  <slot>outgoingMessageClicked()</slot>
+  <slot>outgoingMessageItemActivated()</slot>
+  <slot>deleteOutgoingMessage()</slot>
+  <slot>toggleOutgoingMessage()</slot>
+  <slot>tabSelected(QString)</slot>
+  <slot>mainWindowDestroyed()</slot>
  </slots>
 </ui>

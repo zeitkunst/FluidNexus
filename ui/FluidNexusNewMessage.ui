@@ -22,7 +22,10 @@
      <item row="0" column="0">
       <widget class="QLabel" name="label">
        <property name="text">
-        <string>Title</string>
+        <string>&amp;Title</string>
+       </property>
+       <property name="buddy">
+        <cstring>newMessageTitle</cstring>
        </property>
       </widget>
      </item>
@@ -32,7 +35,10 @@
      <item row="1" column="0">
       <widget class="QLabel" name="label_2">
        <property name="text">
-        <string>Message</string>
+        <string>&amp;Message</string>
+       </property>
+       <property name="buddy">
+        <cstring>newMessageBody</cstring>
        </property>
       </widget>
      </item>
