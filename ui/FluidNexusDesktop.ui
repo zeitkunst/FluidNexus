@@ -224,18 +224,34 @@
  </resources>
  <connections>
   <connection>
+   <sender>newMessageButton</sender>
+   <signal>clicked()</signal>
+   <receiver>FluidNexus</receiver>
+   <slot>showNewMessageWindow()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>86</x>
+     <y>95</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>4</x>
+     <y>136</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
    <sender>incomingMessagesList</sender>
    <signal>clicked(QModelIndex)</signal>
    <receiver>FluidNexus</receiver>
    <slot>incomingMessageClicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>223</x>
-     <y>209</y>
+     <x>134</x>
+     <y>164</y>
     </hint>
     <hint type="destinationlabel">
-     <x>4</x>
-     <y>146</y>
+     <x>1</x>
+     <y>186</y>
     </hint>
    </hints>
   </connection>
@@ -256,14 +272,14 @@
    </hints>
   </connection>
   <connection>
-   <sender>newMessageButton</sender>
-   <signal>clicked()</signal>
+   <sender>actionNewMessage</sender>
+   <signal>triggered()</signal>
    <receiver>FluidNexus</receiver>
-   <slot>showNewMessageWindow()</slot>
+   <slot>incomingMessageClicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>33</x>
-     <y>128</y>
+     <x>-1</x>
+     <y>-1</y>
     </hint>
     <hint type="destinationlabel">
      <x>199</x>

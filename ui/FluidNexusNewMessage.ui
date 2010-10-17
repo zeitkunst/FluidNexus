@@ -27,7 +27,7 @@
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QLineEdit" name="lineEdit"/>
+      <widget class="QLineEdit" name="newMessageTitle"/>
      </item>
      <item row="1" column="0">
       <widget class="QLabel" name="label_2">
@@ -37,7 +37,7 @@
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QPlainTextEdit" name="plainTextEdit"/>
+      <widget class="QPlainTextEdit" name="newMessageBody"/>
      </item>
      <item row="2" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -75,5 +75,26 @@
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>saveButton</sender>
+   <signal>clicked()</signal>
+   <receiver>FluidNexusNewMessage</receiver>
+   <slot>saveButtonClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>353</x>
+     <y>253</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>379</x>
+     <y>241</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <signal>saveButtonSignal()</signal>
+  <slot>saveButtonClicked()</slot>
+ </slots>
 </ui>

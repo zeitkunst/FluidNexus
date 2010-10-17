@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'FluidNexusDesktop.ui'
 #
-# Created: Fri Oct 15 20:53:48 2010
+# Created: Sun Oct 17 00:44:05 2010
 #      by: PyQt4 UI code generator 4.7.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -107,9 +107,10 @@ class Ui_FluidNexus(object):
 
         self.retranslateUi(FluidNexus)
         self.tabWidget.setCurrentIndex(0)
+        QtCore.QObject.connect(self.newMessageButton, QtCore.SIGNAL("clicked()"), FluidNexus.showNewMessageWindow)
         QtCore.QObject.connect(self.incomingMessagesList, QtCore.SIGNAL("clicked(QModelIndex)"), FluidNexus.incomingMessageClicked)
         QtCore.QObject.connect(self.actionQuit, QtCore.SIGNAL("triggered()"), FluidNexus.close)
-        QtCore.QObject.connect(self.newMessageButton, QtCore.SIGNAL("clicked()"), FluidNexus.showNewMessageWindow)
+        QtCore.QObject.connect(self.actionNewMessage, QtCore.SIGNAL("triggered()"), FluidNexus.incomingMessageClicked)
         QtCore.QMetaObject.connectSlotsByName(FluidNexus)
 
     def retranslateUi(self, FluidNexus):

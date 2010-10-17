@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'FluidNexusNewMessage.ui'
 #
-# Created: Fri Oct 15 20:37:54 2010
+# Created: Sun Oct 17 01:01:43 2010
 #      by: PyQt4 UI code generator 4.7.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -21,15 +21,15 @@ class Ui_FluidNexusNewMessage(object):
         self.label = QtGui.QLabel(FluidNexusNewMessage)
         self.label.setObjectName("label")
         self.formLayout.setWidget(0, QtGui.QFormLayout.LabelRole, self.label)
-        self.lineEdit = QtGui.QLineEdit(FluidNexusNewMessage)
-        self.lineEdit.setObjectName("lineEdit")
-        self.formLayout.setWidget(0, QtGui.QFormLayout.FieldRole, self.lineEdit)
+        self.newMessageTitle = QtGui.QLineEdit(FluidNexusNewMessage)
+        self.newMessageTitle.setObjectName("newMessageTitle")
+        self.formLayout.setWidget(0, QtGui.QFormLayout.FieldRole, self.newMessageTitle)
         self.label_2 = QtGui.QLabel(FluidNexusNewMessage)
         self.label_2.setObjectName("label_2")
         self.formLayout.setWidget(1, QtGui.QFormLayout.LabelRole, self.label_2)
-        self.plainTextEdit = QtGui.QPlainTextEdit(FluidNexusNewMessage)
-        self.plainTextEdit.setObjectName("plainTextEdit")
-        self.formLayout.setWidget(1, QtGui.QFormLayout.FieldRole, self.plainTextEdit)
+        self.newMessageBody = QtGui.QPlainTextEdit(FluidNexusNewMessage)
+        self.newMessageBody.setObjectName("newMessageBody")
+        self.formLayout.setWidget(1, QtGui.QFormLayout.FieldRole, self.newMessageBody)
         self.horizontalLayout_3 = QtGui.QHBoxLayout()
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
         spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
@@ -44,6 +44,7 @@ class Ui_FluidNexusNewMessage(object):
         self.horizontalLayout.addLayout(self.formLayout)
 
         self.retranslateUi(FluidNexusNewMessage)
+        QtCore.QObject.connect(self.saveButton, QtCore.SIGNAL("clicked()"), FluidNexusNewMessage.saveButtonClicked)
         QtCore.QMetaObject.connectSlotsByName(FluidNexusNewMessage)
 
     def retranslateUi(self, FluidNexusNewMessage):
