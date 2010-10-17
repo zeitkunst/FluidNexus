@@ -224,7 +224,7 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         if (currentItemIcon.isNull()):
             pass
 
-        item = self.database.returnItemBasedOnHash(currentItem.data(0, 0).toString())
+        item = self.database.returnItemBasedOnHash(unicode(currentItem.data(0, 0).toString()))
         te = self.ui.outgoingMessageText
         te.clear()
         te.setPlainText(item[5])
@@ -283,7 +283,11 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         # Remove from hash and sync
         # TODO
         # Make this into a method, or raise a signal, or something of the sort
-        del self.enabledHash[str(currentItem.data(0, 0).toString())]
+        try:
+            del self.enabledHash[unicode(currentItem.data(0, 0).toString())]
+        except KeyError:
+            # not sure why I get a key error here...
+            pass
         self.settings.setValue("outgoing/enabled", pickle.dumps(self.enabledHash))
         self.settings.sync()
 
@@ -309,11 +313,17 @@ class FluidNexusDesktop(QtGui.QMainWindow):
                     treeItem.setText(2, title)
                     treeItem.setText(3, body[0:20] + "...")
             self.database.add_new(u"00:00", 0, unicode(title), unicode(body), hash, u"00:00")
+
+            try:
+                del self.enabledHash[self.currentEditingHash]
+            except KeyError:
+                # If we haven't toggled anything yet, the item won't be there yet
+                pass
             self.currentEditingHash = None
         else:
             self.database.add_new(u"00:00", 0, unicode(title), unicode(body), hash, u"00:00")
             outgoing = QtGui.QTreeWidgetItem(self.ui.outgoingMessagesList)
-            outgoing.setText(0, md5.md5(title + body).hexdigest())
+            outgoing.setText(0, hash)
             outgoing.setText(2, title)
             outgoing.setText(3, body[0:20] + "...")
             outgoing.font(2).setBold(True)
