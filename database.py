@@ -350,6 +350,11 @@ class FluidNexusDatabase:
                 id = item
             return id
 
+    def updateItem(self, hash, title, data):
+        sql = unicode("update FluidNexusData set title = '%s', data = '%s' where hash = '%s'" (title, data, hash))
+        rows = self.__query(sql)
+        return rows
+
 ################################################################################
 #################    return item based on hash      ############################
 ################################################################################

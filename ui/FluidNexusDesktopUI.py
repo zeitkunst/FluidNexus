@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'FluidNexusDesktop.ui'
 #
-# Created: Sun Oct 17 14:15:35 2010
+# Created: Sun Oct 17 15:14:44 2010
 #      by: PyQt4 UI code generator 4.7.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -132,7 +132,7 @@ class Ui_FluidNexus(object):
         self.menubar.addAction(self.menuHelp.menuAction())
 
         self.retranslateUi(FluidNexus)
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(1)
         QtCore.QObject.connect(self.newMessageButton, QtCore.SIGNAL("clicked()"), FluidNexus.showNewMessageWindow)
         QtCore.QObject.connect(self.actionQuit, QtCore.SIGNAL("triggered()"), FluidNexus.mainWindowDestroyed)
         QtCore.QObject.connect(self.outgoingMessagesList, QtCore.SIGNAL("clicked(QModelIndex)"), FluidNexus.outgoingMessageClicked)
@@ -140,6 +140,7 @@ class Ui_FluidNexus(object):
         QtCore.QObject.connect(self.deleteOutgoingButton, QtCore.SIGNAL("clicked()"), FluidNexus.deleteOutgoingMessage)
         QtCore.QObject.connect(self.incomingMessagesList, QtCore.SIGNAL("clicked(QModelIndex)"), FluidNexus.incomingMessageClicked)
         QtCore.QObject.connect(self.toggleOutgoingButton, QtCore.SIGNAL("clicked()"), FluidNexus.toggleOutgoingMessage)
+        QtCore.QObject.connect(self.outgoingMessagesList, QtCore.SIGNAL("doubleClicked(QModelIndex)"), FluidNexus.outgoingMessageDoubleClicked)
         QtCore.QMetaObject.connectSlotsByName(FluidNexus)
 
     def retranslateUi(self, FluidNexus):

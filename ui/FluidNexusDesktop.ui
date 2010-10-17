@@ -24,7 +24,7 @@
       <item row="0" column="0">
        <widget class="QTabWidget" name="tabWidget">
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="incomingTab">
          <attribute name="title">
@@ -401,6 +401,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>outgoingMessagesList</sender>
+   <signal>doubleClicked(QModelIndex)</signal>
+   <receiver>FluidNexus</receiver>
+   <slot>outgoingMessageDoubleClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>170</x>
+     <y>203</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1</x>
+     <y>185</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>incomingMessageClicked()</slot>
@@ -411,5 +427,6 @@
   <slot>toggleOutgoingMessage()</slot>
   <slot>tabSelected(QString)</slot>
   <slot>mainWindowDestroyed()</slot>
+  <slot>outgoingMessageDoubleClicked()</slot>
  </slots>
 </ui>

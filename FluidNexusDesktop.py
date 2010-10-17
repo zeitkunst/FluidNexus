@@ -47,14 +47,20 @@ class TreeIter(QtGui.QTreeWidgetItemIterator):
             raise StopIteration
 
 class FluidNexusNewMessageDialog(QtGui.QDialog):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, title = None, message = None):
         QtGui.QDialog.__init__(self, parent)
 
         self.parent = parent
 
         self.ui = Ui_FluidNexusNewMessage()
         self.ui.setupUi(self)
-        
+
+        if (title is not None):
+            self.ui.newMessageTitle.setText(title)
+
+        if (message is not None):
+            self.ui.newMessageBody.setPlainText(message)
+
         self.connect(self.ui.cancelButton, QtCore.SIGNAL("clicked()"), self.closeDialog)
         self.connect(self, QtCore.SIGNAL("saveButtonClicked"), self.parent.newMessageSaveButtonClicked)
 
@@ -98,6 +104,8 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         #self.database.setupDatabase()
         self.setupTreeViews()
 
+        # Save the currently edited hash
+        self.currentEditingHash = None
 
         # Ensure files are readable only by user
         # @HACK@
@@ -221,6 +229,16 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         te.clear()
         te.setPlainText(item[5])
 
+    def outgoingMessageDoubleClicked(self):
+        currentItem = self.ui.outgoingMessagesList.currentItem()
+
+        item = self.database.returnItemBasedOnHash(currentItem.data(0, 0).toString())
+
+        self.currentEditingHash = str(currentItem.data(0, 0).toString())
+
+        self.newMessageDialog = FluidNexusNewMessageDialog(parent = self, title = str(currentItem.data(2, 0).toString()), message = item[5])
+        self.newMessageDialog.exec_()
+
     def outgoingMessageItemActivated(self):
         if (not self.ui.deleteOutgoingButton.isEnabled()):
             self.ui.deleteOutgoingButton.setEnabled(True)
@@ -277,16 +295,32 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         self.newMessageDialog.exec_()
 
     def newMessageSaveButtonClicked(self, title, body):
-        self.database.add_new("00:00", 0, title, body, md5.md5(title + body).hexdigest(), "00:00")
-        outgoing = QtGui.QTreeWidgetItem(self.ui.outgoingMessagesList)
-        outgoing.setText(0, md5.md5(title + body).hexdigest())
-        outgoing.setText(2, title)
-        outgoing.setText(3, body[0:20] + "...")
-        outgoing.font(2).setBold(True)
-        outgoing.font(3).setBold(True)
-        enabledIcon = QtGui.QIcon()
-        enabledIcon.addPixmap(QtGui.QPixmap(":/icon32x32/icons/32x32/menu_enable_outgoing.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        outgoing.setIcon(1, enabledIcon)
+        hash = unicode(md5.md5(unicode(title) + unicode(body)).hexdigest())
+
+        if (self.currentEditingHash is not None):
+            self.database.remove_by_hash(self.currentEditingHash)
+
+            # Find the right item to update
+            treeItems = TreeIter(self.ui.outgoingMessagesList)
+            for treeItem in treeItems:
+                currentItemHash = unicode(treeItem.data(0, 0).toString())
+                if (currentItemHash == unicode(self.currentEditingHash)):
+                    treeItem.setText(0, unicode(md5.md5(unicode(title) + unicode(body)).hexdigest()))
+                    treeItem.setText(2, title)
+                    treeItem.setText(3, body[0:20] + "...")
+            self.database.add_new(u"00:00", 0, unicode(title), unicode(body), hash, u"00:00")
+            self.currentEditingHash = None
+        else:
+            self.database.add_new(u"00:00", 0, unicode(title), unicode(body), hash, u"00:00")
+            outgoing = QtGui.QTreeWidgetItem(self.ui.outgoingMessagesList)
+            outgoing.setText(0, md5.md5(title + body).hexdigest())
+            outgoing.setText(2, title)
+            outgoing.setText(3, body[0:20] + "...")
+            outgoing.font(2).setBold(True)
+            outgoing.font(3).setBold(True)
+            enabledIcon = QtGui.QIcon()
+            enabledIcon.addPixmap(QtGui.QPixmap(":/icon32x32/icons/32x32/menu_enable_outgoing.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+            outgoing.setIcon(1, enabledIcon)
 
 
 if __name__ == "__main__":
