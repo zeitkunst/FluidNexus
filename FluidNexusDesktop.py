@@ -5,6 +5,14 @@ from ui.FluidNexusDesktopUI import Ui_FluidNexus
 from ui.FluidNexusNewMessageUI import Ui_FluidNexusNewMessage
 from database import FluidNexusDatabase
 
+# TODO
+# -- need to enable saving to database, loading of outgoing from database to treeview on restart
+# -- need to save enabled or not to local configuration by hash (probably pickled
+# -- need to save database to local directory in home
+# -- need to implement logging facility to local directory in home
+# -- need to implement networking in QThreads
+# -- need to modularize present code
+
 DEFAULTS = {
     "database": {
         "type": "pysqlite2",
