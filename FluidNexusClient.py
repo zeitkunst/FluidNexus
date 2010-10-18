@@ -75,7 +75,8 @@ if __name__ == "__main__":
         database = FluidNexusDatabase()
 
         client = FluidNexusClient(database = database)
-        client.runLightblue()
+        while True:
+            client.runLightblue()
         #thread.start_new_thread(client.runLightblue, ())
     except:
         log.print_exception_trace()
