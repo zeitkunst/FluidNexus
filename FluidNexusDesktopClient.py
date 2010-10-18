@@ -43,8 +43,8 @@ if __name__ == "__main__":
     #for item in database:
     #    print item
     try:
-        database = FluidNexusDatabase(databaseType = "pysqlite2")
-        database.setupDatabase()
+        database = FluidNexusDatabase(databaseDir = "/home/nknouf/.FluidNexus", databaseType = "pysqlite2")
+        #database.setupDatabase()
         title = u'Client testing'
         data = u'This is nothing but a test of the client'
         hash = unicode(md5.md5(title + data).hexdigest())

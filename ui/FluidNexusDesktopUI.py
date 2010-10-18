@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'FluidNexusDesktop.ui'
 #
-# Created: Sun Oct 17 15:14:44 2010
+# Created: Sun Oct 17 16:29:37 2010
 #      by: PyQt4 UI code generator 4.7.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -132,7 +132,7 @@ class Ui_FluidNexus(object):
         self.menubar.addAction(self.menuHelp.menuAction())
 
         self.retranslateUi(FluidNexus)
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(0)
         QtCore.QObject.connect(self.newMessageButton, QtCore.SIGNAL("clicked()"), FluidNexus.showNewMessageWindow)
         QtCore.QObject.connect(self.actionQuit, QtCore.SIGNAL("triggered()"), FluidNexus.mainWindowDestroyed)
         QtCore.QObject.connect(self.outgoingMessagesList, QtCore.SIGNAL("clicked(QModelIndex)"), FluidNexus.outgoingMessageClicked)

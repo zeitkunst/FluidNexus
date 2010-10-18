@@ -347,7 +347,6 @@ class FluidNexusClient(object):
     def __init__(self, database = None):
         """Initialize the client."""
         log.write("Starting Fluid Nexus Client")
-        self.mutex = thread.allocate_lock()
         self.db = database
    
     def splitclass(self, deviceClass):
@@ -509,10 +508,12 @@ class FluidNexusClient(object):
                     port = None
             log.write("at end of service search")
             
-            log.write(str(port))
             if port is not None:
+                print "before server"
                 serverMessageHashes = self.getServerMessageHashes(services)
+                print "before our"
                 ourMessageHashes = self.getOurMessageHashes()
+                print "before not our"
                 notOurMessageHashes = self.getNotOurMessageHashes()
                 hashesToSend = []
 
@@ -542,6 +543,10 @@ class FluidNexusClient(object):
                     log.write("no data to send")
 
     def run(self):
+        while True:
+            self.runLightblue()
+
+    def runBT(self):
         """Version of the run method that does not use the lightblue library; does not work because "bt_discover" opens up a window, but doesn't return a list."""
 
         allDevices = socket.bt_discover()
@@ -584,7 +589,6 @@ class FluidNexusClient(object):
                 clientSocket.send('aaaaaaaaaa')
                 time.sleep(1)
                 clientSocket.close()
-
 
 if __name__ == """__main__""":
     pass

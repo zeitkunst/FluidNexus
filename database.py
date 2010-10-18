@@ -404,8 +404,8 @@ class FluidNexusDatabase:
 ################################################################################
 #################        DEBUG LIB          ####################################
 ################################################################################
-if __name__ == "__main__":
-    # Run this script standalone to reset the database
-    database = FluidNexusDatabase()
-    database.setupDatabase()
-    database.add_new ('source', 23,'title','data','hash','cell')
+#if __name__ == "__main__":
+#    # Run this script standalone to reset the database
+#    database = FluidNexusDatabase()
+#    database.setupDatabase()
+#    database.add_new('source', 23,'title','data','hash','cell')

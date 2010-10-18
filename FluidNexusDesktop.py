@@ -46,6 +46,39 @@ class TreeIter(QtGui.QTreeWidgetItemIterator):
         else:
             raise StopIteration
 
+# We need to create a separate class to allow threading for the client and the server
+class FluidNexusClientQt(QtCore.QThread):
+    def __init__(self, databaseDir = None, databaseType = None, parent = None):
+        QtCore.QThread.__init__(self, parent)
+
+        self.databaseDir = databaseDir
+        self.databaseType = databaseType
+
+
+    def run(self):
+        while True:
+            # TODO
+            # HACK
+            # This works, but it's probably horribly, horribly inefficient.  The problem is is that each time the run method is called it comes from another thread, meaning that we can't reuse the connection anymore.  So we have to use this hack.
+            database = FluidNexusDatabase(databaseDir = self.databaseDir, databaseType = self.databaseType)
+            self.client = FluidNexusClient(database = database)
+            self.client.runLightblue()
+
+class FluidNexusServerQt(QtCore.QThread):
+    def __init__(self, databaseDir = None, databaseType = None, parent = None):
+        QtCore.QThread.__init__(self, parent)
+
+        self.databaseDir = databaseDir
+        self.databaseType = databaseType
+
+        database = FluidNexusDatabase(databaseDir = self.databaseDir, databaseType = self.databaseType)
+        self.server = FluidNexusServer(database = database, library="lightblue")
+        self.server.initMessageAdvertisements()
+
+    def run(self):
+        while True:
+            self.server.run()
+
 class FluidNexusNewMessageDialog(QtGui.QDialog):
     def __init__(self, parent=None, title = None, message = None):
         QtGui.QDialog.__init__(self, parent)
@@ -117,10 +150,13 @@ class FluidNexusDesktop(QtGui.QMainWindow):
             pass
 
         # Setup clients and servers
-        self.client = FluidNexusClient(database = self.database)
-        #self.client.runLightblue()
+        self.clientThread = FluidNexusClientQt(parent = self, databaseDir = self.dataDir, databaseType = "pysqlite2")
+        self.clientThread.start()
 
-        self.server = FluidNexusServer(database = self.database, library="lightblue")
+        self.serverThread = FluidNexusServerQt(parent = self, databaseDir = self.dataDir, databaseType = "pysqlite2")
+        self.serverThread.start()
+
+        #self.server = FluidNexusServer(database = self.database, library="lightblue")
         #self.server.initMessageAdvertisements()
         #self.server.run()
 
@@ -159,7 +195,7 @@ class FluidNexusDesktop(QtGui.QMainWindow):
             # Data
             a.setText(2, item[5][0:20] + "...")
 
-        self.ui.incomingMessagesList.hideColumn(0)
+        #self.ui.incomingMessagesList.hideColumn(0)
 
         # Setup outgoing
         self.database.outgoing()
@@ -191,7 +227,7 @@ class FluidNexusDesktop(QtGui.QMainWindow):
             a.font(2).setWeight(75)
             a.font(3).setWeight(75)
 
-        self.ui.outgoingMessagesList.hideColumn(0)
+        #self.ui.outgoingMessagesList.hideColumn(0)
         self.ui.outgoingMessagesList.resizeColumnToContents(1)
 
     def mainWindowDestroyed(self):
@@ -207,6 +243,10 @@ class FluidNexusDesktop(QtGui.QMainWindow):
 
         self.settings.setValue("outgoing/enabled", pickle.dumps(self.enabledHash))
         self.settings.sync()
+
+        print "Stopping client thread..."
+        self.clientThread.exit()
+        self.serverThread.exit()
 
         self.database.close()
         self.close()
