@@ -133,6 +133,21 @@ class FluidNexusDatabase:
         #databaseDir = os.path.join(pythonDir, databaseDir)
 
 
+    def openDB(self):
+        """Need to open a new connection, because of problems of sharing connections between threads."""
+        if (self.databaseType == "e32"):
+            self.db = e32db.Dbms()
+            self.dbv = e32db.Db_view()
+            try:
+                self.db.open(unicode(os.path.join(databaseDir, databaseName)))
+            except:
+                self.db.create(unicode(os.path.join(databaseDir, databaseName)))
+                self.db.open(unicode(os.path.join(databaseDir, databaseName)))
+        elif (self.databaseType == "pysqlite2"):
+            self.con = sqlite.connect(unicode(os.path.join(self.databaseDir, self.databaseName)), isolation_level=None)
+            self.db = self.con.cursor()
+
+
 
 ################################################################################
 ###############         Setup                        ###########################
@@ -248,7 +263,12 @@ class FluidNexusDatabase:
         return self
 
     def close(self):
-        self.db.close()
+        if (self.databaseType == "e32"):
+            pass
+        elif (self.databaseType == "pysqlite2"):
+            self.db.close()
+            self.con.close()
+
 ################################################################################
 #################        Outgoing messages  ####################################
 ################################################################################
@@ -404,6 +424,9 @@ class FluidNexusDatabase:
 ################################################################################
 #################        DEBUG LIB          ####################################
 ################################################################################
+if __name__ == "__main__":
+    database = FluidNexusDatabase()
+    database.setupDatabase()
 #if __name__ == "__main__":
 #    # Run this script standalone to reset the database
 #    database = FluidNexusDatabase()

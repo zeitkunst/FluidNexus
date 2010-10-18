@@ -6,6 +6,7 @@ import os
 import pickle
 import stat
 import sys
+import time
 
 # External library imports
 from PyQt4 import QtCore, QtGui
@@ -18,7 +19,6 @@ from FluidNexusNetworking import FluidNexusClient, FluidNexusServer
 
 # TODO
 # -- need to check if database already exists in home directory; if not, populate it with basic info
-# -- need to implement networking in QThreads
 # -- need to modularize present code
 
 DEFAULTS = {
@@ -63,6 +63,7 @@ class FluidNexusClientQt(QtCore.QThread):
             database = FluidNexusDatabase(databaseDir = self.databaseDir, databaseType = self.databaseType)
             self.client = FluidNexusClient(database = database)
             self.client.runLightblue()
+            time.sleep(30)
 
 class FluidNexusServerQt(QtCore.QThread):
     def __init__(self, databaseDir = None, databaseType = None, parent = None):
@@ -74,10 +75,14 @@ class FluidNexusServerQt(QtCore.QThread):
         database = FluidNexusDatabase(databaseDir = self.databaseDir, databaseType = self.databaseType)
         self.server = FluidNexusServer(database = database, library="lightblue")
         self.server.initMessageAdvertisements()
+        self.server.database.close()
+
 
     def run(self):
         while True:
+            self.server.database.openDB()
             self.server.run()
+
 
 class FluidNexusNewMessageDialog(QtGui.QDialog):
     def __init__(self, parent=None, title = None, message = None):
@@ -156,9 +161,8 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         self.serverThread = FluidNexusServerQt(parent = self, databaseDir = self.dataDir, databaseType = "pysqlite2")
         self.serverThread.start()
 
-        #self.server = FluidNexusServer(database = self.database, library="lightblue")
-        #self.server.initMessageAdvertisements()
-        #self.server.run()
+        # Setup signals
+        self.connect(self, QtCore.SIGNAL("incomingMessageDeleted"), self.incomingMessageDeleted)
 
     def _setupDefaultSettings(self):
         self.settings.clear()
@@ -195,7 +199,7 @@ class FluidNexusDesktop(QtGui.QMainWindow):
             # Data
             a.setText(2, item[5][0:20] + "...")
 
-        #self.ui.incomingMessagesList.hideColumn(0)
+        self.ui.incomingMessagesList.hideColumn(0)
 
         # Setup outgoing
         self.database.outgoing()
@@ -227,7 +231,7 @@ class FluidNexusDesktop(QtGui.QMainWindow):
             a.font(2).setWeight(75)
             a.font(3).setWeight(75)
 
-        #self.ui.outgoingMessagesList.hideColumn(0)
+        self.ui.outgoingMessagesList.hideColumn(0)
         self.ui.outgoingMessagesList.resizeColumnToContents(1)
 
     def mainWindowDestroyed(self):
@@ -250,6 +254,9 @@ class FluidNexusDesktop(QtGui.QMainWindow):
 
         self.database.close()
         self.close()
+
+    def incomingMessageDeleted(self, messageHash):
+        self.serverThread.server.stopAdvertise(str(messageHash))
 
     def incomingMessageClicked(self):
         currentItem = self.ui.incomingMessagesList.currentItem()
@@ -333,6 +340,30 @@ class FluidNexusDesktop(QtGui.QMainWindow):
 
         # Update status bar
         self.statusBar().showMessage("'%s' deleted." % currentItem.data(2, 0).toString())
+
+    def deleteIncomingMessage(self):
+        # TODO
+        # Remove the advertised hash once we've deleted it
+        # Disable the delete button if nothing else is selected
+
+        # Get current item, delete from database
+        currentItem = self.ui.incomingMessagesList.currentItem()
+        self.database.remove_by_hash(currentItem.data(0, 0).toString())
+
+        # Remove the selected items from the list
+        for twi in self.ui.incomingMessagesList.selectedItems():
+            self.ui.incomingMessagesList.removeItemWidget(twi, 0)
+        del twi # remove last reference
+
+        # Clear message text area
+        te = self.ui.incomingMessageText
+        te.clear()
+
+        # Update status bar
+        self.statusBar().showMessage("'%s' deleted." % currentItem.data(1, 0).toString())
+
+        self.emit(QtCore.SIGNAL("incomingMessageDeleted"), currentItem.data(0, 0).toString())
+
 
     def showNewMessageWindow(self):
         self.newMessageDialog = FluidNexusNewMessageDialog(parent = self)

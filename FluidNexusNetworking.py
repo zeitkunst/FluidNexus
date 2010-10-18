@@ -179,6 +179,19 @@ class FluidNexusServer(object):
                 s.listen(1)
                 lightblue.advertise(unicode(':' + hash), s, lightblue.RFCOMM)
 
+    def stopAdvertise(self, hash):
+        try:
+            s = self.advertisingSockets[hash]
+        except KeyError:
+            print "Key %s not found, returning..." % hash
+            return
+
+        if (self.library == "e32"):
+            print "not implemented for e32 yet"
+            return
+        elif (self.library == "lightblue"):
+            lightblue.stopadvertise(s)
+            del self.advertisingSockets[hash]
 
     def advertiseNewHash(self, hash):
         """Advertise a new hash that we have just received."""
