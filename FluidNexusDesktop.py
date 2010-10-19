@@ -71,17 +71,21 @@ class FluidNexusServerQt(QtCore.QThread):
 
         self.databaseDir = databaseDir
         self.databaseType = databaseType
+        self.parent = parent
 
         database = FluidNexusDatabase(databaseDir = self.databaseDir, databaseType = self.databaseType)
         self.server = FluidNexusServer(database = database, library="lightblue")
         self.server.initMessageAdvertisements()
         self.server.database.close()
 
+        self.connect(self, QtCore.SIGNAL("incomingMessageAdded"), self.parent.incomingMessageAdded)
+
 
     def run(self):
         while True:
             self.server.database.openDB()
-            self.server.run()
+            newHash = self.server.run()
+            self.emit(QtCore.SIGNAL("incomingMessageAdded"), newHash)
 
 
 class FluidNexusNewMessageDialog(QtGui.QDialog):
@@ -123,9 +127,6 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         
         self.settings = QtCore.QSettings("zeitkunst", "Fluid Nexus")
        
-        # Setup the defaults
-        #self._setupDefaultSettings()
-
         # Setup location of the app-specific data
         self._setupAppData()
 
@@ -139,11 +140,13 @@ class FluidNexusDesktop(QtGui.QMainWindow):
 
         # Setup the database and the views
         self.database = FluidNexusDatabase(databaseDir = self.dataDir, databaseType = "pysqlite2")
-        #self.database.setupDatabase()
-        self.setupTreeViews()
+
+        # Setup models
+        self.setupModels()
 
         # Save the currently edited hash
         self.currentEditingHash = None
+        self.currentEditingRow = None
 
         # Ensure files are readable only by user
         # @HACK@
@@ -186,6 +189,49 @@ class FluidNexusDesktop(QtGui.QMainWindow):
             os.makedirs(self.dataDir)
 
         os.chmod(self.dataDir, stat.S_IREAD | stat.S_IWRITE | stat.S_IEXEC)
+
+    def setupModels(self):
+        # Incoming model
+        self.incomingMessagesModel = QtGui.QStandardItemModel(parent = self)
+        self.incomingMessagesModel.setHorizontalHeaderLabels(["Hash", "Title", "Message"])
+        self.database.non_outgoing()
+        for item in self.database:
+            itemHash = QtGui.QStandardItem(item[6])
+            itemTitle = QtGui.QStandardItem(item[4])
+            itemMessageFragment = QtGui.QStandardItem(item[5][0:20])
+            self.incomingMessagesModel.appendRow([itemHash, itemTitle, itemMessageFragment])
+
+        self.ui.incomingMessagesList.setModel(self.incomingMessagesModel)
+        self.ui.incomingMessagesList.hideColumn(0)
+
+        # Outgoing model
+        iconOutgoing = QtGui.QIcon()
+        iconOutgoing.addPixmap(QtGui.QPixmap(":/icon32x32/icons/32x32/menu_enable_outgoing.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.outgoingMessagesModel = QtGui.QStandardItemModel(parent = self)
+        self.outgoingMessagesModel.setHorizontalHeaderItem(0, QtGui.QStandardItem("Hash"))
+        self.outgoingMessagesModel.setHorizontalHeaderItem(1, QtGui.QStandardItem(iconOutgoing, ""))
+        self.outgoingMessagesModel.setHorizontalHeaderItem(2, QtGui.QStandardItem("Title"))
+        self.outgoingMessagesModel.setHorizontalHeaderItem(3, QtGui.QStandardItem("Message"))
+
+        self.database.outgoing()
+        for item in self.database:
+            itemHash = QtGui.QStandardItem(item[6])
+            itemTitle = QtGui.QStandardItem(item[4])
+            itemMessageFragment = QtGui.QStandardItem(item[5][0:20])
+
+            if (self.enabledHash.has_key(item[6])):
+                if (self.enabledHash[item[6]]):
+                    enabledIcon = QtGui.QIcon()
+                    enabledIcon.addPixmap(QtGui.QPixmap(":/icon32x32/icons/32x32/menu_enable_outgoing.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+                else:
+                    enabledIcon = QtGui.QIcon()
+            else:
+                enabledIcon = QtGui.QIcon()
+
+            self.outgoingMessagesModel.appendRow([itemHash, QtGui.QStandardItem(enabledIcon, ""), itemTitle, itemMessageFragment])
+
+        self.ui.outgoingMessagesList.setModel(self.outgoingMessagesModel)
+        self.ui.outgoingMessagesList.hideColumn(0)
 
     def setupTreeViews(self):
         # Setup incoming
@@ -235,58 +281,83 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         self.ui.outgoingMessagesList.resizeColumnToContents(1)
 
     def mainWindowDestroyed(self):
-        #self.settings.setValue(name, DEFAULTS[section][key])
-        items = TreeIter(self.ui.outgoingMessagesList)
-        for item in items:
-            currentItemIcon = item.icon(1)
-            hash
-            if (currentItemIcon.isNull()):
-                self.enabledHash[str(item.data(0, 0).toString())] = False
-            else:
-                self.enabledHash[str(item.data(0, 0).toString())] = True
-
-        self.settings.setValue("outgoing/enabled", pickle.dumps(self.enabledHash))
-        self.settings.sync()
-
         print "Stopping client thread..."
-        self.clientThread.exit()
-        self.serverThread.exit()
+        #self.clientThread.quit()
+        #self.clientThread.wait()
+        print "Stopping server thread..."
+        #self.serverThread.quit()
+        #self.serverThread.wait()
 
-        self.database.close()
-        self.close()
+        #self.database.close()
+        #self.close()
 
     def incomingMessageDeleted(self, messageHash):
         self.serverThread.server.stopAdvertise(str(messageHash))
 
-    def incomingMessageClicked(self):
-        currentItem = self.ui.incomingMessagesList.currentItem()
-        item = self.database.returnItemBasedOnHash(currentItem.data(0, 0).toString())
+    def incomingMessageAdded(self, newHash):
+        """Slot for when an incoming message was added by the server thread."""
+        item = self.database.returnItemBasedOnHash(newHash)
+
+        itemHash = QtGui.QStandardItem(item[6])
+        itemTitle = QtGui.QStandardItem(item[4])
+        itemMessageFragment = QtGui.QStandardItem(item[5][0:20])
+        self.incomingMessagesModel.insertRow(0, [itemHash, itemTitle, itemMessageFragment])
+
+    def incomingMessageClicked(self, index):
+        currentItem = self.incomingMessagesModel.itemFromIndex(index)
+        row = currentItem.row()
+        messageHash = str(self.incomingMessagesModel.item(row, column = 0).text())
+        item = self.database.returnItemBasedOnHash(messageHash)
         te = self.ui.incomingMessageText
         te.clear()
         te.setPlainText(item[5])
 
-    def outgoingMessageClicked(self):
-        currentItem = self.ui.outgoingMessagesList.currentItem()
-        currentItemIcon = currentItem.icon(1)
-        if (currentItemIcon.isNull()):
-            pass
+    def editOutgoingMessage(self):
+        indices = self.ui.outgoingMessagesList.selectedIndexes()
+        currentItem = self.outgoingMessagesModel.itemFromIndex(indices[0])
+        row = currentItem.row()
+        messageHash = str(self.outgoingMessagesModel.item(row, column = 0).text())
+        item = self.database.returnItemBasedOnHash(messageHash)
+        messageTitle = str(self.outgoingMessagesModel.item(row, column = 2).text())
 
-        item = self.database.returnItemBasedOnHash(unicode(currentItem.data(0, 0).toString()))
+        self.currentEditingHash = messageHash
+        self.currentEditingRow = row
+
+        self.newMessageDialog = FluidNexusNewMessageDialog(parent = self, title = messageTitle, message = item[5])
+        self.newMessageDialog.exec_()
+
+    def outgoingMessageClicked(self, index):
+        if (not self.ui.deleteOutgoingButton.isEnabled()):
+            self.ui.deleteOutgoingButton.setEnabled(True)
+
+        if (not self.ui.toggleOutgoingButton.isEnabled()):
+            self.ui.toggleOutgoingButton.setEnabled(True)
+
+        if (not self.ui.editMessageButton.isEnabled()):
+            self.ui.editMessageButton.setEnabled(True)
+
+
+        currentItem = self.outgoingMessagesModel.itemFromIndex(index)
+        row = currentItem.row()
+        messageHash = str(self.outgoingMessagesModel.item(row, column = 0).text())
+        item = self.database.returnItemBasedOnHash(messageHash)
         te = self.ui.outgoingMessageText
         te.clear()
         te.setPlainText(item[5])
 
-    def outgoingMessageDoubleClicked(self):
-        currentItem = self.ui.outgoingMessagesList.currentItem()
-
-        item = self.database.returnItemBasedOnHash(currentItem.data(0, 0).toString())
-
-        self.currentEditingHash = str(currentItem.data(0, 0).toString())
-
-        self.newMessageDialog = FluidNexusNewMessageDialog(parent = self, title = str(currentItem.data(2, 0).toString()), message = item[5])
+    def outgoingMessageDoubleClicked(self, index):
+        print "double clicked"
+        currentItem = self.outgoingMessagesModel.itemFromIndex(index)
+        row = currentItem.row()
+        messageHash = str(self.outgoingMessagesModel.item(row, column = 0).text())
+        item = self.database.returnItemBasedOnHash(messageHash)
+        
+        self.currentEditingHash = messageHash
+        self.newMessageDialog = FluidNexusNewMessageDialog(parent = self, title = item[4], message = item[5])
         self.newMessageDialog.exec_()
 
-    def outgoingMessageItemActivated(self):
+    def outgoingMessageItemActivated(self, index):
+        print "here"
         if (not self.ui.deleteOutgoingButton.isEnabled()):
             self.ui.deleteOutgoingButton.setEnabled(True)
 
@@ -294,18 +365,21 @@ class FluidNexusDesktop(QtGui.QMainWindow):
             self.ui.toggleOutgoingButton.setEnabled(True)
 
     def toggleOutgoingMessage(self):
-        currentItem = self.ui.outgoingMessagesList.currentItem()
-        currentItemIcon = currentItem.icon(1)
+        indices = self.ui.outgoingMessagesList.selectedIndexes()
+        currentItem = self.outgoingMessagesModel.itemFromIndex(indices[0])
+        row = currentItem.row()
+        messageHash = str(self.outgoingMessagesModel.item(row, column = 0).text())
+        currentItemIcon = self.outgoingMessagesModel.item(row, column = 1).icon()
 
         if (currentItemIcon.isNull()):
             enabledIcon = QtGui.QIcon()
             enabledIcon.addPixmap(QtGui.QPixmap(":/icon32x32/icons/32x32/menu_enable_outgoing.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-            currentItem.setIcon(1, enabledIcon)
-            self.enabledHash[str(currentItem.data(0, 0).toString())] = True
+            self.outgoingMessagesModel.setItem(row, 1, QtGui.QStandardItem(enabledIcon, ""))
+            self.enabledHash[messageHash] = True
         else:
             enabledIcon = QtGui.QIcon()
-            currentItem.setIcon(1, enabledIcon)
-            self.enabledHash[str(currentItem.data(0, 0).toString())] = False
+            self.outgoingMessagesModel.setItem(row, 1, QtGui.QStandardItem(enabledIcon, ""))
+            self.enabledHash[messageHash] = False
 
         self.settings.setValue("outgoing/enabled", pickle.dumps(self.enabledHash))
         self.settings.sync()
@@ -313,56 +387,56 @@ class FluidNexusDesktop(QtGui.QMainWindow):
     def deleteOutgoingMessage(self):
         # TODO
         # Disable the delete button if nothing else is selected
+        indices = self.ui.outgoingMessagesList.selectedIndexes()
+        currentItem = self.outgoingMessagesModel.itemFromIndex(indices[0])
+        row = currentItem.row()
+        messageHash = str(self.outgoingMessagesModel.item(row, column = 0).text())
+        title = str(self.outgoingMessagesModel.item(row, column = 1).text())
+        self.outgoingMessagesModel.removeRow(row)
 
-        # Get current item, delete from database
-        currentItem = self.ui.outgoingMessagesList.currentItem()
-        self.database.remove_by_hash(currentItem.data(0, 0).toString())
-
-        # Remove the selected items from the list
-        for twi in self.ui.outgoingMessagesList.selectedItems():
-            self.ui.outgoingMessagesList.removeItemWidget(twi, 0)
-        del twi # remove last reference
+        self.database.remove_by_hash(messageHash)
 
         # Clear message text area
         te = self.ui.outgoingMessageText
         te.clear()
 
+        # Update status bar
+        self.statusBar().showMessage("'%s' deleted." % title)
+
         # Remove from hash and sync
         # TODO
         # Make this into a method, or raise a signal, or something of the sort
         try:
-            del self.enabledHash[unicode(currentItem.data(0, 0).toString())]
+            del self.enabledHash[unicode(messageHash)]
         except KeyError:
             # not sure why I get a key error here...
             pass
         self.settings.setValue("outgoing/enabled", pickle.dumps(self.enabledHash))
         self.settings.sync()
 
-        # Update status bar
-        self.statusBar().showMessage("'%s' deleted." % currentItem.data(2, 0).toString())
-
     def deleteIncomingMessage(self):
         # TODO
-        # Remove the advertised hash once we've deleted it
         # Disable the delete button if nothing else is selected
 
         # Get current item, delete from database
-        currentItem = self.ui.incomingMessagesList.currentItem()
-        self.database.remove_by_hash(currentItem.data(0, 0).toString())
+        indices = self.ui.incomingMessagesList.selectedIndexes()
+        currentItem = self.incomingMessagesModel.itemFromIndex(indices[0])
+        row = currentItem.row()
+        hash = str(self.incomingMessagesModel.item(row, column = 0).text())
+        title = str(self.incomingMessagesModel.item(row, column = 1).text())
+        self.incomingMessagesModel.removeRow(row)
 
-        # Remove the selected items from the list
-        for twi in self.ui.incomingMessagesList.selectedItems():
-            self.ui.incomingMessagesList.removeItemWidget(twi, 0)
-        del twi # remove last reference
+        self.database.remove_by_hash(hash)
 
         # Clear message text area
         te = self.ui.incomingMessageText
         te.clear()
 
         # Update status bar
-        self.statusBar().showMessage("'%s' deleted." % currentItem.data(1, 0).toString())
+        self.statusBar().showMessage("'%s' deleted." % title)
 
-        self.emit(QtCore.SIGNAL("incomingMessageDeleted"), currentItem.data(0, 0).toString())
+        # Emit signal to deadvertise hash
+        self.emit(QtCore.SIGNAL("incomingMessageDeleted"), hash)
 
 
     def showNewMessageWindow(self):
@@ -370,20 +444,16 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         self.newMessageDialog.exec_()
 
     def newMessageSaveButtonClicked(self, title, body):
-        hash = unicode(md5.md5(unicode(title) + unicode(body)).hexdigest())
+        messageHash = unicode(md5.md5(unicode(title) + unicode(body)).hexdigest())
 
         if (self.currentEditingHash is not None):
             self.database.remove_by_hash(self.currentEditingHash)
 
             # Find the right item to update
-            treeItems = TreeIter(self.ui.outgoingMessagesList)
-            for treeItem in treeItems:
-                currentItemHash = unicode(treeItem.data(0, 0).toString())
-                if (currentItemHash == unicode(self.currentEditingHash)):
-                    treeItem.setText(0, unicode(md5.md5(unicode(title) + unicode(body)).hexdigest()))
-                    treeItem.setText(2, title)
-                    treeItem.setText(3, body[0:20] + "...")
-            self.database.add_new(u"00:00", 0, unicode(title), unicode(body), hash, u"00:00")
+            self.database.add_new(u"00:00", 0, unicode(title), unicode(body), messageHash, u"00:00")
+            self.outgoingMessagesModel.setItem(self.currentEditingRow, 0, QtGui.QStandardItem(messageHash))
+            self.outgoingMessagesModel.setItem(self.currentEditingRow, 2, QtGui.QStandardItem(title))
+            self.outgoingMessagesModel.setItem(self.currentEditingRow, 3, QtGui.QStandardItem(body[0:20] + " ..."))
 
             try:
                 del self.enabledHash[self.currentEditingHash]
@@ -391,17 +461,17 @@ class FluidNexusDesktop(QtGui.QMainWindow):
                 # If we haven't toggled anything yet, the item won't be there yet
                 pass
             self.currentEditingHash = None
+            self.currentEditingRow = None
         else:
-            self.database.add_new(u"00:00", 0, unicode(title), unicode(body), hash, u"00:00")
-            outgoing = QtGui.QTreeWidgetItem(self.ui.outgoingMessagesList)
-            outgoing.setText(0, hash)
-            outgoing.setText(2, title)
-            outgoing.setText(3, body[0:20] + "...")
-            outgoing.font(2).setBold(True)
-            outgoing.font(3).setBold(True)
+            self.database.add_new(u"00:00", 0, unicode(title), unicode(body), messageHash, u"00:00")
+
+            itemHash = QtGui.QStandardItem(messageHash)
+            itemTitle = QtGui.QStandardItem(title)
+            itemMessageFragment = QtGui.QStandardItem(body[0:20] + " ...")
             enabledIcon = QtGui.QIcon()
             enabledIcon.addPixmap(QtGui.QPixmap(":/icon32x32/icons/32x32/menu_enable_outgoing.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-            outgoing.setIcon(1, enabledIcon)
+            self.outgoingMessagesModel.insertRow(0, [itemHash, QtGui.QStandardItem(enabledIcon, ""), itemTitle, itemMessageFragment])
+
 
 
 if __name__ == "__main__":

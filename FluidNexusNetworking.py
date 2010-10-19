@@ -332,6 +332,8 @@ class FluidNexusServer(object):
         self.database.add_received(ownerHash, timestamp, 0, title, message, md5.md5(title + message).hexdigest(), '0')
         self.advertiseNewHash(md5.md5(title + message).hexdigest())
 
+        return md5.md5(title + message).hexdigest()
+
         # TODO
         # Not sure why this is here...
 #        try:
@@ -498,7 +500,11 @@ class FluidNexusClient(object):
 
         log.write("looking for devices")
         #allDevices = socket.bt_discover()
-        allDevices = lightblue.finddevices()
+        try:
+            allDevices = lightblue.finddevices()
+        except Exception, e:
+            print "Error looking up devices: %s" % e
+            return
         phones = []
 
         for device in allDevices:
