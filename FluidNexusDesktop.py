@@ -472,12 +472,11 @@ class FluidNexusDesktop(QtGui.QMainWindow):
             enabledIcon.addPixmap(QtGui.QPixmap(":/icon32x32/icons/32x32/menu_enable_outgoing.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
             self.outgoingMessagesModel.insertRow(0, [itemHash, QtGui.QStandardItem(enabledIcon, ""), itemTitle, itemMessageFragment])
 
-
-
-if __name__ == "__main__":
-    print "here"
+def start():
     app = QtGui.QApplication(sys.argv)
     fluidNexus = FluidNexusDesktop()
     fluidNexus.show()
     sys.exit(app.exec_())
 
+if __name__ == "__main__":
+    start()
