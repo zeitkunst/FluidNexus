@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import binascii
+import hashlib
 import os
 import struct
 import time
@@ -38,8 +39,10 @@ DONE_DONE = 0x00F0
 
 # TODO
 # Need to figure out the time thing...
-testData = {'FluidNexusaaaaaaaaaaaaaaaaaaaaaa':
-            ("1234567890", 'This is a test from ver2', 'Nothing but a test.\n\nTesting here.\n\nHope this gets through.\n\nShould eventually try unicode.')
+testTitle = 'This is a test from ver2'
+testMessage = 'Nothing but a test.\n\nTesting here.\n\nHope this gets through.\n\nShould eventually try unicode.'
+testData = {hashlib.md5(testTitle + testMessage).hexdigest():
+            (str(int(float(time.time()))), testTitle, testMessage)
 }
 print testData
 
