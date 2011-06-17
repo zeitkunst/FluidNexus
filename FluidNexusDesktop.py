@@ -125,10 +125,19 @@ class FluidNexusDesktop(QtGui.QMainWindow):
 
         self.statusBar().showMessage("Messages loaded.")
         
-        self.settings = QtCore.QSettings("zeitkunst", "Fluid Nexus")
+        self.settings = QtCore.QSettings("fluidnexus.net", "Fluid Nexus")
        
         # Setup location of the app-specific data
         self._setupAppData()
+        
+        # Check to see if this is the first time we're being run
+        firstRun = self.settings.value("app/firstRun", True)
+
+        if firstRun:
+            self.__setupDefaultSettings()
+            self.settings.setValue("app/firstRun", False)
+            self.settings.setValue("app/dataDir", self.dataDir)
+            firstRun = False
 
         # Setup a hash for enabled outgoing messages
         enabledHash = self.settings.value("outgoing/enabled", "none").toString() 
@@ -167,7 +176,7 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         # Setup signals
         self.connect(self, QtCore.SIGNAL("incomingMessageDeleted"), self.incomingMessageDeleted)
 
-    def _setupDefaultSettings(self):
+    def __setupDefaultSettings(self):
         self.settings.clear()
 
         for section in DEFAULTS.keys():
@@ -475,6 +484,7 @@ class FluidNexusDesktop(QtGui.QMainWindow):
 def start():
     app = QtGui.QApplication(sys.argv)
     fluidNexus = FluidNexusDesktop()
+    print "here"
     fluidNexus.show()
     sys.exit(app.exec_())
 
