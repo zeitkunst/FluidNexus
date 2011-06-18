@@ -24,17 +24,20 @@ import time
 import os
 import md5
 
-# @HACK@
-# Adding paths to find the modules
-sys.path.append('.')
-sys.path.append(os.getcwd())
-sys.path.append('C:\\System\\Apps\\Python\\my\\')
-sys.path.append('E:\\System\\Apps\\Python\\my\\')
-sys.path.append('C:\\Python')
-sys.path.append('E:\\Python')
+# my imports
+import Log
 
-sys.path.append('C:\\System\\Apps\\Python\\my\\')
-from logger import Logger
+## @HACK@
+## Adding paths to find the modules
+#sys.path.append('.')
+#sys.path.append(os.getcwd())
+#sys.path.append('C:\\System\\Apps\\Python\\my\\')
+#sys.path.append('E:\\System\\Apps\\Python\\my\\')
+#sys.path.append('C:\\Python')
+#sys.path.append('E:\\Python')
+#
+#sys.path.append('C:\\System\\Apps\\Python\\my\\')
+#from logger import Logger
 
 # Series 60 specific imports
 try:
@@ -63,7 +66,7 @@ try:
 
     # Setup logging and redirect standard input and output
     log = Logger(dataPath + u'\\FluidNexus.log', prefix = 'database: ')
-    sys.stderr = sys.stdout = log
+    #sys.stderr = sys.stdout = log
     #log = sys.stderr = sys.stdout
     
     # For those extraneous errors floating around...
@@ -99,8 +102,10 @@ class FluidNexusDatabase:
 ################################################################################
     def __init__(self, databaseDir = dataPath, databaseType = "e32", databaseName = 'FluidNexus.db'):
         """Initialization method that makes sure the database file and directory exist, and creates/opens the database file, and prepares the database view."""
-        self.log = Logger(os.path.join(databaseDir, u'FluidNexus.log'), prefix = 'database: ')
-        #sys.stderr = sys.stdout = self.log
+
+        self.logger = Log.getLogger(databaseDir)
+        #self.logger = Logger(os.path.join(databaseDir, u'FluidNexus.log'), prefix = 'database: ')
+        #sys.stderr = sys.stdout = self.logger
 
         self.databaseDir = databaseDir
         self.databaseName = databaseName
@@ -405,7 +410,7 @@ class FluidNexusDatabase:
         """clear signal that there is data"""
         sql = unicode("update FluidNexusSignal set signal = 0 where id = 0")
         rows = self.__query(sql)
-        self.log.write(str(rows))
+        self.logger.write(str(rows))
         return rows
 
 ################################################################################
