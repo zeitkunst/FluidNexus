@@ -177,9 +177,13 @@ TODO
 
         for index in xrange(0, numHashes):
             hashPacked = self.cs.recv(self.hashStruct.size)
-            hashUnpacked = self.hashStruct.unpack(hashPacked)
-            self.logger.debug("Received hash: " + hashUnpacked[0])
-            self.hashesToReceive.append(hashUnpacked[0])
+            hashUnpacked = self.hashStruct.unpack(hashPacked)[0]
+            self.logger.debug("Received hash: " + hashUnpacked)
+            
+            hashUnpacked = hashUnpacked.lower()
+            if (not (self.database.look_for_hash(hashUnpacked))):
+                self.logger.debug("Don't currently have hash: " + hashUnpacked)
+                self.hashesToReceive.append(hashUnpacked)
 
         self.currentSendingState = HASH_REQUEST
     
