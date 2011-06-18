@@ -22,6 +22,8 @@ FluidNexusUUID = "bd547e68-952b-11e0-a6c7-0023148b3104"
 HELO = 0x0010
 HASH_LIST = 0x0020
 HASH_REQUEST = 0x0030
+SWITCH = 0x0040
+SWITCH_DONE = 0x0041
 DONE_DONE = 0x00F0
 
 # Length constants
@@ -154,6 +156,99 @@ TODO
         messagePacker = struct.Struct(">%ds" % int(len(message)) )
         self.cs.send(messagePacker.pack(message))
 
+    def respondSWITCH(self):
+        """Respond to SWITCH with a SWITCH."""
+
+        self.cs.send(self.commandStruct.pack(SWITCH))
+
+        self.doRequestLoop()
+
+    def sendHashListRequest(self):
+        """Send a request for a list of hashes from the client."""
+
+        # Send command for hash list
+        self.cs.send(self.commandStruct.pack(HASH_LIST))
+        numHashesCommand = self.cs.recv(self.commandStruct.size)
+        numHashes = self.commandStruct.unpack(numHashesCommand)
+        numHashes = numHashes[0]
+        self.logger.debug("Expect to receive %d hashes" % numHashes)
+
+        self.hashesToReceive = []
+
+        for index in xrange(0, numHashes):
+            hashPacked = self.cs.recv(self.hashStruct.size)
+            hashUnpacked = self.hashStruct.unpack(hashPacked)
+            self.logger.debug("Received hash: " + hashUnpacked[0])
+            self.hashesToReceive.append(hashUnpacked[0])
+
+        self.currentSendingState = HASH_REQUEST
+    
+    def __requestHash(self, currentHash):
+        """Private method to request data for a particular hash."""
+
+        # Send command for hash request
+        self.cs.send(self.commandStruct.pack(HASH_REQUEST))
+        self.logger.debug("=> Requesting data for hash %s" % currentHash)
+
+        # Send hash that we want to receive
+        self.cs.send(self.hashStruct.pack(currentHash))
+
+        # Receive data corresponding to hash
+        versionPacker = struct.Struct(">B")
+        versionPacked = self.cs.recv(versionPacker.size)
+        self.logger.debug("received %s " % binascii.hexlify(versionPacked))
+        version = versionPacker.unpack(versionPacked)[0]
+        self.logger.debug("Version: %d" % version)
+        
+        titleLengthPacker = struct.Struct(">I")
+        titleLengthPacked = self.cs.recv(titleLengthPacker.size)
+        titleLength = titleLengthPacker.unpack(titleLengthPacked)[0]
+        self.logger.debug("Title length: %d" % titleLength)
+
+        messageLengthPacker = struct.Struct(">I")
+        messageLengthPacked = self.cs.recv(messageLengthPacker.size)
+        messageLength = messageLengthPacker.unpack(messageLengthPacked)[0]
+        self.logger.debug("Message length: %d" % messageLength)
+
+        timestampPacker = struct.Struct(">10s")
+        timestampPacked = self.cs.recv(timestampPacker.size)
+        timestamp = timestampPacker.unpack(timestampPacked)[0]
+        self.logger.debug("Timestamp: %s" % timestamp)
+
+        titlePacker = struct.Struct(">%ds" % int(titleLength) )
+        titlePacked = self.cs.recv(titlePacker.size)
+        title = titlePacker.unpack(titlePacked)[0]
+        self.logger.debug("Title: %s" % title)
+
+        messagePacker = struct.Struct(">%ds" % int(messageLength) )
+        messagePacked = self.cs.recv(messagePacker.size)
+        message = messagePacker.unpack(messagePacked)[0]
+        self.logger.debug("Message: %s" % message)
+    
+    def sendHashRequest(self):
+        """Send a request for a given hash."""
+
+        # TODO
+        # Only request hashes we don't already have
+        # Receiving hash request
+        for currentHash in self.hashesToReceive:
+            self.__requestHash(currentHash)
+
+    def doRequestLoop(self):
+        """Enter into a loop to send requests to our client."""
+        done = False
+        self.currentSendingState = HASH_LIST
+        while (not done):
+            if (self.currentSendingState == HASH_LIST):
+                self.sendHashListRequest()
+            elif (self.currentSendingState == HASH_REQUEST):
+                self.sendHashRequest()
+                # Send command for hash list
+                self.cs.send(self.commandStruct.pack(SWITCH_DONE))
+                done = True
+            else:
+                done = True
+
     def respondDoneDone(self):
         """Respond that we're really done."""
         self.logger.debug("=> Sending back command")
@@ -194,6 +289,9 @@ TODO
             elif (unpacked_command == HASH_REQUEST):
                 self.logger.debug("=> Received command for particular hash request")
                 self.respondWithDataForHash()
+            elif (unpacked_command == SWITCH):
+                self.logger.debug("=> Received command to switch direction")
+                self.respondSWITCH()
             elif (unpacked_command == DONE_DONE):
                 self.logger.debug("=> Received command that we're done")
                 self.respondDoneDone()
