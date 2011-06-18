@@ -162,7 +162,6 @@ TODO
         self.cs = None
         self.ci = None
 
-
     def run(self):
         """Run the main loop."""
 
