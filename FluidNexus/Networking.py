@@ -67,7 +67,7 @@ TODO
     def __init__(self, databaseDir = ".", databaseType = "pysqlite2", logPath = "FluidNexus.log", level = logging.DEBUG, numConnections = 5):
         super(BluetoothServer, self).__init__(logPath = logPath, level = level)
 
-        self.database = FluidNexusDatabase(databaseDir = databaseDir, databaseType = databaseType,)
+        self.database = FluidNexusDatabase(databaseDir = databaseDir, databaseType = databaseType)
 
         # Do initial setup
         self.setupServerSocket(numConnections = numConnections)

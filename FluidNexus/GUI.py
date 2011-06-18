@@ -14,7 +14,7 @@ from PyQt4 import QtCore, QtGui
 # My library imports
 from ui.FluidNexusDesktopUI import Ui_FluidNexus
 from ui.FluidNexusNewMessageUI import Ui_FluidNexusNewMessage
-from database import FluidNexusDatabase
+from Database import FluidNexusDatabase
 from FluidNexusNetworking import FluidNexusClient, FluidNexusServer
 
 # TODO
@@ -148,6 +148,12 @@ class FluidNexusDesktop(QtGui.QMainWindow):
             self.enabledHash = pickle.loads(str(enabledHash))
 
         # Setup the database and the views
+        self.dataDir = unicode(self.settings.value("app/dataDir").toString())
+        name = unicode(self.settings.value("database/name").toString())
+        logPath = os.path.join(self.dataDir, "FluidNexus.log")
+        self.databaseDir = os.path.join(self.dataDir, name)
+        self.databaseType = unicode(self.settings.value("database/type").toString())
+
         self.database = FluidNexusDatabase(databaseDir = self.dataDir, databaseType = "pysqlite2")
 
         # Setup models
@@ -167,11 +173,13 @@ class FluidNexusDesktop(QtGui.QMainWindow):
             pass
 
         # Setup clients and servers
+        """
         self.clientThread = FluidNexusClientQt(parent = self, databaseDir = self.dataDir, databaseType = "pysqlite2")
         self.clientThread.start()
 
         self.serverThread = FluidNexusServerQt(parent = self, databaseDir = self.dataDir, databaseType = "pysqlite2")
         self.serverThread.start()
+        """
 
         # Setup signals
         self.connect(self, QtCore.SIGNAL("incomingMessageDeleted"), self.incomingMessageDeleted)
