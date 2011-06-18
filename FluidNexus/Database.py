@@ -100,10 +100,10 @@ class FluidNexusDatabase:
 ################################################################################
 ################         Constructor                   #########################
 ################################################################################
-    def __init__(self, databaseDir = dataPath, databaseType = "e32", databaseName = 'FluidNexus.db'):
+    def __init__(self, databaseDir = dataPath, databaseType = "e32", databaseName = 'FluidNexus.db', logPath = "FluidNexus.log"):
         """Initialization method that makes sure the database file and directory exist, and creates/opens the database file, and prepares the database view."""
 
-        self.logger = Log.getLogger()
+        self.logger = Log.getLogger(logPath = logPath)
         #self.logger = Logger(os.path.join(databaseDir, u'FluidNexus.log'), prefix = 'database: ')
         #sys.stderr = sys.stdout = self.logger
 

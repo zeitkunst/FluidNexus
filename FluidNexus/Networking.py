@@ -182,7 +182,7 @@ TODO
             self.logger.debug("received %s " % binascii.hexlify(command))
             unpacked_command = self.commandStruct.unpack(command)
             unpacked_command = unpacked_command[0]
-            self.logger.debug("unpacked: ", unpacked_command)
+            self.logger.debug("unpacked: " + str(unpacked_command))
 
             # Go through our command tree
             if (unpacked_command == HELO):

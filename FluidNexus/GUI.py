@@ -16,6 +16,7 @@ from ui.FluidNexusDesktopUI import Ui_FluidNexus
 from ui.FluidNexusNewMessageUI import Ui_FluidNexusNewMessage
 from Database import FluidNexusDatabase
 from FluidNexusNetworking import FluidNexusClient, FluidNexusServer
+import Log
 
 # TODO
 # -- need to check if database already exists in home directory; if not, populate it with basic info
@@ -128,16 +129,19 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         self.settings = QtCore.QSettings("fluidnexus.net", "Fluid Nexus")
        
         # Setup location of the app-specific data
-        self._setupAppData()
+        self.__setupAppData()
         
         # Check to see if this is the first time we're being run
-        firstRun = self.settings.value("app/firstRun", True)
+        firstRun = self.settings.value("app/firstRun", True).toBool()
 
         if firstRun:
             self.__setupDefaultSettings()
-            self.settings.setValue("app/firstRun", False)
-            self.settings.setValue("app/dataDir", self.dataDir)
             firstRun = False
+        else:
+            self.__setupDatabaseConnection()
+
+        # Setup logging
+        self.logger = Log.getLogger(logPath = self.logPath)
 
         # Setup a hash for enabled outgoing messages
         enabledHash = self.settings.value("outgoing/enabled", "none").toString() 
@@ -147,14 +151,6 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         else:
             self.enabledHash = pickle.loads(str(enabledHash))
 
-        # Setup the database and the views
-        self.dataDir = unicode(self.settings.value("app/dataDir").toString())
-        name = unicode(self.settings.value("database/name").toString())
-        logPath = os.path.join(self.dataDir, "FluidNexus.log")
-        self.databaseDir = os.path.join(self.dataDir, name)
-        self.databaseType = unicode(self.settings.value("database/type").toString())
-
-        self.database = FluidNexusDatabase(databaseDir = self.dataDir, databaseType = "pysqlite2")
 
         # Setup models
         self.setupModels()
@@ -184,6 +180,8 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         # Setup signals
         self.connect(self, QtCore.SIGNAL("incomingMessageDeleted"), self.incomingMessageDeleted)
 
+        self.logger.debug("FluidNexus desktop version has started.")
+
     def __setupDefaultSettings(self):
         self.settings.clear()
 
@@ -192,7 +190,26 @@ class FluidNexusDesktop(QtGui.QMainWindow):
                 name = section + "/" + key
                 self.settings.setValue(name, DEFAULTS[section][key])
 
-    def _setupAppData(self):
+        self.settings.setValue("app/dataDir", self.dataDir)
+        self.logPath = os.path.join(self.dataDir, "FluidNexus.log")
+        name = unicode(self.settings.value("database/name").toString())
+        self.databaseDir = os.path.join(self.dataDir, name)
+        self.databaseType = unicode(self.settings.value("database/type").toString())
+        self.database = FluidNexusDatabase(databaseDir = self.dataDir, databaseType = "pysqlite2", logPath = self.logPath)
+        self.database.setupDatabase()
+        self.settings.setValue("app/firstRun", False)
+
+    def __setupDatabaseConnection(self):
+        """Setup our connection to the database."""
+        self.logPath = os.path.join(self.dataDir, "FluidNexus.log")
+        name = unicode(self.settings.value("database/name").toString())
+        self.databaseDir = os.path.join(self.dataDir, name)
+        self.databaseType = unicode(self.settings.value("database/type").toString())
+        self.database = FluidNexusDatabase(databaseDir = self.dataDir, databaseType = "pysqlite2", logPath = self.logPath)
+
+
+
+    def __setupAppData(self):
         """ Setup the application data directory in the home directory."""
 
         homeDir = os.path.expanduser('~')
