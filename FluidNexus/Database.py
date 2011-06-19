@@ -383,11 +383,12 @@ class FluidNexusDatabase:
 ################################################################################
 #################    return item based on hash      ############################
 ################################################################################
-    def returnItemBasedOnHash(self, hash):
+    def returnItemBasedOnHash(self, hashName):
         """ look in database for a hash, 
                 returns this entry id if found
                 returns -1 if not"""
-        sql = unicode("select * from FluidNexusData where hash = '%s'" % unicode(hash))
+        hashName = hashName.lower()
+        sql = unicode("select * from FluidNexusData where hash = '%s'" % unicode(hashName))
         rows = self.__query(sql)
         row = None
         for item in self:

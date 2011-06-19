@@ -30,25 +30,11 @@ DONE_DONE = 0x00F0
 TIMESTAMP_LENGTH = 13
 OWNER_HASH_LENGTH= 32
 
-"""
-settings = QtCore.QSettings("fluidnexus.net", "Fluid Nexus")
-dataDir = unicode(settings.value("app/dataDir").toString())
-name = unicode(settings.value("database/name").toString())
-databaseDir = os.path.join(dataDir, name)
-databaseType = unicode(settings.value("database/type").toString())
-"""
-
-#database = FluidNexusDatabase(databaseDir = databaseDir, databaseType = databaseType)
-
-testTitle = 'This is a test from ver2'
-testMessage = 'Nothing but a test.\n\nTesting here.\n\nHope this gets through.\n\nShould eventually try unicode.'
-testData = {hashlib.md5(testTitle + testMessage).hexdigest():
-    (str(int(float(time.time()))), testTitle, testMessage)
-}
-
-
 # TODO
-# Deal with settings/config better
+# * Deal with settings/config better
+# * Refactor to allow for reuse of methods between client, server classes
+# * Better error checking, deal with socket timeouts, socket closing, etc
+
 class Networking(object):
     """Base class for all other networking activity.  Other networking modalities need to subclass from this class."""
 
