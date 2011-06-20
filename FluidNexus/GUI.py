@@ -14,6 +14,7 @@ from PyQt4 import QtCore, QtGui
 # My library imports
 from ui.FluidNexusDesktopUI import Ui_FluidNexus
 from ui.FluidNexusNewMessageUI import Ui_FluidNexusNewMessage
+from ui.FluidNexusAboutUI import Ui_FluidNexusAbout
 from Database import FluidNexusDatabase
 from FluidNexusNetworking import FluidNexusClient, FluidNexusServer
 import Log
@@ -88,6 +89,67 @@ class FluidNexusServerQt(QtCore.QThread):
             newHash = self.server.run()
             self.emit(QtCore.SIGNAL("incomingMessageAdded"), newHash)
 
+class MessageTextBrowser(QtGui.QTextBrowser):
+    """Wrapper around the text browser that adds some useful stuff for us."""
+
+    mine_text = """
+    <table width='100%'>
+        <tr>
+        <td width='40' rowspan='2'><img src=':/icons/icons/32x32/menu_enable_outgoing.png' width='32' height='32' /></td>
+            <td><h3>%1</h3></td>
+        </tr>
+        <tr>
+            <td>%2</td>
+        </tr>
+    </table>
+    """
+
+    other_text = """
+    <table width='100%'>
+        <tr>
+        <td width='40' rowspan='2'><img src=':/icons/icons/fluid_nexus_icon.png' width='32' height='32' /></td>
+            <td><h3>%1</h3></td>
+        </tr>
+        <tr>
+            <td>%2</td>
+        </tr>
+    </table>
+    """
+
+    def __init__(self, parent = None, mine = False, message_title = "Testing title", message_content = "Testing content", message_type = 0, message_hash = None):
+        QtGui.QWidget.__init__(self, parent)
+        QtCore.QObject.connect(self, QtCore.SIGNAL("textChanged()"), self.setHeight)
+
+        self.setMessageHash(message_hash)
+
+        self.__setupUI()
+
+        if (mine):
+            s = QtCore.QString(self.mine_text).arg(message_title, message_content)
+        else:
+            s = QtCore.QString(self.other_text).arg(message_title, message_content)
+
+        self.setHtml(s)
+
+    def __setupUI(self):
+        """Setup some UI parameters."""
+        self.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.Fixed)
+
+    def setMessageHash(self, message_hash):
+        self.message_hash = message_hash
+
+    def getMessageHash(self, message_hash):
+        return self.message_hash
+
+    def setHeight(self):
+        #print dir(self.document())
+        self.document().setTextWidth(self.width() - 2)
+        height = self.document().size().toSize().height() + 5
+        print self.document().size()
+        print height
+        self.setMinimumHeight(height)
+        self.setMaximumHeight(height)
+
 
 class FluidNexusNewMessageDialog(QtGui.QDialog):
     def __init__(self, parent=None, title = None, message = None):
@@ -115,10 +177,321 @@ class FluidNexusNewMessageDialog(QtGui.QDialog):
         self.emit(QtCore.SIGNAL("saveButtonClicked"), self.ui.newMessageTitle.text(), self.ui.newMessageBody.document().toPlainText())
         self.close()
 
+class FluidNexusAboutDialog(QtGui.QDialog):
+    def __init__(self, parent=None, title = None, message = None):
+        QtGui.QDialog.__init__(self, parent)
+
+        self.parent = parent
+
+        self.ui = Ui_FluidNexusAbout()
+        self.ui.setupUi(self)
+
+    def closeDialog(self):
+        self.close()
 
 
 
 class FluidNexusDesktop(QtGui.QMainWindow):
+    def __init__(self, parent=None):
+        QtGui.QWidget.__init__(self, parent)
+        self.ui = Ui_FluidNexus()
+        self.ui.setupUi(self)
+
+        self.statusBar().showMessage("Messages loaded.")
+        
+        self.settings = QtCore.QSettings("fluidnexus.net", "Fluid Nexus")
+       
+        # Setup location of the app-specific data
+        self.__setupAppData()
+        
+        # Check to see if this is the first time we're being run
+        firstRun = self.settings.value("app/firstRun", True).toBool()
+
+        if firstRun:
+            self.__setupDefaultSettings()
+            firstRun = False
+        else:
+            self.__setupDatabaseConnection()
+
+        # Setup logging
+        self.logger = Log.getLogger(logPath = self.logPath)
+
+        self.logger.debug("FluidNexus desktop version has started.")
+
+        verticalLayout_2 = QtGui.QVBoxLayout(self.ui.scrollAreaWidgetContents)
+        verticalLayout_2.setMargin(1)
+
+        self.ui.FluidNexusVBoxLayout = QtGui.QVBoxLayout()
+
+        self.ui.FluidNexusVBoxLayout.setSpacing(5)
+        self.ui.FluidNexusVBoxLayout.setMargin(1)
+        verticalLayout_2.addLayout(self.ui.FluidNexusVBoxLayout)
+
+        # Setup display
+        self.setupDisplay()
+
+        # Setup actions
+        self.setupActions()
+
+
+    def __setupDefaultSettings(self):
+        self.settings.clear()
+
+        for section in DEFAULTS.keys():
+            for key in DEFAULTS[section].keys():
+                name = section + "/" + key
+                self.settings.setValue(name, DEFAULTS[section][key])
+
+        self.settings.setValue("app/dataDir", self.dataDir)
+        self.logPath = os.path.join(self.dataDir, "FluidNexus.log")
+        name = unicode(self.settings.value("database/name").toString())
+        self.databaseDir = os.path.join(self.dataDir, name)
+        self.databaseType = unicode(self.settings.value("database/type").toString())
+        self.database = FluidNexusDatabase(databaseDir = self.dataDir, databaseType = "pysqlite2", logPath = self.logPath)
+        self.database.setupDatabase()
+        self.settings.setValue("app/firstRun", False)
+
+    def __setupDatabaseConnection(self):
+        """Setup our connection to the database."""
+        self.logPath = os.path.join(self.dataDir, "FluidNexus.log")
+        name = unicode(self.settings.value("database/name").toString())
+        self.databaseDir = os.path.join(self.dataDir, name)
+        self.databaseType = unicode(self.settings.value("database/type").toString())
+        self.database = FluidNexusDatabase(databaseDir = self.dataDir, databaseType = "pysqlite2", logPath = self.logPath)
+
+
+
+    def __setupAppData(self):
+        """ Setup the application data directory in the home directory."""
+
+        homeDir = os.path.expanduser('~')
+
+        if sys.platform == "win32":
+            self.dataDir = os.path.join(homeDir, "FluidNexusData")
+        else:
+            self.dataDir = os.path.join(homeDir, ".FluidNexus")
+        
+        if not os.path.isdir(self.dataDir):
+            os.makedirs(self.dataDir)
+
+        os.chmod(self.dataDir, stat.S_IREAD | stat.S_IWRITE | stat.S_IEXEC)
+
+    def setupDisplay(self):
+        """Setup our display with a bunch of text browsers."""
+
+        self.database.all()
+        for item in self.database:
+            message_hash = item[6]
+            message_title = item[4]
+            message_content = item[5]
+            message_mine = item[8]
+
+            tb = MessageTextBrowser(parent = self, mine = message_mine, message_title = message_title, message_content = message_content, message_hash = message_hash)
+            self.ui.FluidNexusVBoxLayout.insertWidget(0, tb)
+
+    def setupActions(self):
+        """Setup the actions that we already know about."""
+        self.connect(self.ui.actionAbout, QtCore.SIGNAL('triggered()'), self.displayAbout)
+
+    def displayAbout(self):
+        """Display our about box."""
+        self.aboutDialog = FluidNexusAboutDialog(parent = self)
+        self.aboutDialog.exec_()
+
+    def mainWindowDestroyed(self):
+        print "Stopping client thread..."
+        #self.clientThread.quit()
+        #self.clientThread.wait()
+        print "Stopping server thread..."
+        #self.serverThread.quit()
+        #self.serverThread.wait()
+
+        #self.database.close()
+        #self.close()
+
+    def incomingMessageDeleted(self, messageHash):
+        self.serverThread.server.stopAdvertise(str(messageHash))
+
+    def incomingMessageAdded(self, newHash):
+        """Slot for when an incoming message was added by the server thread."""
+        item = self.database.returnItemBasedOnHash(newHash)
+
+        itemHash = QtGui.QStandardItem(item[6])
+        itemTitle = QtGui.QStandardItem(item[4])
+        itemMessageFragment = QtGui.QStandardItem(item[5][0:20])
+        self.incomingMessagesModel.insertRow(0, [itemHash, itemTitle, itemMessageFragment])
+
+    def incomingMessageClicked(self, index):
+        currentItem = self.incomingMessagesModel.itemFromIndex(index)
+        row = currentItem.row()
+        messageHash = str(self.incomingMessagesModel.item(row, column = 0).text())
+        item = self.database.returnItemBasedOnHash(messageHash)
+        te = self.ui.incomingMessageText
+        te.clear()
+        te.setPlainText(item[5])
+
+    def editOutgoingMessage(self):
+        indices = self.ui.outgoingMessagesList.selectedIndexes()
+        currentItem = self.outgoingMessagesModel.itemFromIndex(indices[0])
+        row = currentItem.row()
+        messageHash = str(self.outgoingMessagesModel.item(row, column = 0).text())
+        item = self.database.returnItemBasedOnHash(messageHash)
+        messageTitle = str(self.outgoingMessagesModel.item(row, column = 2).text())
+
+        self.currentEditingHash = messageHash
+        self.currentEditingRow = row
+
+        self.newMessageDialog = FluidNexusNewMessageDialog(parent = self, title = messageTitle, message = item[5])
+        self.newMessageDialog.exec_()
+
+    def outgoingMessageClicked(self, index):
+        if (not self.ui.deleteOutgoingButton.isEnabled()):
+            self.ui.deleteOutgoingButton.setEnabled(True)
+
+        if (not self.ui.toggleOutgoingButton.isEnabled()):
+            self.ui.toggleOutgoingButton.setEnabled(True)
+
+        if (not self.ui.editMessageButton.isEnabled()):
+            self.ui.editMessageButton.setEnabled(True)
+
+
+        currentItem = self.outgoingMessagesModel.itemFromIndex(index)
+        row = currentItem.row()
+        messageHash = str(self.outgoingMessagesModel.item(row, column = 0).text())
+        item = self.database.returnItemBasedOnHash(messageHash)
+        te = self.ui.outgoingMessageText
+        te.clear()
+        te.setPlainText(item[5])
+
+    def outgoingMessageDoubleClicked(self, index):
+        print "double clicked"
+        currentItem = self.outgoingMessagesModel.itemFromIndex(index)
+        row = currentItem.row()
+        messageHash = str(self.outgoingMessagesModel.item(row, column = 0).text())
+        item = self.database.returnItemBasedOnHash(messageHash)
+        
+        self.currentEditingHash = messageHash
+        self.newMessageDialog = FluidNexusNewMessageDialog(parent = self, title = item[4], message = item[5])
+        self.newMessageDialog.exec_()
+
+    def outgoingMessageItemActivated(self, index):
+        print "here"
+        if (not self.ui.deleteOutgoingButton.isEnabled()):
+            self.ui.deleteOutgoingButton.setEnabled(True)
+
+        if (not self.ui.toggleOutgoingButton.isEnabled()):
+            self.ui.toggleOutgoingButton.setEnabled(True)
+
+    def toggleOutgoingMessage(self):
+        indices = self.ui.outgoingMessagesList.selectedIndexes()
+        currentItem = self.outgoingMessagesModel.itemFromIndex(indices[0])
+        row = currentItem.row()
+        messageHash = str(self.outgoingMessagesModel.item(row, column = 0).text())
+        currentItemIcon = self.outgoingMessagesModel.item(row, column = 1).icon()
+
+        if (currentItemIcon.isNull()):
+            enabledIcon = QtGui.QIcon()
+            enabledIcon.addPixmap(QtGui.QPixmap(":/icon32x32/icons/32x32/menu_enable_outgoing.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+            self.outgoingMessagesModel.setItem(row, 1, QtGui.QStandardItem(enabledIcon, ""))
+            self.enabledHash[messageHash] = True
+        else:
+            enabledIcon = QtGui.QIcon()
+            self.outgoingMessagesModel.setItem(row, 1, QtGui.QStandardItem(enabledIcon, ""))
+            self.enabledHash[messageHash] = False
+
+        self.settings.setValue("outgoing/enabled", pickle.dumps(self.enabledHash))
+        self.settings.sync()
+
+    def deleteOutgoingMessage(self):
+        # TODO
+        # Disable the delete button if nothing else is selected
+        indices = self.ui.outgoingMessagesList.selectedIndexes()
+        currentItem = self.outgoingMessagesModel.itemFromIndex(indices[0])
+        row = currentItem.row()
+        messageHash = str(self.outgoingMessagesModel.item(row, column = 0).text())
+        title = str(self.outgoingMessagesModel.item(row, column = 1).text())
+        self.outgoingMessagesModel.removeRow(row)
+
+        self.database.remove_by_hash(messageHash)
+
+        # Clear message text area
+        te = self.ui.outgoingMessageText
+        te.clear()
+
+        # Update status bar
+        self.statusBar().showMessage("'%s' deleted." % title)
+
+        # Remove from hash and sync
+        # TODO
+        # Make this into a method, or raise a signal, or something of the sort
+        try:
+            del self.enabledHash[unicode(messageHash)]
+        except KeyError:
+            # not sure why I get a key error here...
+            pass
+        self.settings.setValue("outgoing/enabled", pickle.dumps(self.enabledHash))
+        self.settings.sync()
+
+    def deleteIncomingMessage(self):
+        # TODO
+        # Disable the delete button if nothing else is selected
+
+        # Get current item, delete from database
+        indices = self.ui.incomingMessagesList.selectedIndexes()
+        currentItem = self.incomingMessagesModel.itemFromIndex(indices[0])
+        row = currentItem.row()
+        hash = str(self.incomingMessagesModel.item(row, column = 0).text())
+        title = str(self.incomingMessagesModel.item(row, column = 1).text())
+        self.incomingMessagesModel.removeRow(row)
+
+        self.database.remove_by_hash(hash)
+
+        # Clear message text area
+        te = self.ui.incomingMessageText
+        te.clear()
+
+        # Update status bar
+        self.statusBar().showMessage("'%s' deleted." % title)
+
+        # Emit signal to deadvertise hash
+        self.emit(QtCore.SIGNAL("incomingMessageDeleted"), hash)
+
+
+    def showNewMessageWindow(self):
+        self.newMessageDialog = FluidNexusNewMessageDialog(parent = self)
+        self.newMessageDialog.exec_()
+
+    def newMessageSaveButtonClicked(self, title, body):
+        messageHash = unicode(md5.md5(unicode(title) + unicode(body)).hexdigest())
+
+        if (self.currentEditingHash is not None):
+            self.database.remove_by_hash(self.currentEditingHash)
+
+            # Find the right item to update
+            self.database.add_new(u"00:00", 0, unicode(title), unicode(body), messageHash, u"00:00")
+            self.outgoingMessagesModel.setItem(self.currentEditingRow, 0, QtGui.QStandardItem(messageHash))
+            self.outgoingMessagesModel.setItem(self.currentEditingRow, 2, QtGui.QStandardItem(title))
+            self.outgoingMessagesModel.setItem(self.currentEditingRow, 3, QtGui.QStandardItem(body[0:20] + " ..."))
+
+            try:
+                del self.enabledHash[self.currentEditingHash]
+            except KeyError:
+                # If we haven't toggled anything yet, the item won't be there yet
+                pass
+            self.currentEditingHash = None
+            self.currentEditingRow = None
+        else:
+            self.database.add_new(u"00:00", 0, unicode(title), unicode(body), messageHash, u"00:00")
+
+            itemHash = QtGui.QStandardItem(messageHash)
+            itemTitle = QtGui.QStandardItem(title)
+            itemMessageFragment = QtGui.QStandardItem(body[0:20] + " ...")
+            enabledIcon = QtGui.QIcon()
+            enabledIcon.addPixmap(QtGui.QPixmap(":/icon32x32/icons/32x32/menu_enable_outgoing.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+            self.outgoingMessagesModel.insertRow(0, [itemHash, QtGui.QStandardItem(enabledIcon, ""), itemTitle, itemMessageFragment])
+
+
+class FluidNexusDesktopOld(QtGui.QMainWindow):
     def __init__(self, parent=None):
         QtGui.QWidget.__init__(self, parent)
         self.ui = Ui_FluidNexus()
