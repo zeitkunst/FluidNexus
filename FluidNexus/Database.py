@@ -234,11 +234,14 @@ class FluidNexusDatabase:
             elif (self.databaseType == "pysqlite2"):
                 self.db.execute(SQLQuery)
         else:
+            # TODO
+            # Check to see if this works on s60
             if (params is not None):
                 self.affectedRows = self.db.execute(unicode(SQLQuery), params)
-                self.con.commit()
             else:
                 self.affectedRows = self.db.execute(unicode(SQLQuery))
+
+            self.con.commit()
 
 ################################################################################
 ###################   return number of rows          ###########################
@@ -324,8 +327,9 @@ class FluidNexusDatabase:
               - hash:   message hash
               - cellID: cell ID where we are"""
         now = float(time.time())
-        sql = unicode("insert into FluidNexusData (source,time,type,title,data,hash,cellID, mine) values ('%s', %f, %d, '%s', '%s', '%s', '%s', 1)" %  (source, now, messageType, title, data, messageHash, str(cellID)))
-        self.__query(sql)
+        sql = unicode("insert into FluidNexusData (source,time,type,title,data,hash,cellID, mine) values (?, ?, ?, ?, ?, ?, ?, 1)")
+        t = (source, now, messageType, title, data, messageHash, str(cellID))
+        self.__query(sql, params = t)
 
 ################################################################################
 #################     Add a recived mesage     #################################

@@ -27,10 +27,6 @@ SWITCH = 0x0040
 SWITCH_DONE = 0x0041
 DONE_DONE = 0x00F0
 
-# Length constants
-TIMESTAMP_LENGTH = 13
-OWNER_HASH_LENGTH= 32
-
 # TODO
 # * Deal with settings/config better
 # * Refactor to allow for reuse of methods between client, server classes
@@ -641,8 +637,7 @@ TODO
 
         self.logger.debug("Received messages: " + str(messages))
 
-        # TODO
-        # deal with when we don't have any messages
+        # Go through the received messages and add any that were sent
         fields = messages.ListFields()
         if (fields != []):
             for message in fields[0][1]: 
