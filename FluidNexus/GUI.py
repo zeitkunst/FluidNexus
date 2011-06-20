@@ -311,6 +311,7 @@ class FluidNexusDesktop(QtGui.QMainWindow):
 
     def setupSysTray(self):
         """Setup the systray."""
+        self.showing = True
         self.sysTray = QtGui.QSystemTrayIcon(self)
         self.sysTray.setIcon( QtGui.QIcon(':icons/icons/fluid_nexus_icon.png') )
         self.sysTray.setVisible(True)
@@ -321,7 +322,14 @@ class FluidNexusDesktop(QtGui.QMainWindow):
 
     def onSysTrayActivated(self, reason):
         """Handle systray actions."""
+
         self.logger.debug("Handing actions: " + str(reason))
+        if ((reason == 3) and (self.showing)):
+            self.hide()
+            self.showing = False
+        elif ((reason == 3) and (not (self.showing))):
+            self.show()
+            self.showing = True
 
     def handleNewMessage(self):
         print "new message"
