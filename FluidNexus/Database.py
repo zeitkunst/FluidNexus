@@ -186,10 +186,10 @@ class FluidNexusDatabase:
         ######################################
         # This table saves the data that we have accepted and can browse
         if (self.databaseType == "e32"):
-            self.db.execute(unicode('create table FluidNexusData (id counter, source varchar(32), time bigint, type integer, title varchar(40), data long varchar, hash varchar(32), cellID varchar(20), mine bit)'))
+            self.db.execute(unicode('create table FluidNexusData (id counter, source varchar(32), time float, type integer, title varchar(40), data long varchar, hash varchar(32), cellID varchar(20), mine bit)'))
             self.db.execute(unicode('create table FluidNexusSignal (id counter, signal bit)'))
         elif (self.databaseType == "pysqlite2"):
-            self.db.execute(unicode("create table FluidNexusData (id integer primary key autoincrement, source varchar(32), time integer default '0', type integer default '0', title varchar(40), data varchar, hash varchar(32), cellID varchar(20) default '0', mine integer default '0')"))
+            self.db.execute(unicode("create table FluidNexusData (id integer primary key autoincrement, source varchar(32), time float default '0', type integer default '0', title varchar(40), data varchar, hash varchar(32), cellID varchar(20) default '0', mine integer default '0')"))
             self.db.execute(unicode("create table FluidNexusSignal (id integer primary key autoincrement, signal integer default '0')"))
 
         sql = unicode("insert into FluidNexusSignal (signal) values (0)")
@@ -199,18 +199,19 @@ class FluidNexusDatabase:
         # This is from text messages listed in the TxTMob CHI paper
         title = u'Run'
         data = u'Run against Bush in progress (just went through times sq).  media march starts at 7, 52nd and broadway'
+        now = time.time()
         hash = unicode(md5.md5(title + data).hexdigest())
-        self.db.execute(unicode("insert into FluidNexusData (source, type, title, data, hash) values ('00:02:EE:6B:86:09', 0, '%s', '%s', '%s')" % (title, data, hash)))
+        self.db.execute(unicode("insert into FluidNexusData (source, time, type, title, data, hash) values ('00:02:EE:6B:86:09', %f, 0, '%s', '%s', '%s')" % (now, title, data, hash)))
 
         title = u'Federal agents'
         data = u'Video dispatch. Federal agents trailing activists at 6th Ave and 9th St. Situation tense.'
         hash = unicode(md5.md5(title + data).hexdigest())
-        self.db.execute(unicode("insert into FluidNexusData (source, type, title, data, hash) values ('00:02:EE:6B:86:09', 0, '%s', '%s', '%s')" % (title, data, hash)))
+        self.db.execute(unicode("insert into FluidNexusData (source, time, type, title, data, hash) values ('00:02:EE:6B:86:09', %f, 0, '%s', '%s', '%s')" % (now, title, data, hash)))
 
         title = u'Mobilize to dine'
         data = u'CT delegation @ Maison (7th Ave. & 53rd).  Outdoor dining area.  Try to get people there.'
         hash = unicode(md5.md5(title + data).hexdigest())
-        self.db.execute(unicode("insert into FluidNexusData (source, type, title, data, hash) values ('00:02:EE:6B:86:09', 0, '%s', '%s', '%s')" % (title, data, hash)))
+        self.db.execute(unicode("insert into FluidNexusData (source, time, type, title, data, hash) values ('00:02:EE:6B:86:09', %f, 0, '%s', '%s', '%s')" % (now, title, data, hash)))
 
         print 'finished populating the database'
 
@@ -317,8 +318,8 @@ class FluidNexusDatabase:
               - data:   data itself
               - hash:   message hash
               - cellID: cell ID where we are"""
-        now = int(float(time.time()))
-        sql = unicode("insert into FluidNexusData (source,time,type,title,data,hash,cellID, mine) values ('%s', %d, %d, '%s', '%s', '%s', '%s', 1)" %  (source, now, type, title, data, hash, str(cellID)))
+        now = float(time.time())
+        sql = unicode("insert into FluidNexusData (source,time,type,title,data,hash,cellID, mine) values ('%s', %f, %d, '%s', '%s', '%s', '%s', 1)" %  (source, now, type, title, data, hash, str(cellID)))
         self.__query(sql)
 
 ################################################################################
@@ -335,7 +336,7 @@ class FluidNexusDatabase:
               - cellID: cell ID where we are"""
         #sql = unicode("insert into FluidNexusData (source,time,type,title,data,hash,cellID, mine) values ('%s', %d, %d, '%s', '%s', '%s', '%s', 0)" %  (unicode(source), int(time), (type), unicode(title), unicode(data), unicode(hash), unicode(cellID)))
         try:
-            sql = "insert into FluidNexusData (source, time, type, title, data, hash, cellID, mine) values ('%s', %u, %d, '%s', '%s', '%s', '%s', 0)" % (source, int(float(time)), int(type), title, data, hash, cellID)
+            sql = "insert into FluidNexusData (source, time, type, title, data, hash, cellID, mine) values ('%s', %f, %d, '%s', '%s', '%s', '%s', 0)" % (source, float(time), int(type), title, data, hash, cellID)
             numRows = self.__query(sql)
         except Exception, e:
             print e

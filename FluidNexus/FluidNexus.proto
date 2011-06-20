@@ -2,20 +2,21 @@ package FluidNexus;
 
 option java_package = "net.fluidnexus.FluidNexus";
 option java_outer_classname = "FluidNexusProtos";
+option optimize_for = LITE_RUNTIME;
 
 //"create table FluidNexusData (_id integer primary key autoincrement,    source varchar(32), time bigint, type integer, title varchar(40), data long     varchar, hash varchar(32), cellID varchar(20), mine bit);";
 
 message FluidNexusHashes {
-    repeated string hash = 1;
+    repeated string message_hash = 1;
 }
 
 message FluidNexusMessage {
-    optional string title = 1;
-    optional string message = 2;
-    optional float timestamp = 3;
-    optional string hash = 4;
-    optional string source = 5;
-    optional bool mine = 6;
+    optional string message_title = 1;
+    optional string message_content = 2;
+    optional float message_timestamp = 3;
+    optional string message_hash = 4;
+    optional string message_source = 5;
+    optional bool message_mine = 6;
 
     // Do we want to do it this way, or use mime-types?
     enum MessageType {
@@ -25,7 +26,8 @@ message FluidNexusMessage {
         VIDEO = 3;
     }
 
-    optional bytes attachment = 7;
+    optional MessageType message_type = 7;
+    optional bytes message_attachment = 8;
 }
 
 message FluidNexusMessages {
