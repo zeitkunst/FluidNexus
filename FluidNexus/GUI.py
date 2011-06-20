@@ -123,9 +123,10 @@ class MessageTextBrowser(QtGui.QTextBrowser):
     </table>
     """
 
-    def __init__(self, parent = None, mine = False, message_title = "Testing title", message_content = "Testing content", message_type = 0, message_hash = None, message_timestamp = time.time()):
+    def __init__(self, parent = None, mine = False, message_title = "Testing title", message_content = "Testing content", message_type = 0, message_hash = None, message_timestamp = time.time(), logPath = "FluidNexus.log"):
         QtGui.QWidget.__init__(self, parent)
         QtCore.QObject.connect(self, QtCore.SIGNAL("textChanged()"), self.setHeight)
+        self.logger = Log.getLogger(logPath = logPath)
 
         self.setMessageHash(message_hash)
 
@@ -244,6 +245,7 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         # Setup actions
         self.setupActions()
 
+        self.setupSysTray()
 
     def __setupDefaultSettings(self):
         self.settings.clear()
@@ -298,7 +300,7 @@ class FluidNexusDesktop(QtGui.QMainWindow):
             message_content = item[5]
             message_mine = item[8]
 
-            tb = MessageTextBrowser(parent = self, mine = message_mine, message_title = message_title, message_content = message_content, message_hash = message_hash, message_timestamp = time.ctime(message_timestamp))
+            tb = MessageTextBrowser(parent = self, mine = message_mine, message_title = message_title, message_content = message_content, message_hash = message_hash, message_timestamp = time.ctime(message_timestamp), logPath = self.logPath)
             self.ui.FluidNexusVBoxLayout.insertWidget(0, tb)
 
     def setupActions(self):
@@ -307,6 +309,20 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         self.connect(self.ui.actionQuit, QtCore.SIGNAL('triggered()'), self.handleQuit)
         self.connect(self.ui.actionNewMessage, QtCore.SIGNAL('triggered()'), self.handleNewMessage)
 
+    def setupSysTray(self):
+        """Setup the systray."""
+        self.sysTray = QtGui.QSystemTrayIcon(self)
+        self.sysTray.setIcon( QtGui.QIcon(':icons/icons/fluid_nexus_icon.png') )
+        self.sysTray.setVisible(True)
+        self.connect(self.sysTray, QtCore.SIGNAL("activated(QSystemTrayIcon::ActivationReason)"), self.onSysTrayActivated)
+
+        self.sysTrayMenu = QtGui.QMenu(self)
+        act = self.sysTrayMenu.addAction("FOO")
+
+    def onSysTrayActivated(self, reason):
+        """Handle systray actions."""
+        self.logger.debug("Handing actions: " + str(reason))
+
     def handleNewMessage(self):
         print "new message"
         self.newMessageDialog = FluidNexusNewMessageDialog(parent = self)
@@ -314,6 +330,8 @@ class FluidNexusDesktop(QtGui.QMainWindow):
 
 
     def handleQuit(self):
+        self.logger.debug("Quiting...")
+        self.sysTray.hide()
         self.database.close()
         self.close()
 
