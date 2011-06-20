@@ -95,11 +95,14 @@ class MessageTextBrowser(QtGui.QTextBrowser):
     mine_text = """
     <table width='100%'>
         <tr>
-        <td width='40' rowspan='2'><img src=':/icons/icons/32x32/menu_enable_outgoing.png' width='32' height='32' /></td>
+        <td width='40' rowspan='3'><img src=':/icons/icons/32x32/menu_enable_outgoing.png' width='32' height='32' /></td>
             <td><h3>%1</h3></td>
         </tr>
         <tr>
             <td>%2</td>
+        </tr>
+        <tr>
+            <td align='right'>%3&nbsp;&nbsp;&nbsp;<img src=':/icons/icons/32x32/menu_delete.png' width='32' height='32'/></td>
         </tr>
     </table>
     """
@@ -107,16 +110,20 @@ class MessageTextBrowser(QtGui.QTextBrowser):
     other_text = """
     <table width='100%'>
         <tr>
-        <td width='40' rowspan='2'><img src=':/icons/icons/fluid_nexus_icon.png' width='32' height='32' /></td>
+        <td width='40' rowspan='3'><img src=':/icons/icons/fluid_nexus_icon.png' width='32' height='32' /></td>
             <td><h3>%1</h3></td>
         </tr>
         <tr>
             <td>%2</td>
         </tr>
+        <tr>
+            <td align='right'>%3&nbsp;&nbsp;&nbsp;<img src=':/icons/icons/32x32/menu_delete.png' width='32' height='32'/></td>
+        </tr>
+
     </table>
     """
 
-    def __init__(self, parent = None, mine = False, message_title = "Testing title", message_content = "Testing content", message_type = 0, message_hash = None):
+    def __init__(self, parent = None, mine = False, message_title = "Testing title", message_content = "Testing content", message_type = 0, message_hash = None, message_timestamp = time.time()):
         QtGui.QWidget.__init__(self, parent)
         QtCore.QObject.connect(self, QtCore.SIGNAL("textChanged()"), self.setHeight)
 
@@ -125,9 +132,9 @@ class MessageTextBrowser(QtGui.QTextBrowser):
         self.__setupUI()
 
         if (mine):
-            s = QtCore.QString(self.mine_text).arg(message_title, message_content)
+            s = QtCore.QString(self.mine_text).arg(message_title, message_content, message_timestamp)
         else:
-            s = QtCore.QString(self.other_text).arg(message_title, message_content)
+            s = QtCore.QString(self.other_text).arg(message_title, message_content, message_timestamp)
 
         self.setHtml(s)
 
@@ -138,18 +145,19 @@ class MessageTextBrowser(QtGui.QTextBrowser):
     def setMessageHash(self, message_hash):
         self.message_hash = message_hash
 
-    def getMessageHash(self, message_hash):
+    def getMessageHash(self):
         return self.message_hash
 
     def setHeight(self):
         #print dir(self.document())
         self.document().setTextWidth(self.width() - 2)
         height = self.document().size().toSize().height() + 5
-        print self.document().size()
-        print height
+        height = int(height * 0.2)
         self.setMinimumHeight(height)
         self.setMaximumHeight(height)
 
+    def mousePressEvent(self, e):
+        print self.getMessageHash()
 
 class FluidNexusNewMessageDialog(QtGui.QDialog):
     def __init__(self, parent=None, title = None, message = None):
@@ -218,6 +226,9 @@ class FluidNexusDesktop(QtGui.QMainWindow):
 
         self.logger.debug("FluidNexus desktop version has started.")
 
+        # This method of laying out things was cribbed from choqok
+        # TODO
+        # Still doesn't resize the textbrowsers properly though...
         verticalLayout_2 = QtGui.QVBoxLayout(self.ui.scrollAreaWidgetContents)
         verticalLayout_2.setMargin(1)
 
@@ -281,17 +292,30 @@ class FluidNexusDesktop(QtGui.QMainWindow):
 
         self.database.all()
         for item in self.database:
+            message_timestamp = item[2]
             message_hash = item[6]
             message_title = item[4]
             message_content = item[5]
             message_mine = item[8]
 
-            tb = MessageTextBrowser(parent = self, mine = message_mine, message_title = message_title, message_content = message_content, message_hash = message_hash)
+            tb = MessageTextBrowser(parent = self, mine = message_mine, message_title = message_title, message_content = message_content, message_hash = message_hash, message_timestamp = time.ctime(message_timestamp))
             self.ui.FluidNexusVBoxLayout.insertWidget(0, tb)
 
     def setupActions(self):
         """Setup the actions that we already know about."""
         self.connect(self.ui.actionAbout, QtCore.SIGNAL('triggered()'), self.displayAbout)
+        self.connect(self.ui.actionQuit, QtCore.SIGNAL('triggered()'), self.handleQuit)
+        self.connect(self.ui.actionNewMessage, QtCore.SIGNAL('triggered()'), self.handleNewMessage)
+
+    def handleNewMessage(self):
+        print "new message"
+        self.newMessageDialog = FluidNexusNewMessageDialog(parent = self)
+        self.newMessageDialog.exec_()
+
+
+    def handleQuit(self):
+        self.database.close()
+        self.close()
 
     def displayAbout(self):
         """Display our about box."""
