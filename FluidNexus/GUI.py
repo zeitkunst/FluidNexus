@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # Standard library imports
-import md5
+import hashlib
 import os
 import pickle
 import stat
@@ -22,6 +22,8 @@ import Log
 # TODO
 # -- need to check if database already exists in home directory; if not, populate it with basic info
 # -- need to modularize present code
+
+VERSION="$Id"
 
 DEFAULTS = {
     "database": {
@@ -512,7 +514,7 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         self.newMessageDialog.exec_()
 
     def newMessageSaveButtonClicked(self, title, body):
-        messageHash = unicode(md5.md5(unicode(title) + unicode(body)).hexdigest())
+        messageHash = unicode(hashlib.md5(unicode(title) + unicode(body)).hexdigest())
 
         if (self.currentEditingHash is not None):
             self.database.remove_by_hash(self.currentEditingHash)
@@ -901,7 +903,7 @@ class FluidNexusDesktopOld(QtGui.QMainWindow):
         self.newMessageDialog.exec_()
 
     def newMessageSaveButtonClicked(self, title, body):
-        messageHash = unicode(md5.md5(unicode(title) + unicode(body)).hexdigest())
+        messageHash = unicode(hashlib.md5(unicode(title) + unicode(body)).hexdigest())
 
         if (self.currentEditingHash is not None):
             self.database.remove_by_hash(self.currentEditingHash)
