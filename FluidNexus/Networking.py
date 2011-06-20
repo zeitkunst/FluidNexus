@@ -642,7 +642,14 @@ TODO
         self.logger.debug("Received messages: " + str(messages))
 
         # TODO
-        # Add to local database
+        # deal with when we don't have any messages
+        fields = messages.ListFields()
+        if (fields != []):
+            for message in fields[0][1]: 
+                message_hash = hashlib.md5(unicode(message.message_title) + unicode(message.message_content)).hexdigest()
+                self.database.add_received("foo", message.message_timestamp, 0, message.message_title, message.message_content, message_hash, "(123, 123, 123, 123)")
+
+        self.getHashesFromDatabase()
         self.setState(self.STATE_WRITE_SWITCH)
 
     def handleError(self):

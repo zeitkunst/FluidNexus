@@ -22,7 +22,8 @@
 import sys
 import time
 import os
-import md5
+import re
+import hashlib
 
 # my imports
 import Log
@@ -200,18 +201,18 @@ class FluidNexusDatabase:
         title = u'Run'
         data = u'Run against Bush in progress (just went through times sq).  media march starts at 7, 52nd and broadway'
         now = time.time()
-        hash = unicode(md5.md5(title + data).hexdigest())
-        self.db.execute(unicode("insert into FluidNexusData (source, time, type, title, data, hash) values ('00:02:EE:6B:86:09', %f, 0, '%s', '%s', '%s')" % (now, title, data, hash)))
+        messageHash = hashlib.md5(title + data).hexdigest()
+        self.db.execute(unicode("insert into FluidNexusData (source, time, type, title, data, hash) values ('00:02:EE:6B:86:09', %f, 0, '%s', '%s', '%s')" % (now, title, data, messageHash)))
 
         title = u'Federal agents'
         data = u'Video dispatch. Federal agents trailing activists at 6th Ave and 9th St. Situation tense.'
-        hash = unicode(md5.md5(title + data).hexdigest())
-        self.db.execute(unicode("insert into FluidNexusData (source, time, type, title, data, hash) values ('00:02:EE:6B:86:09', %f, 0, '%s', '%s', '%s')" % (now, title, data, hash)))
+        messageHash = hashlib.md5(title + data).hexdigest()
+        self.db.execute(unicode("insert into FluidNexusData (source, time, type, title, data, hash) values ('00:02:EE:6B:86:09', %f, 0, '%s', '%s', '%s')" % (now, title, data, messageHash)))
 
         title = u'Mobilize to dine'
         data = u'CT delegation @ Maison (7th Ave. & 53rd).  Outdoor dining area.  Try to get people there.'
-        hash = unicode(md5.md5(title + data).hexdigest())
-        self.db.execute(unicode("insert into FluidNexusData (source, time, type, title, data, hash) values ('00:02:EE:6B:86:09', %f, 0, '%s', '%s', '%s')" % (now, title, data, hash)))
+        messageHash = hashlib.md5(title + data).hexdigest()
+        self.db.execute(unicode("insert into FluidNexusData (source, time, type, title, data, hash) values ('00:02:EE:6B:86:09', %f, 0, '%s', '%s', '%s')" % (now, title, data, messageHash)))
 
         print 'finished populating the database'
 
@@ -219,7 +220,7 @@ class FluidNexusDatabase:
 ################################################################################
 ###################   do a query  (private method)   ###########################
 ################################################################################
-    def __query(self, SQLQuery):
+    def __query(self, SQLQuery, params = None):
         """Run the SQL query, preparing ourselves for returning the results."""
 
         # If we have a select statement, prepare the view
@@ -233,7 +234,11 @@ class FluidNexusDatabase:
             elif (self.databaseType == "pysqlite2"):
                 self.db.execute(SQLQuery)
         else:
-            self.affectedRows = self.db.execute(unicode(SQLQuery))
+            if (params is not None):
+                self.affectedRows = self.db.execute(unicode(SQLQuery), params)
+                self.con.commit()
+            else:
+                self.affectedRows = self.db.execute(unicode(SQLQuery))
 
 ################################################################################
 ###################   return number of rows          ###########################
@@ -309,7 +314,7 @@ class FluidNexusDatabase:
 ################################################################################
 #################     Add a self made mesage   #################################
 ################################################################################
-    def add_new(self, source, type, title, data, hash, cellID):
+    def add_new(self, source, messageType, title, data, messageHash, cellID):
         """ creates a new message created by user 
             this computes actual time and fills the mine field as 1
               - source: the source's MAC address hash
@@ -319,13 +324,13 @@ class FluidNexusDatabase:
               - hash:   message hash
               - cellID: cell ID where we are"""
         now = float(time.time())
-        sql = unicode("insert into FluidNexusData (source,time,type,title,data,hash,cellID, mine) values ('%s', %f, %d, '%s', '%s', '%s', '%s', 1)" %  (source, now, type, title, data, hash, str(cellID)))
+        sql = unicode("insert into FluidNexusData (source,time,type,title,data,hash,cellID, mine) values ('%s', %f, %d, '%s', '%s', '%s', '%s', 1)" %  (source, now, messageType, title, data, messageHash, str(cellID)))
         self.__query(sql)
 
 ################################################################################
 #################     Add a recived mesage     #################################
 ################################################################################
-    def add_received(self, source, time, type, title, data, hash, cellID):
+    def add_received(self, source, time, messageType, title, data, messageHash, cellID):
         """ stores a message
             fills the mine field as 0
               - source: the source's MAC address hash
@@ -336,8 +341,11 @@ class FluidNexusDatabase:
               - cellID: cell ID where we are"""
         #sql = unicode("insert into FluidNexusData (source,time,type,title,data,hash,cellID, mine) values ('%s', %d, %d, '%s', '%s', '%s', '%s', 0)" %  (unicode(source), int(time), (type), unicode(title), unicode(data), unicode(hash), unicode(cellID)))
         try:
-            sql = "insert into FluidNexusData (source, time, type, title, data, hash, cellID, mine) values ('%s', %f, %d, '%s', '%s', '%s', '%s', 0)" % (source, float(time), int(type), title, data, hash, cellID)
-            numRows = self.__query(sql)
+            sql = "insert into FluidNexusData (source, time, type, title, data, hash, cellID, mine) values (?, ?, ?, ?, ?, ?, ?, 0)"
+            t = (source, float(time), int(messageType), title, data, messageHash, cellID)
+
+            print sql
+            numRows = self.__query(sql, params = t)
         except Exception, e:
             print e
 
