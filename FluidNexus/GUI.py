@@ -16,15 +16,13 @@ from ui.FluidNexusDesktopUI import Ui_FluidNexus
 from ui.FluidNexusNewMessageUI import Ui_FluidNexusNewMessage
 from ui.FluidNexusAboutUI import Ui_FluidNexusAbout
 from Database import FluidNexusDatabase
-from FluidNexusNetworking import FluidNexusClient, FluidNexusServer
+from Networking import BluetoothServerVer3
 import Log
+from FluidNexusNetworking import FluidNexusClient, FluidNexusServer
 
 # TODO
-# -- need to check if database already exists in home directory; if not, populate it with basic info
-# -- need to modularize present code
-
-VERSION="$Id"
-
+# * Deal with sqlite thread stuff...why can't I call a thread's method to close the database connection opened in that thread?  And do I even need to close the connection on thread quit?
+# 
 DEFAULTS = {
     "database": {
         "type": "pysqlite2",
@@ -70,26 +68,41 @@ class FluidNexusClientQt(QtCore.QThread):
             time.sleep(30)
 
 class FluidNexusServerQt(QtCore.QThread):
-    def __init__(self, databaseDir = None, databaseType = None, parent = None):
+    def __init__(self, dataDir = None, databaseType = None, logPath = "FluidNexus.log", parent = None):
         QtCore.QThread.__init__(self, parent)
 
-        self.databaseDir = databaseDir
+        self.databaseDir = dataDir
         self.databaseType = databaseType
         self.parent = parent
+        self.logger = Log.getLogger(logPath = logPath)
 
-        database = FluidNexusDatabase(databaseDir = self.databaseDir, databaseType = self.databaseType)
-        self.server = FluidNexusServer(database = database, library="lightblue")
-        self.server.initMessageAdvertisements()
-        self.server.database.close()
 
-        self.connect(self, QtCore.SIGNAL("incomingMessageAdded"), self.parent.incomingMessageAdded)
+        self.btServer = BluetoothServerVer3(databaseDir = dataDir, databaseType = databaseType, logPath = logPath)
 
+        self.connect(self, QtCore.SIGNAL("newMessages"), self.parent.newMessages)
+        self.connect(self, QtCore.SIGNAL("started()"), self.handleStarted)
+        self.connect(self, QtCore.SIGNAL("finished()"), self.handleFinished)
+        self.connect(self, QtCore.SIGNAL("terminated()"), self.handleTerminated)
+
+    def handleStarted(self):
+        self.logger.debug("BluetoothServerThread started")
+
+    def handleFinished(self):
+        self.logger.debug("BluetoothServerThread finished")
+        self.start()
+
+    def handleTerminated(self):
+        self.logger.debug("BluetoothServerThread terminated")
+
+    def cleanup(self):
+        """Cleanup after ourselves."""
+        self.btServer.cleanup()
 
     def run(self):
-        while True:
-            self.server.database.openDB()
-            newHash = self.server.run()
-            self.emit(QtCore.SIGNAL("incomingMessageAdded"), newHash)
+        newMessages = self.btServer.run()
+
+        if (newMessages != []):
+            self.emit(QtCore.SIGNAL("newMessages"), newMessages)
 
 class MessageTextBrowser(QtGui.QTextBrowser):
     """Wrapper around the text browser that adds some useful stuff for us."""
@@ -181,6 +194,8 @@ class FluidNexusNewMessageDialog(QtGui.QDialog):
         self.connect(self, QtCore.SIGNAL("saveButtonClicked"), self.parent.newMessageSaveButtonClicked)
 
     def closeDialog(self):
+        # TODO
+        # Ask for confirmation if the data has changed
         self.close()
 
     def saveButtonClicked(self):
@@ -189,6 +204,15 @@ class FluidNexusNewMessageDialog(QtGui.QDialog):
         self.close()
 
 class FluidNexusAboutDialog(QtGui.QDialog):
+
+    aboutText = """Copyright 2008-2011 Nicholas A. Knouf
+    
+Fluid Nexus is an application for mobile   phones that is primarily designed to enable activists or relief workers to send messages and data amongst themselves independent of a centralized cellular      network.  The idea is to provide a means of communication between people when   the centralized network has been shut down, either by the government during a   time of unrest, or by nature due to a massive disaster.  During such times the  use of the centralized network for voice or SMS is not possible.  Yet, if we    can use the fact that people still must move about the world, then we can use   ideas from sneaker-nets to turn people into carriers of data.  Given enough     people, we can create fluid, temporary, ad-hoc networks that pass messages one  person at a time, spreading out as a contagion and eventually reaching members  of the group.  This enables surreptitious communication via daily activity and  relies on a fluid view of reality.  Additionally, Fluid Nexus can be used as a  hyperlocal message board, loosely attached to physical locations.  
+    
+Fluid Nexus is not designed as a general-purpose piece of software; rather, it is developed with specific types of users in mind.  Thus, while the ideas here could be very useful for social-networking or productivity applications, this is not what I am most interested in.  However, I definitely welcome the extension of these ideas into these other domains.  Indeed, Fluid Nexus is related to work in the following projects: mesh networking in the OLPC ( http://wiki.laptop.org/go/Mesh_Network_Details ), the Haggle project ( http://www.haggleproject.org/ ), and Comm.unity ( http://community.mit.edu/ ), among many  others."""
+
+    creditsText = """Some credits text to go here.  Bruno, Luis, Maria, Claudia, Niranjan, etc."""
+
     def __init__(self, parent=None, title = None, message = None):
         QtGui.QDialog.__init__(self, parent)
 
@@ -196,6 +220,7 @@ class FluidNexusAboutDialog(QtGui.QDialog):
 
         self.ui = Ui_FluidNexusAbout()
         self.ui.setupUi(self)
+        self.ui.AboutDialogAboutText.setText(self.aboutText)
 
     def closeDialog(self):
         self.close()
@@ -249,6 +274,9 @@ class FluidNexusDesktop(QtGui.QMainWindow):
 
         self.setupSysTray()
 
+        # Start the network threads
+        self.__startNetworkThreads()
+
     def __setupDefaultSettings(self):
         self.settings.clear()
 
@@ -290,6 +318,13 @@ class FluidNexusDesktop(QtGui.QMainWindow):
             os.makedirs(self.dataDir)
 
         os.chmod(self.dataDir, stat.S_IREAD | stat.S_IWRITE | stat.S_IEXEC)
+
+    def __startNetworkThreads(self):
+        self.serverThread = FluidNexusServerQt(parent = self, dataDir = self.dataDir, databaseType = "pysqlite2", logPath = self.logPath)
+        self.serverThread.start()
+
+    def __stopNetworkThreads(self):
+        self.serverThread.quit()
 
     def setupDisplay(self):
         """Setup our display with a bunch of text browsers."""
@@ -341,6 +376,8 @@ class FluidNexusDesktop(QtGui.QMainWindow):
 
     def handleQuit(self):
         self.logger.debug("Quiting...")
+        self.emit(QtCore.SIGNAL("handleQuit"))
+        self.__stopNetworkThreads()
         self.sysTray.hide()
         self.database.close()
         self.close()
@@ -364,14 +401,13 @@ class FluidNexusDesktop(QtGui.QMainWindow):
     def incomingMessageDeleted(self, messageHash):
         self.serverThread.server.stopAdvertise(str(messageHash))
 
-    def incomingMessageAdded(self, newHash):
+    def newMessages(self, newMessages):
         """Slot for when an incoming message was added by the server thread."""
-        item = self.database.returnItemBasedOnHash(newHash)
+        self.logger.debug("New messages received: " + str(newMessages))
+        for message in newMessages:
+            tb = MessageTextBrowser(parent = self, mine = 0, message_title = message["message_title"], message_content = message["message_content"], message_hash = message["message_hash"], message_timestamp = time.ctime(message["message_timestamp"]), logPath = self.logPath)
+            self.ui.FluidNexusVBoxLayout.insertWidget(0, tb)
 
-        itemHash = QtGui.QStandardItem(item[6])
-        itemTitle = QtGui.QStandardItem(item[4])
-        itemMessageFragment = QtGui.QStandardItem(item[5][0:20])
-        self.incomingMessagesModel.insertRow(0, [itemHash, itemTitle, itemMessageFragment])
 
     def incomingMessageClicked(self, index):
         currentItem = self.incomingMessagesModel.itemFromIndex(index)
@@ -513,34 +549,15 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         self.newMessageDialog = FluidNexusNewMessageDialog(parent = self)
         self.newMessageDialog.exec_()
 
-    def newMessageSaveButtonClicked(self, title, body):
-        messageHash = unicode(hashlib.md5(unicode(title) + unicode(body)).hexdigest())
+    def newMessageSaveButtonClicked(self, message_title, message_content):
+        message_hash = unicode(hashlib.md5(unicode(message_title) + unicode(message_content)).hexdigest())
 
-        if (self.currentEditingHash is not None):
-            self.database.remove_by_hash(self.currentEditingHash)
+        self.database.add_new(u"00:00", 0, unicode(message_title), unicode(message_content), message_hash, u"00:00")
 
-            # Find the right item to update
-            self.database.add_new(u"00:00", 0, unicode(title), unicode(body), messageHash, u"00:00")
-            self.outgoingMessagesModel.setItem(self.currentEditingRow, 0, QtGui.QStandardItem(messageHash))
-            self.outgoingMessagesModel.setItem(self.currentEditingRow, 2, QtGui.QStandardItem(title))
-            self.outgoingMessagesModel.setItem(self.currentEditingRow, 3, QtGui.QStandardItem(body[0:20] + " ..."))
+        tb = MessageTextBrowser(parent = self, mine = 1, message_title = message_title, message_content = message_content, message_hash = message_hash, message_timestamp = time.ctime(time.time()), logPath = self.logPath)
 
-            try:
-                del self.enabledHash[self.currentEditingHash]
-            except KeyError:
-                # If we haven't toggled anything yet, the item won't be there yet
-                pass
-            self.currentEditingHash = None
-            self.currentEditingRow = None
-        else:
-            self.database.add_new(u"00:00", 0, unicode(title), unicode(body), messageHash, u"00:00")
+        self.ui.FluidNexusVBoxLayout.insertWidget(0, tb)
 
-            itemHash = QtGui.QStandardItem(messageHash)
-            itemTitle = QtGui.QStandardItem(title)
-            itemMessageFragment = QtGui.QStandardItem(body[0:20] + " ...")
-            enabledIcon = QtGui.QIcon()
-            enabledIcon.addPixmap(QtGui.QPixmap(":/icon32x32/icons/32x32/menu_enable_outgoing.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-            self.outgoingMessagesModel.insertRow(0, [itemHash, QtGui.QStandardItem(enabledIcon, ""), itemTitle, itemMessageFragment])
 
 
 class FluidNexusDesktopOld(QtGui.QMainWindow):

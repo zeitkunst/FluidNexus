@@ -38,7 +38,14 @@ class Networking(object):
     def __init__(self, databaseDir = ".", databaseType = "pysqlite2", logPath = "FluidNexus.log", level = logging.DEBUG):
         self.logger = Log.getLogger(logPath = logPath)
 
-        self.database = FluidNexusDatabase(databaseDir = databaseDir, databaseType = databaseType)
+        self.databaseDir = databaseDir
+        self.databaseType = databaseType
+
+    def openDatabase(self):
+        self.database = FluidNexusDatabase(databaseDir = self.databaseDir, databaseType = self.databaseType)
+
+    def closeDatabase(self):
+        self.database.close()
 
     def getHashesFromDatabase(self):
         """Get the current list of hashes from the database."""
@@ -331,11 +338,9 @@ TODO
         self.setupServerSocket(numConnections = numConnections)
         self.setupService()
 
-        self.getHashesFromDatabase()
-        self.hashesToSend = None
 
         # Enter into the main loop
-        self.run()
+        #self.run()
 
     def setState(self, state):
         """Set our state."""
@@ -639,10 +644,13 @@ TODO
 
         # Go through the received messages and add any that were sent
         fields = messages.ListFields()
+        self.newMessages = []
         if (fields != []):
             for message in fields[0][1]: 
                 message_hash = hashlib.md5(unicode(message.message_title) + unicode(message.message_content)).hexdigest()
                 self.database.add_received("foo", message.message_timestamp, 0, message.message_title, message.message_content, message_hash, "(123, 123, 123, 123)")
+                newMessage = {"message_hash": message_hash, "message_timestamp": message.message_timestamp, "message_title": message.message_title, "message_content": message.message_content}
+                self.newMessages.append(newMessage)
 
         self.getHashesFromDatabase()
         self.setState(self.STATE_WRITE_SWITCH)
@@ -662,19 +670,35 @@ TODO
         TODO
         * do we just need to change handleError to this?"""
         self.hashesToSend = None
-        self.cs.close()
-        self.cs = None
-        self.ci = None
+
+        if (self.cs is not None):
+            self.cs.close()
+            self.cs = None
+            self.ci = None
         self.setState(self.STATE_START)
 
+    def cleanupThread(self):
+        """Cleanup our things when called from a thread."""
+        self.setState(self.STATE_QUIT)
+        if (self.cs is not None):
+            self.cs.close()
+            self.cs = None
+            self.ci = None
+        self.closeDatabase()
 
     def run(self):
         """Run the main loop."""
+        
+        self.openDatabase()
+        self.getHashesFromDatabase()
+        self.hashesToSend = None
 
         self.cs = None
         self.ci = None
+        
+        self.notDone = True
 
-        while (True):
+        while (self.notDone):
 
             currentState = self.getState()
             self.logger.debug("Current state is: " + str(currentState))
@@ -728,7 +752,10 @@ TODO
             elif (currentState == self.STATE_WRITE_DONE):
                 self.writeCommand(self.DONE)
                 self.cleanup()
+                self.notDone = False
             else:
                 self.logger.debug("No command matches.")
                 self.handleError()
 
+        self.closeDatabase()
+        return self.newMessages

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'FluidNexus/ui/FluidNexusAbout.ui'
 #
-# Created: Mon Jun 20 17:13:56 2011
+# Created: Mon Jun 20 18:21:35 2011
 #      by: PyQt4 UI code generator 4.8.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -62,9 +62,59 @@ class Ui_FluidNexusAbout(object):
         self.tabWidget.setObjectName(_fromUtf8("tabWidget"))
         self.AboutDialogAboutTab = QtGui.QWidget()
         self.AboutDialogAboutTab.setObjectName(_fromUtf8("AboutDialogAboutTab"))
+        self.AboutDialogAboutText = QtGui.QTextBrowser(self.AboutDialogAboutTab)
+        self.AboutDialogAboutText.setGeometry(QtCore.QRect(10, 10, 311, 281))
+        palette = QtGui.QPalette()
+        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255, 0))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Active, QtGui.QPalette.Base, brush)
+        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Active, QtGui.QPalette.NoRole, brush)
+        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255, 0))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Inactive, QtGui.QPalette.Base, brush)
+        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Inactive, QtGui.QPalette.NoRole, brush)
+        brush = QtGui.QBrush(QtGui.QColor(244, 244, 244))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Base, brush)
+        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.NoRole, brush)
+        self.AboutDialogAboutText.setPalette(palette)
+        self.AboutDialogAboutText.setFrameShape(QtGui.QFrame.NoFrame)
+        self.AboutDialogAboutText.setOpenExternalLinks(True)
+        self.AboutDialogAboutText.setObjectName(_fromUtf8("AboutDialogAboutText"))
         self.tabWidget.addTab(self.AboutDialogAboutTab, _fromUtf8(""))
         self.AboutDialogCreditsTab = QtGui.QWidget()
         self.AboutDialogCreditsTab.setObjectName(_fromUtf8("AboutDialogCreditsTab"))
+        self.AboutDialogCreditsText = QtGui.QTextBrowser(self.AboutDialogCreditsTab)
+        self.AboutDialogCreditsText.setGeometry(QtCore.QRect(10, 10, 311, 281))
+        palette = QtGui.QPalette()
+        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255, 0))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Active, QtGui.QPalette.Base, brush)
+        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Active, QtGui.QPalette.NoRole, brush)
+        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255, 0))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Inactive, QtGui.QPalette.Base, brush)
+        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Inactive, QtGui.QPalette.NoRole, brush)
+        brush = QtGui.QBrush(QtGui.QColor(244, 244, 244))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Base, brush)
+        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.NoRole, brush)
+        self.AboutDialogCreditsText.setPalette(palette)
+        self.AboutDialogCreditsText.setFrameShape(QtGui.QFrame.NoFrame)
+        self.AboutDialogCreditsText.setOpenExternalLinks(True)
+        self.AboutDialogCreditsText.setObjectName(_fromUtf8("AboutDialogCreditsText"))
         self.tabWidget.addTab(self.AboutDialogCreditsTab, _fromUtf8(""))
         self.verticalLayout.addWidget(self.tabWidget)
 
@@ -82,5 +132,6 @@ class Ui_FluidNexusAbout(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.AboutDialogAboutTab), QtGui.QApplication.translate("FluidNexusAbout", "About", None, QtGui.QApplication.UnicodeUTF8))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.AboutDialogCreditsTab), QtGui.QApplication.translate("FluidNexusAbout", "Credits", None, QtGui.QApplication.UnicodeUTF8))
 
+import FluidNexus_rc
 import FluidNexus_rc
 import FluidNexus_rc

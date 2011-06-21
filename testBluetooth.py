@@ -13,3 +13,4 @@ databaseDir = os.path.join(dataDir, name)
 databaseType = unicode(settings.value("database/type").toString())
 
 btServer = BluetoothServerVer3(databaseDir = dataDir, databaseType = databaseType, logPath = logPath)
+btServer.run()
