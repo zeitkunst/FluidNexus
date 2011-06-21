@@ -5,11 +5,11 @@ import binascii
 import hashlib
 import logging
 import os
+import select
 import struct
 import time
 
 # External imports
-from PyQt4 import QtCore
 from bluetooth import *
 
 # My imports
@@ -34,6 +34,34 @@ DONE_DONE = 0x00F0
 
 class Networking(object):
     """Base class for all other networking activity.  Other networking modalities need to subclass from this class."""
+
+    # STATES
+    STATE_START = 0x0000
+    STATE_WAITING = 0x0001
+    STATE_READ_HELO = 0x0010
+    STATE_WRITE_HELO = 0x0020
+    STATE_READ_HASHES = 0x0030
+    STATE_WRITE_MESSAGES = 0x0040
+    STATE_READ_SWITCH = 0x0050
+    STATE_WRITE_HASHES = 0x0060
+    STATE_READ_MESSAGES = 0x0070
+    STATE_WRITE_SWITCH = 0x0080
+    STATE_READ_DONE = 0x0090
+    STATE_WRITE_DONE = 0x00A0
+    STATE_QUIT = 0x00F0
+
+    # Commands
+    HELO = 0x0010
+    HASHES = 0x0020
+    MESSAGES = 0x0030
+    SWITCH = 0x0080
+    DONE = 0x00F0
+
+    commandStruct = struct.Struct('>H')
+    sizeStruct = struct.Struct('>I')
+    hashStruct = struct.Struct('>32s')
+    state = STATE_START
+
 
     def __init__(self, databaseDir = ".", databaseType = "pysqlite2", logPath = "FluidNexus.log", level = logging.DEBUG):
         self.logger = Log.getLogger(logPath = logPath)
@@ -60,470 +88,7 @@ class Networking(object):
             # Get the last item (the hash)
             self.ourHashes.append('%s' % str(item[-1]))
 
-class BluetoothServerVer2(Networking):
-    """Class that deals with bluetooth networking.  
-
-TODO
-
-* Write client that can connect to other machines
-* Deal with different libraries such as lightblue."""
-
-    commandStruct = struct.Struct('>H')
-    hashStruct = struct.Struct('>32s')
-
-    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", logPath = "FluidNexus.log", level = logging.DEBUG, numConnections = 5):
-        super(BluetoothServer, self).__init__(databaseDir = databaseDir, databaseType = databaseType, logPath = logPath, level = level)
-
-        # Do initial setup
-        self.setupServerSocket(numConnections = numConnections)
-        self.setupService()
-
-        self.getHashesFromDatabase()
-
-        # Enter into the main loop
-        self.run()
-
-    def setupServerSocket(self, numConnections = 5):
-        """Setup the socket for accepting connections."""
-        self.serverSocket = BluetoothSocket(RFCOMM)
-        self.serverSocket.bind(("", PORT_ANY))
-        self.serverSocket.listen(numConnections)
-
-    def setupService(self):
-        """Setup the service advertisement."""
-        advertise_service(self.serverSocket, "FluidNexus", service_id = FluidNexusUUID, service_classes = [FluidNexusUUID, SERIAL_PORT_CLASS], profiles = [SERIAL_PORT_PROFILE])
-
-    def respondHELO(self):
-        """Respond to HELO with a HELO."""
-
-        self.cs.send(self.commandStruct.pack(HELO))
-
-    def respondWithHashes(self):
-        """Respond with the hashes that we have."""
-
-        self.logger.debug("=> Send hashes")
-        # Send hashes
-        # TODO
-        # Deal with having more hashes than we can send
-        numHashes = len(self.messageHashes)
-        numHashesPacked = self.commandStruct.pack(numHashes)
-        
-        self.cs.send(numHashesPacked)
-        for currentHash in self.messageHashes:
-            self.cs.send(self.hashStruct.pack(currentHash))
-
-    def respondWithDataForHash(self):
-        """Respond with data for a particular hash."""
-        # Receiving hash request
-        self.logger.debug("=> Receiving hash request")
-        # TODO
-        # should figure out how to deal with this using the struct
-        tmpHash = self.cs.recv(32)
-        self.logger.debug(tmpHash)
-
-        data = self.database.returnItemBasedOnHash(tmpHash)
-        timestamp = str(data[2])
-        title = str(data[4])
-        message = str(data[5])
-
-        # Send data corresponding to hash
-        self.logger.debug("=> Send data corresponding to hash %s" % tmpHash)
-        versionPack = struct.Struct(">B")
-        self.cs.send(versionPack.pack(0x02))
-        
-        titleLengthPack = struct.Struct(">I")
-        self.cs.send(titleLengthPack.pack(int(len(title))))
-
-        messageLengthPack = struct.Struct(">I")
-        self.cs.send(messageLengthPack.pack(int(len(message))))
-
-        timestampPacker = struct.Struct(">10s")
-        self.cs.send(timestampPacker.pack(timestamp))
-
-        titlePacker = struct.Struct(">%ds" % int(len(title)) )
-        self.cs.send(titlePacker.pack(title))
-
-        messagePacker = struct.Struct(">%ds" % int(len(message)) )
-        self.cs.send(messagePacker.pack(message))
-
-    def respondSWITCH(self):
-        """Respond to SWITCH with a SWITCH."""
-
-        self.cs.send(self.commandStruct.pack(SWITCH))
-
-        self.doRequestLoop()
-
-    def sendHashListRequest(self):
-        """Send a request for a list of hashes from the client."""
-
-        # Send command for hash list
-        self.cs.send(self.commandStruct.pack(HASH_LIST))
-        numHashesCommand = self.cs.recv(self.commandStruct.size)
-        numHashes = self.commandStruct.unpack(numHashesCommand)
-        numHashes = numHashes[0]
-        self.logger.debug("Expect to receive %d hashes" % numHashes)
-
-        self.hashesToReceive = []
-
-        for index in xrange(0, numHashes):
-            hashPacked = self.cs.recv(self.hashStruct.size)
-            hashUnpacked = self.hashStruct.unpack(hashPacked)[0]
-            self.logger.debug("Received hash: " + hashUnpacked)
-            
-            hashUnpacked = hashUnpacked.lower()
-            if (not (self.database.look_for_hash(hashUnpacked))):
-                self.logger.debug("Don't currently have hash: " + hashUnpacked)
-                self.hashesToReceive.append(hashUnpacked)
-
-        self.currentSendingState = HASH_REQUEST
-    
-    def __requestHash(self, currentHash):
-        """Private method to request data for a particular hash."""
-
-        # Send command for hash request
-        self.cs.send(self.commandStruct.pack(HASH_REQUEST))
-        self.logger.debug("=> Requesting data for hash %s" % currentHash)
-
-        # Send hash that we want to receive
-        self.cs.send(self.hashStruct.pack(currentHash))
-
-        # Receive data corresponding to hash
-        versionPacker = struct.Struct(">B")
-        versionPacked = self.cs.recv(versionPacker.size)
-        self.logger.debug("received %s " % binascii.hexlify(versionPacked))
-        version = versionPacker.unpack(versionPacked)[0]
-        self.logger.debug("Version: %d" % version)
-        
-        titleLengthPacker = struct.Struct(">I")
-        titleLengthPacked = self.cs.recv(titleLengthPacker.size)
-        titleLength = titleLengthPacker.unpack(titleLengthPacked)[0]
-        self.logger.debug("Title length: %d" % titleLength)
-
-        messageLengthPacker = struct.Struct(">I")
-        messageLengthPacked = self.cs.recv(messageLengthPacker.size)
-        messageLength = messageLengthPacker.unpack(messageLengthPacked)[0]
-        self.logger.debug("Message length: %d" % messageLength)
-
-        timestampPacker = struct.Struct(">10s")
-        timestampPacked = self.cs.recv(timestampPacker.size)
-        timestamp = timestampPacker.unpack(timestampPacked)[0]
-        self.logger.debug("Timestamp: %s" % timestamp)
-
-        titlePacker = struct.Struct(">%ds" % int(titleLength) )
-        titlePacked = self.cs.recv(titlePacker.size)
-        title = titlePacker.unpack(titlePacked)[0]
-        self.logger.debug("Title: %s" % title)
-
-        messagePacker = struct.Struct(">%ds" % int(messageLength) )
-        messagePacked = self.cs.recv(messagePacker.size)
-        message = messagePacker.unpack(messagePacked)[0]
-        self.logger.debug("Message: %s" % message)
-    
-    def sendHashRequest(self):
-        """Send a request for a given hash."""
-
-        # TODO
-        # Only request hashes we don't already have
-        # Receiving hash request
-        for currentHash in self.hashesToReceive:
-            self.__requestHash(currentHash)
-
-    def doRequestLoop(self):
-        """Enter into a loop to send requests to our client."""
-        done = False
-        self.currentSendingState = HASH_LIST
-        while (not done):
-            if (self.currentSendingState == HASH_LIST):
-                self.sendHashListRequest()
-            elif (self.currentSendingState == HASH_REQUEST):
-                self.sendHashRequest()
-                # Send command for hash list
-                self.cs.send(self.commandStruct.pack(SWITCH_DONE))
-                done = True
-            else:
-                done = True
-
-    def respondDoneDone(self):
-        """Respond that we're really done."""
-        self.logger.debug("=> Sending back command")
-        self.cs.send(self.commandStruct.pack(DONE_DONE))
-        self.cs.close()
-        self.cs = None
-        self.ci = None
-
-    def run(self):
-        """Run the main loop."""
-
-        self.cs = None
-        self.ci = None
-
-        while (True):
-            self.logger.debug("starting accept sequence")
-
-            # TODO
-            # At some point, make this threaded
-            if (self.cs is None):
-                self.cs, self.ci = self.serverSocket.accept()
-
-            # First thing we get should be a command
-            self.logger.debug("=> Receive command")
-            command = self.cs.recv(self.commandStruct.size)
-            self.logger.debug("received %s " % binascii.hexlify(command))
-            unpacked_command = self.commandStruct.unpack(command)
-            unpacked_command = unpacked_command[0]
-            self.logger.debug("unpacked: " + str(unpacked_command))
-
-            # Go through our command tree
-            if (unpacked_command == HELO):
-                self.logger.debug("=> Received HELO")
-                self.respondHELO()
-            elif (unpacked_command == HASH_LIST):
-                self.logger.debug("=> Received command for hash list")
-                self.respondWithHashes()
-            elif (unpacked_command == HASH_REQUEST):
-                self.logger.debug("=> Received command for particular hash request")
-                self.respondWithDataForHash()
-            elif (unpacked_command == SWITCH):
-                self.logger.debug("=> Received command to switch direction")
-                self.respondSWITCH()
-            elif (unpacked_command == DONE_DONE):
-                self.logger.debug("=> Received command that we're done")
-                self.respondDoneDone()
-            else:
-                self.logger.debug("No command matches.")
-                self.cs.send(self.commandStruct.pack(0x00F0))
-                self.cs.close()
-                self.cs = None
-                self.ci = None
-
-
-class BluetoothServerVer3(Networking):
-    """Class that deals with bluetooth networking using version 3 of the protocol, specifically using protocol buffers.  
-
-TODO
-
-* Write client that can connect to other machines
-* Deal with different libraries such as lightblue."""
-
-    # STATES
-    STATE_START = 0x0000
-    STATE_READ_HELO = 0x0010
-    STATE_WRITE_HELO = 0x0020
-    STATE_READ_HASHES = 0x0030
-    STATE_WRITE_MESSAGES = 0x0040
-    STATE_READ_SWITCH = 0x0050
-    STATE_WRITE_HASHES = 0x0060
-    STATE_READ_MESSAGES = 0x0070
-    STATE_WRITE_SWITCH = 0x0080
-    STATE_READ_DONE = 0x0090
-    STATE_WRITE_DONE = 0x00A0
-    STATE_QUIT = 0x00F0
-
-    # Commands
-    HELO = 0x0010
-    HASHES = 0x0020
-    MESSAGES = 0x0030
-    SWITCH = 0x0080
-    DONE = 0x00F0
-
-    commandStruct = struct.Struct('>H')
-    sizeStruct = struct.Struct('>I')
-    hashStruct = struct.Struct('>32s')
-    state = STATE_START
-
-    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", logPath = "FluidNexus.log", level = logging.DEBUG, numConnections = 5):
-        super(BluetoothServerVer3, self).__init__(databaseDir = databaseDir, databaseType = databaseType, logPath = logPath, level = level)
-
-        # Do initial setup
-        self.setupServerSocket(numConnections = numConnections)
-        self.setupService()
-
-
-        # Enter into the main loop
-        #self.run()
-
-    def setState(self, state):
-        """Set our state."""
-        tmpNewState = str(state)
-        tmpOldState = str(self.state)
-
-        self.logger.debug("Changing state from %s to %s" % (tmpOldState, tmpNewState))
-        self.state = state
-
-    def getState(self):
-        """Return our current state."""
-
-        return self.state
-
-    def setupServerSocket(self, numConnections = 5):
-        """Setup the socket for accepting connections."""
-        self.serverSocket = BluetoothSocket(RFCOMM)
-        self.serverSocket.bind(("", PORT_ANY))
-        self.serverSocket.listen(numConnections)
-
-    def setupService(self):
-        """Setup the service advertisement."""
-        advertise_service(self.serverSocket, "FluidNexus", service_id = FluidNexusUUID, service_classes = [FluidNexusUUID, SERIAL_PORT_CLASS], profiles = [SERIAL_PORT_PROFILE])
-
-    def respondHELO(self):
-        """Respond to HELO with a HELO."""
-
-        self.cs.send(self.commandStruct.pack(self.HELO))
-
-    def respondWithHashes(self):
-        """Respond with the hashes that we have."""
-
-        self.logger.debug("=> Send hashes")
-        # Send hashes
-        # TODO
-        # Deal with having more hashes than we can send
-        numHashes = len(self.messageHashes)
-        numHashesPacked = self.commandStruct.pack(numHashes)
-        
-        self.cs.send(numHashesPacked)
-        for currentHash in self.messageHashes:
-            self.cs.send(self.hashStruct.pack(currentHash))
-
-    def respondWithDataForHash(self):
-        """Respond with data for a particular hash."""
-        # Receiving hash request
-        self.logger.debug("=> Receiving hash request")
-        # TODO
-        # should figure out how to deal with this using the struct
-        tmpHash = self.cs.recv(32)
-        self.logger.debug(tmpHash)
-
-        data = self.database.returnItemBasedOnHash(tmpHash)
-        timestamp = str(data[2])
-        title = str(data[4])
-        message = str(data[5])
-
-        # Send data corresponding to hash
-        self.logger.debug("=> Send data corresponding to hash %s" % tmpHash)
-        versionPack = struct.Struct(">B")
-        self.cs.send(versionPack.pack(0x02))
-        
-        titleLengthPack = struct.Struct(">I")
-        self.cs.send(titleLengthPack.pack(int(len(title))))
-
-        messageLengthPack = struct.Struct(">I")
-        self.cs.send(messageLengthPack.pack(int(len(message))))
-
-        timestampPacker = struct.Struct(">10s")
-        self.cs.send(timestampPacker.pack(timestamp))
-
-        titlePacker = struct.Struct(">%ds" % int(len(title)) )
-        self.cs.send(titlePacker.pack(title))
-
-        messagePacker = struct.Struct(">%ds" % int(len(message)) )
-        self.cs.send(messagePacker.pack(message))
-
-    def respondSWITCH(self):
-        """Respond to SWITCH with a SWITCH."""
-
-        self.cs.send(self.commandStruct.pack(SWITCH))
-
-        self.doRequestLoop()
-
-    def sendHashListRequest(self):
-        """Send a request for a list of hashes from the client."""
-
-        # Send command for hash list
-        self.cs.send(self.commandStruct.pack(HASH_LIST))
-        numHashesCommand = self.cs.recv(self.commandStruct.size)
-        numHashes = self.commandStruct.unpack(numHashesCommand)
-        numHashes = numHashes[0]
-        self.logger.debug("Expect to receive %d hashes" % numHashes)
-
-        self.hashesToReceive = []
-
-        for index in xrange(0, numHashes):
-            hashPacked = self.cs.recv(self.hashStruct.size)
-            hashUnpacked = self.hashStruct.unpack(hashPacked)[0]
-            self.logger.debug("Received hash: " + hashUnpacked)
-            
-            hashUnpacked = hashUnpacked.lower()
-            if (not (self.database.look_for_hash(hashUnpacked))):
-                self.logger.debug("Don't currently have hash: " + hashUnpacked)
-                self.hashesToReceive.append(hashUnpacked)
-
-        self.currentSendingState = HASH_REQUEST
-    
-    def __requestHash(self, currentHash):
-        """Private method to request data for a particular hash."""
-
-        # Send command for hash request
-        self.cs.send(self.commandStruct.pack(HASH_REQUEST))
-        self.logger.debug("=> Requesting data for hash %s" % currentHash)
-
-        # Send hash that we want to receive
-        self.cs.send(self.hashStruct.pack(currentHash))
-
-        # Receive data corresponding to hash
-        versionPacker = struct.Struct(">B")
-        versionPacked = self.cs.recv(versionPacker.size)
-        self.logger.debug("received %s " % binascii.hexlify(versionPacked))
-        version = versionPacker.unpack(versionPacked)[0]
-        self.logger.debug("Version: %d" % version)
-        
-        titleLengthPacker = struct.Struct(">I")
-        titleLengthPacked = self.cs.recv(titleLengthPacker.size)
-        titleLength = titleLengthPacker.unpack(titleLengthPacked)[0]
-        self.logger.debug("Title length: %d" % titleLength)
-
-        messageLengthPacker = struct.Struct(">I")
-        messageLengthPacked = self.cs.recv(messageLengthPacker.size)
-        messageLength = messageLengthPacker.unpack(messageLengthPacked)[0]
-        self.logger.debug("Message length: %d" % messageLength)
-
-        timestampPacker = struct.Struct(">10s")
-        timestampPacked = self.cs.recv(timestampPacker.size)
-        timestamp = timestampPacker.unpack(timestampPacked)[0]
-        self.logger.debug("Timestamp: %s" % timestamp)
-
-        titlePacker = struct.Struct(">%ds" % int(titleLength) )
-        titlePacked = self.cs.recv(titlePacker.size)
-        title = titlePacker.unpack(titlePacked)[0]
-        self.logger.debug("Title: %s" % title)
-
-        messagePacker = struct.Struct(">%ds" % int(messageLength) )
-        messagePacked = self.cs.recv(messagePacker.size)
-        message = messagePacker.unpack(messagePacked)[0]
-        self.logger.debug("Message: %s" % message)
-    
-    def sendHashRequest(self):
-        """Send a request for a given hash."""
-
-        # TODO
-        # Only request hashes we don't already have
-        # Receiving hash request
-        for currentHash in self.hashesToReceive:
-            self.__requestHash(currentHash)
-
-    def doRequestLoop(self):
-        """Enter into a loop to send requests to our client."""
-        done = False
-        self.currentSendingState = HASH_LIST
-        while (not done):
-            if (self.currentSendingState == HASH_LIST):
-                self.sendHashListRequest()
-            elif (self.currentSendingState == HASH_REQUEST):
-                self.sendHashRequest()
-                # Send command for hash list
-                self.cs.send(self.commandStruct.pack(SWITCH_DONE))
-                done = True
-            else:
-                done = True
-
-    def respondDoneDone(self):
-        """Respond that we're really done."""
-        self.logger.debug("=> Sending back command")
-        self.cs.send(self.commandStruct.pack(DONE_DONE))
-        self.cs.close()
-        self.cs = None
-        self.ci = None
-
-    def readCommand(self):
+    def readCommand(self, cs):
         """Read a command from the socket.
         
         TODO        
@@ -531,7 +96,7 @@ TODO
 
         # First thing we get should be a command
         self.logger.debug("=> Receive command")
-        command = self.cs.recv(self.commandStruct.size)
+        command = cs.recv(self.commandStruct.size)
         self.logger.debug("received %s " % binascii.hexlify(command))
         unpackedCommand = self.commandStruct.unpack(command)
         unpackedCommand = unpackedCommand[0]
@@ -539,41 +104,41 @@ TODO
         
         return unpackedCommand
 
-    def writeCommand(self, command):
+    def writeCommand(self, cs, command):
         """Write a command to the socket.
 
         TODO
         * Include return values for error checking."""
 
-        self.cs.send(self.commandStruct.pack(command))
+        cs.send(self.commandStruct.pack(command))
 
-    def writeSize(self, size):
+    def writeSize(self, cs, size):
         """Write a size to the socket.
 
         TODO
         * do some error handling."""
-        self.cs.send(self.sizeStruct.pack(size))
+        cs.send(self.sizeStruct.pack(size))
 
-    def writeSerializedString(self, data):
+    def writeSerializedString(self, cs, data):
         """Write a serialized string to the socket.
 
         TODO
         * do some error handling."""
-        self.cs.send(data)
+        cs.send(data)
 
-    def readHashes(self):
+    def readHashes(self, cs):
         """Read the hashes serialized using protobuffers."""
         
-        command = self.readCommand()
+        command = self.readCommand(cs)
         self.logger.debug("Received command: " + str(command))
         if (command != self.HASHES):
-            self.handleError()
+            self.handleError(cs)
 
-        sizePacked = self.cs.recv(self.sizeStruct.size)
+        sizePacked = cs.recv(self.sizeStruct.size)
         size = self.sizeStruct.unpack(sizePacked)[0]
         self.logger.debug("Expecting to receive data of size " + str(size))
 
-        data = self.cs.recv(size)
+        data = cs.recv(size)
         hashes = FluidNexus_pb2.FluidNexusHashes()
         hashes.ParseFromString(data)
 
@@ -586,7 +151,7 @@ TODO
         self.logger.debug("Received message: " + str(hashes))
         self.setState(self.STATE_WRITE_MESSAGES)
 
-    def writeMessages(self):
+    def writeMessages(self, cs):
         """Write the messages that the other side doesn't have."""
 
         # Our output protobuf message
@@ -604,12 +169,12 @@ TODO
 
         messagesSerialized = messages.SerializeToString()
         messagesSerializedSize = len(messagesSerialized)
-        self.writeCommand(self.MESSAGES)
-        self.writeSize(messagesSerializedSize)
-        self.writeSerializedString(messagesSerialized)
+        self.writeCommand(cs, self.MESSAGES)
+        self.writeSize(cs, messagesSerializedSize)
+        self.writeSerializedString(cs, messagesSerialized)
         self.setState(self.STATE_READ_SWITCH)
 
-    def writeHashes(self):
+    def writeHashes(self, cs):
         """Write our current hashes to the client."""
         hashes = FluidNexus_pb2.FluidNexusHashes()
 
@@ -618,23 +183,23 @@ TODO
 
         hashesSerialized = hashes.SerializeToString()
         hashesSerializedSize = len(hashesSerialized)
-        self.writeCommand(self.HASHES)
-        self.writeSize(hashesSerializedSize)
-        self.writeSerializedString(hashesSerialized)
+        self.writeCommand(cs, self.HASHES)
+        self.writeSize(cs, hashesSerializedSize)
+        self.writeSerializedString(cs, hashesSerialized)
         self.setState(self.STATE_READ_MESSAGES)
 
-    def readMessages(self):
+    def readMessages(self, cs):
         """Read the messages from the client."""
 
-        sizePacked = self.cs.recv(self.sizeStruct.size)
+        sizePacked = cs.recv(self.sizeStruct.size)
         size = self.sizeStruct.unpack(sizePacked)[0]
         self.logger.debug("Expecting to receive data of size " + str(size))
 
         data = ""
         while len(data) < size:
-            chunk = self.cs.recv(size - len(data))
+            chunk = cs.recv(size - len(data))
             if chunk == "":
-                self.handleError()
+                self.handleError(cs)
             data = data + chunk
 
         messages = FluidNexus_pb2.FluidNexusMessages()
@@ -655,36 +220,127 @@ TODO
         self.getHashesFromDatabase()
         self.setState(self.STATE_WRITE_SWITCH)
 
-    def handleError(self):
+
+class BluetoothServerVer3(Networking):
+    """Class that deals with bluetooth networking using version 3 of the protocol, specifically using protocol buffers.  
+
+TODO
+
+* Write client that can connect to other machines
+* Deal with different libraries such as lightblue."""
+
+
+    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", logPath = "FluidNexus.log", level = logging.DEBUG, numConnections = 5):
+        super(BluetoothServerVer3, self).__init__(databaseDir = databaseDir, databaseType = databaseType, logPath = logPath, level = level)
+
+        # Do initial setup
+        self.setupServerSockets(numConnections = numConnections)
+        self.setupService()
+
+
+        # Enter into the main loop
+        #self.run()
+
+    def setState(self, state):
+        """Set our state."""
+        tmpNewState = str(state)
+        tmpOldState = str(self.state)
+
+        self.logger.debug("Changing state from %s to %s" % (tmpOldState, tmpNewState))
+        self.state = state
+
+    def getState(self):
+        """Return our current state."""
+
+        return self.state
+
+    def setupServerSockets(self, numConnections = 5, blocking = 0):
+        """Setup the socket for accepting connections."""
+        self.serverSocket = BluetoothSocket(RFCOMM)
+        self.serverSocket.bind(("", PORT_ANY))
+        self.serverSocket.listen(numConnections)
+        self.serverSocket.setblocking(blocking)
+        self.clientSockets = []
+
+    def setupService(self):
+        """Setup the service advertisement."""
+        advertise_service(self.serverSocket, "FluidNexus", service_id = FluidNexusUUID, service_classes = [FluidNexusUUID, SERIAL_PORT_CLASS], profiles = [SERIAL_PORT_PROFILE])
+
+
+    def handleError(self, cs):
         """Do some sort of socket error handling if we ever get a command or data that we don't expect."""
         
         self.hashesToSend = None
-        self.cs.close()
-        self.cs = None
-        self.ci = None
+        cs.close()
+        cs = None
         self.setState(self.STATE_START)
 
-    def cleanup(self):
+    def cleanup(self, cs):
         """Cleanup our connections for starting over.
 
         TODO
         * do we just need to change handleError to this?"""
         self.hashesToSend = None
 
-        if (self.cs is not None):
-            self.cs.close()
-            self.cs = None
-            self.ci = None
+        cs.close()
+        cs = None
         self.setState(self.STATE_START)
 
-    def cleanupThread(self):
-        """Cleanup our things when called from a thread."""
-        self.setState(self.STATE_QUIT)
-        if (self.cs is not None):
-            self.cs.close()
-            self.cs = None
-            self.ci = None
-        self.closeDatabase()
+    def handleClientConnection(self, cs):
+        """Handle a connection on the client socket.
+        
+        TODO
+        * Decide if we need to dispatch a new thread to deal with this connection."""
+        notDone = True
+        while (notDone):
+            currentState = self.getState()
+
+            if (currentState == self.STATE_READ_HELO):
+                command = self.readCommand(cs)
+                if (command != self.HELO):
+                    self.handleError(cs)
+                else:
+                    self.setState(self.STATE_WRITE_HELO)
+            elif (currentState == self.STATE_WRITE_HELO):
+                # TODO
+                # Deal with errors in writing to socket
+                self.writeCommand(cs, self.HELO)
+                self.setState(self.STATE_READ_HASHES)
+            elif (currentState == self.STATE_READ_HASHES):
+                self.readHashes(cs)
+            elif (currentState == self.STATE_WRITE_MESSAGES):
+                self.writeMessages(cs)
+            elif (currentState == self.STATE_READ_SWITCH):
+                command = self.readCommand(cs)
+                if (command != self.SWITCH):
+                    self.handleError(cs)
+                else:
+                    self.setState(self.STATE_WRITE_HASHES)
+            elif (currentState == self.STATE_WRITE_HASHES):
+                self.writeHashes(cs)
+            elif (currentState == self.STATE_READ_MESSAGES):
+                command = self.readCommand(cs)
+                if (command != self.MESSAGES):
+                    self.handleError(cs)
+                else:
+                    self.readMessages(cs)
+            elif (currentState == self.STATE_WRITE_SWITCH):
+                self.writeCommand(cs, self.SWITCH)
+                self.setState(self.STATE_READ_DONE)
+            elif (currentState == self.STATE_READ_DONE):
+                command = self.readCommand(cs)
+                if (command != self.DONE):
+                    self.handleError(cs)
+                else:
+                    self.setState(self.STATE_WRITE_DONE)
+            elif (currentState == self.STATE_WRITE_DONE):
+                self.writeCommand(cs, self.DONE)
+                self.cleanup(cs)
+                notDone = False
+            else:
+                self.logger.debug("No command matches.")
+                self.handleError(cs)
+                notDone = False
 
     def run(self):
         """Run the main loop."""
@@ -693,69 +349,32 @@ TODO
         self.getHashesFromDatabase()
         self.hashesToSend = None
 
-        self.cs = None
-        self.ci = None
-        
         self.notDone = True
 
         while (self.notDone):
 
             currentState = self.getState()
-            self.logger.debug("Current state is: " + str(currentState))
-
-            # Go through our command tree
+            
             if (currentState == self.STATE_START):
-                self.logger.debug("starting accept sequence")
                 # TODO
-                # At some point, make this threaded
-                if (self.cs is None):
-                    self.cs, self.ci = self.serverSocket.accept()
-                    self.setState(self.STATE_READ_HELO)
-            elif (currentState == self.STATE_READ_HELO):
-                command = self.readCommand()
-                if (command != self.HELO):
-                    self.handleError()
-                else:
-                    self.setState(self.STATE_WRITE_HELO)
-            elif (currentState == self.STATE_WRITE_HELO):
-                # TODO
-                # Deal with errors in writing to socket
-                self.writeCommand(self.HELO)
-                self.setState(self.STATE_READ_HASHES)
-            elif (currentState == self.STATE_READ_HASHES):
-                self.readHashes()
-            elif (currentState == self.STATE_WRITE_MESSAGES):
-                self.writeMessages()
-            elif (currentState == self.STATE_READ_SWITCH):
-                command = self.readCommand()
-                if (command != self.SWITCH):
-                    self.handleError()
-                else:
-                    self.setState(self.STATE_WRITE_HASHES)
-            elif (currentState == self.STATE_WRITE_HASHES):
-                self.writeHashes()
-            elif (currentState == self.STATE_READ_MESSAGES):
-                command = self.readCommand()
-                if (command != self.MESSAGES):
-                    self.handleError()
-                else:
-                    self.readMessages()
-            elif (currentState == self.STATE_WRITE_SWITCH):
-                self.writeCommand(self.SWITCH)
-                self.setState(self.STATE_READ_DONE)
-            elif (currentState == self.STATE_READ_DONE):
-                command = self.readCommand()
-                if (command != self.DONE):
-                    self.handleError()
-                else:
-                    self.setState(self.STATE_WRITE_DONE)
-            elif (currentState == self.STATE_WRITE_DONE):
-                self.writeCommand(self.DONE)
-                self.cleanup()
-                self.notDone = False
-            else:
-                self.logger.debug("No command matches.")
-                self.handleError()
+                # * This should be dispatched into another thread, probably, and thus we need a separate self.hashesToSend in the other thread, separate states, etc.  Basically we'd need another class that would encapsulate those states.
+                try:
+                    cs, ci = self.serverSocket.accept()
+                    self.clientSockets.append(cs)
+                    self.setState(self.STATE_WAITING)
+                except btcommon.BluetoothError, e:
+                    pass
+            elif (currentState == self.STATE_WAITING):
+                # See if any sockets are ready to read
+                rr, rw, ie = select.select(self.clientSockets, [], [], 10)
+
+                # If a socket is ready to read, then pass off to method that handles the connection
+                if (rr != []):
+                    for cs in rr:
+                        self.setState(self.STATE_READ_HELO)
+                        self.handleClientConnection(cs)
+                        self.clientSockets.remove(cs)
+
 
         self.closeDatabase()
         return self.newMessages
