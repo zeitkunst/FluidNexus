@@ -64,7 +64,7 @@ class Networking(object):
 
 
     def __init__(self, databaseDir = ".", databaseType = "pysqlite2", logPath = "FluidNexus.log", level = logging.DEBUG):
-        self.logger = Log.getLogger(logPath = logPath)
+        self.logger = Log.getLogger(logPath = logPath, level = level)
 
         self.databaseDir = databaseDir
         self.databaseType = databaseType
@@ -132,7 +132,7 @@ class Networking(object):
         command = self.readCommand(cs)
         self.logger.debug("Received command: " + str(command))
         if (command != self.HASHES):
-            self.handleError(cs)
+            self.cleanup(cs)
 
         sizePacked = cs.recv(self.sizeStruct.size)
         size = self.sizeStruct.unpack(sizePacked)[0]
@@ -143,12 +143,9 @@ class Networking(object):
         hashes.ParseFromString(data)
 
         theirHashesSet = set([givenHash for givenHash in hashes.ListFields()[0][1]])
-        print theirHashesSet
         ourHashesSet = set(self.ourHashes)
-        print ourHashesSet
         self.hashesToSend = ourHashesSet.difference(theirHashesSet)
-        print self.hashesToSend
-        self.logger.debug("Received message: " + str(hashes))
+        self.logger.debug("Received hashes: " + str(hashes))
         self.setState(self.STATE_WRITE_MESSAGES)
 
     def writeMessages(self, cs):
@@ -165,7 +162,7 @@ class Networking(object):
             m.message_content = data[5]
             m.message_type = FluidNexus_pb2.FluidNexusMessage.TEXT
 
-        print str(messages)
+        self.logger.debug("Sending messages: " + str(messages))
 
         messagesSerialized = messages.SerializeToString()
         messagesSerializedSize = len(messagesSerialized)
@@ -199,7 +196,7 @@ class Networking(object):
         while len(data) < size:
             chunk = cs.recv(size - len(data))
             if chunk == "":
-                self.handleError(cs)
+                self.cleanup(cs)
             data = data + chunk
 
         messages = FluidNexus_pb2.FluidNexusMessages()
@@ -267,21 +264,10 @@ TODO
         advertise_service(self.serverSocket, "FluidNexus", service_id = FluidNexusUUID, service_classes = [FluidNexusUUID, SERIAL_PORT_CLASS], profiles = [SERIAL_PORT_PROFILE])
 
 
-    def handleError(self, cs):
+    def cleanup(self, cs):
         """Do some sort of socket error handling if we ever get a command or data that we don't expect."""
         
         self.hashesToSend = None
-        cs.close()
-        cs = None
-        self.setState(self.STATE_START)
-
-    def cleanup(self, cs):
-        """Cleanup our connections for starting over.
-
-        TODO
-        * do we just need to change handleError to this?"""
-        self.hashesToSend = None
-
         cs.close()
         cs = None
         self.setState(self.STATE_START)
@@ -298,7 +284,7 @@ TODO
             if (currentState == self.STATE_READ_HELO):
                 command = self.readCommand(cs)
                 if (command != self.HELO):
-                    self.handleError(cs)
+                    self.cleanup(cs)
                 else:
                     self.setState(self.STATE_WRITE_HELO)
             elif (currentState == self.STATE_WRITE_HELO):
@@ -313,7 +299,7 @@ TODO
             elif (currentState == self.STATE_READ_SWITCH):
                 command = self.readCommand(cs)
                 if (command != self.SWITCH):
-                    self.handleError(cs)
+                    self.cleanup(cs)
                 else:
                     self.setState(self.STATE_WRITE_HASHES)
             elif (currentState == self.STATE_WRITE_HASHES):
@@ -321,7 +307,7 @@ TODO
             elif (currentState == self.STATE_READ_MESSAGES):
                 command = self.readCommand(cs)
                 if (command != self.MESSAGES):
-                    self.handleError(cs)
+                    self.cleanup(cs)
                 else:
                     self.readMessages(cs)
             elif (currentState == self.STATE_WRITE_SWITCH):
@@ -330,7 +316,7 @@ TODO
             elif (currentState == self.STATE_READ_DONE):
                 command = self.readCommand(cs)
                 if (command != self.DONE):
-                    self.handleError(cs)
+                    self.cleanup(cs)
                 else:
                     self.setState(self.STATE_WRITE_DONE)
             elif (currentState == self.STATE_WRITE_DONE):
@@ -339,7 +325,7 @@ TODO
                 notDone = False
             else:
                 self.logger.debug("No command matches.")
-                self.handleError(cs)
+                self.cleanup(cs)
                 notDone = False
 
     def run(self):

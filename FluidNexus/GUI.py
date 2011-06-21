@@ -2,6 +2,7 @@
 
 # Standard library imports
 import hashlib
+import logging
 import os
 import pickle
 import stat
@@ -18,7 +19,6 @@ from ui.FluidNexusAboutUI import Ui_FluidNexusAbout
 from Database import FluidNexusDatabase
 from Networking import BluetoothServerVer3
 import Log
-from FluidNexusNetworking import FluidNexusClient, FluidNexusServer
 
 # TODO
 # * Deal with sqlite thread stuff...why can't I call a thread's method to close the database connection opened in that thread?  And do I even need to close the connection on thread quit?
@@ -68,13 +68,13 @@ class FluidNexusClientQt(QtCore.QThread):
             time.sleep(30)
 
 class FluidNexusServerQt(QtCore.QThread):
-    def __init__(self, dataDir = None, databaseType = None, logPath = "FluidNexus.log", parent = None):
+    def __init__(self, dataDir = None, databaseType = None, logPath = "FluidNexus.log", parent = None, level = logging.WARN):
         QtCore.QThread.__init__(self, parent)
 
         self.databaseDir = dataDir
         self.databaseType = databaseType
         self.parent = parent
-        self.logger = Log.getLogger(logPath = logPath)
+        self.logger = Log.getLogger(logPath = logPath, level = level)
 
 
         self.btServer = BluetoothServerVer3(databaseDir = dataDir, databaseType = databaseType, logPath = logPath)
@@ -138,10 +138,10 @@ class MessageTextBrowser(QtGui.QTextBrowser):
     </table>
     """
 
-    def __init__(self, parent = None, mine = False, message_title = "Testing title", message_content = "Testing content", message_type = 0, message_hash = None, message_timestamp = time.time(), logPath = "FluidNexus.log"):
+    def __init__(self, parent = None, mine = False, message_title = "Testing title", message_content = "Testing content", message_type = 0, message_hash = None, message_timestamp = time.time(), logPath = "FluidNexus.log", level = logging.WARN):
         QtGui.QWidget.__init__(self, parent)
         QtCore.QObject.connect(self, QtCore.SIGNAL("textChanged()"), self.setHeight)
-        self.logger = Log.getLogger(logPath = logPath)
+        self.logger = Log.getLogger(logPath = logPath, level = level)
 
         self.setMessageHash(message_hash)
 
@@ -228,7 +228,7 @@ Fluid Nexus is not designed as a general-purpose piece of software; rather, it i
 
 
 class FluidNexusDesktop(QtGui.QMainWindow):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, level = logging.WARN):
         QtGui.QWidget.__init__(self, parent)
         self.ui = Ui_FluidNexus()
         self.ui.setupUi(self)
@@ -250,7 +250,7 @@ class FluidNexusDesktop(QtGui.QMainWindow):
             self.__setupDatabaseConnection()
 
         # Setup logging
-        self.logger = Log.getLogger(logPath = self.logPath)
+        self.logger = Log.getLogger(logPath = self.logPath, level = level)
 
         self.logger.debug("FluidNexus desktop version has started.")
 
@@ -583,7 +583,7 @@ class FluidNexusDesktopOld(QtGui.QMainWindow):
             self.__setupDatabaseConnection()
 
         # Setup logging
-        self.logger = Log.getLogger(logPath = self.logPath)
+        self.logger = Log.getLogger(logPath = self.logPath, level = level)
 
         # Setup a hash for enabled outgoing messages
         enabledHash = self.settings.value("outgoing/enabled", "none").toString() 
