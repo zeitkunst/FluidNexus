@@ -29,8 +29,8 @@ DONE_DONE = 0x00F0
 
 # TODO
 # * Deal with settings/config better
-# * Refactor to allow for reuse of methods between client, server classes
 # * Better error checking, deal with socket timeouts, socket closing, etc
+# * * Basically need to wrap all "recv" with a "read" that takes in socket, amount to read, and captures error of "bluetooth.btcommon.BluetoothError: (104, 'Connection reset by peer')"
 
 class Networking(object):
     """Base class for all other networking activity.  Other networking modalities need to subclass from this class."""
@@ -74,6 +74,19 @@ class Networking(object):
 
     def closeDatabase(self):
         self.database.close()
+
+    def setState(self, state):
+        """Set our state."""
+        tmpNewState = str(state)
+        tmpOldState = str(self.state)
+
+        self.logger.debug("Changing state from %s to %s" % (tmpOldState, tmpNewState))
+        self.state = state
+
+    def getState(self):
+        """Return our current state."""
+
+        return self.state
 
     def getHashesFromDatabase(self):
         """Get the current list of hashes from the database."""
@@ -238,18 +251,6 @@ TODO
         # Enter into the main loop
         #self.run()
 
-    def setState(self, state):
-        """Set our state."""
-        tmpNewState = str(state)
-        tmpOldState = str(self.state)
-
-        self.logger.debug("Changing state from %s to %s" % (tmpOldState, tmpNewState))
-        self.state = state
-
-    def getState(self):
-        """Return our current state."""
-
-        return self.state
 
     def setupServerSockets(self, numConnections = 5, blocking = 0):
         """Setup the socket for accepting connections."""
@@ -364,3 +365,137 @@ TODO
 
         self.closeDatabase()
         return self.newMessages
+
+class BluetoothClientVer3(Networking):
+    """Class that deals with bluetooth networking using version 3 of the protocol, specifically using protocol buffers.  
+
+TODO
+
+* Write client that can connect to other machines
+* Deal with different libraries such as lightblue."""
+
+
+    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", logPath = "FluidNexus.log", level = logging.DEBUG, numConnections = 5):
+        super(BluetoothClientVer3, self).__init__(databaseDir = databaseDir, databaseType = databaseType, logPath = logPath, level = level)
+        self.setState(self.STATE_START)
+
+    def doDeviceDiscovery(self):
+        """Do our device discovery."""
+
+        self.logger.debug("Starting device discovery")
+        self.devices = []
+
+        nearbyDevices = discover_devices(lookup_names = True)
+        self.devices = [list(device) for device in nearbyDevices]
+
+        self.logger.debug("Device discovery completed")
+
+    def doServiceDiscovery(self):
+        """Do service discovery, adding devices to the list that run Fluid Nexus."""
+
+        self.devicesFN = []
+
+        for device in self.devices:
+            services = find_service(uuid = FluidNexusUUID, address = device[0])
+            
+            if (len(services) > 0):
+                device.append(services[0]["port"])
+                self.devicesFN.append(device)
+
+    def cleanup(self, cs):
+        """Do some sort of socket error handling if we ever get a command or data that we don't expect."""
+        
+        self.hashesToSend = None
+        cs.close()
+        cs = None
+        self.setState(self.STATE_START)
+
+
+    def handleServerConnection(self, cs):
+        """HELO            Write           Read
+        HELO            Read            Write
+        HASHES          Write           Read
+        MESSAGES        Read            Write
+        SWITCH          Write           Read
+        HASHES          Read            Write
+        MESSAGES        Write           Read
+        SWITCH          Read            Write
+        DONE            Write           Read
+        DONE            Read            Write"""
+        
+        notDone = True
+        while (notDone):
+            currentState = self.getState()
+            
+            if (currentState == self.STATE_WRITE_HELO):
+                # TODO
+                # Deal with errors in writing to socket
+                self.writeCommand(cs, self.HELO)
+                self.setState(self.STATE_READ_HELO)
+            elif (currentState == self.STATE_READ_HELO):
+                command = self.readCommand(cs)
+                if (command != self.HELO):
+                    self.cleanup(cs)
+                else:
+                    self.setState(self.STATE_WRITE_HASHES)
+            elif (currentState == self.STATE_WRITE_HASHES):
+                self.writeHashes(cs)
+                self.setState(self.STATE_READ_MESSAGES)
+            elif (currentState == self.STATE_READ_MESSAGES):
+                command = self.readCommand(cs)
+                if (command != self.MESSAGES):
+                    self.cleanup(cs)
+                else:
+                    self.readMessages(cs)
+                    self.setState(self.STATE_WRITE_SWITCH)
+            elif (currentState == self.STATE_WRITE_SWITCH):
+                self.writeCommand(cs, self.SWITCH)
+                self.setState(self.STATE_READ_HASHES)
+            elif (currentState == self.STATE_READ_HASHES):
+                self.readHashes(cs)
+            elif (currentState == self.STATE_WRITE_MESSAGES):
+                self.writeMessages(cs)
+            elif (currentState == self.STATE_READ_SWITCH):
+                command = self.readCommand(cs)
+                if (command != self.SWITCH):
+                    self.cleanup(cs)
+                else:
+                    self.setState(self.STATE_WRITE_DONE)
+            elif (currentState == self.STATE_WRITE_DONE):
+                self.writeCommand(cs, self.DONE)
+                self.setState(self.STATE_READ_DONE)
+            elif (currentState == self.STATE_READ_DONE):
+                command = self.readCommand(cs)
+                if (command != self.DONE):
+                    self.cleanup(cs)
+                else:
+                    self.setState(self.STATE_START)
+                    self.cleanup(cs)
+                    notDone = False
+            else:
+                self.logger.debug("No command matches.")
+                self.cleanup(cs)
+                notDone = False
+
+    def run(self):
+        """Our run method."""
+        self.notDone = True
+        self.openDatabase()
+        self.getHashesFromDatabase()
+        self.hashesToSend = None
+
+        while (self.notDone):
+
+            currentState = self.getState()
+           
+            if (currentState == self.STATE_START):
+                self.doDeviceDiscovery()
+                self.doServiceDiscovery()
+                cs = BluetoothSocket(RFCOMM)
+
+                for device in self.devicesFN:
+                    self.logger.debug("Connecting to '%s' (%s)" % (device[1], device[0]))
+                    cs.connect((device[0], device[2]))
+                    self.setState(self.STATE_WRITE_HELO)
+                    self.handleServerConnection(cs)
+                    cs.close()

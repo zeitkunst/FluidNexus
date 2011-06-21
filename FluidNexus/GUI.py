@@ -21,6 +21,8 @@ from Networking import BluetoothServerVer3
 import Log
 
 # TODO
+# * Interface is not automatically updated in insert of new TextBrowser in gnome on Lucid...why is that?
+# * Also, on Lucid gnome get a "QThread: Destoryed while thread is still running" error when doing File...Quit
 # * Deal with sqlite thread stuff...why can't I call a thread's method to close the database connection opened in that thread?  And do I even need to close the connection on thread quit?
 # 
 DEFAULTS = {
