@@ -361,7 +361,8 @@ TODO
                         self.setState(self.STATE_READ_HELO)
                         self.handleClientConnection(cs)
                         self.clientSockets.remove(cs)
-
+                
+                self.notDone = False
 
         self.closeDatabase()
         return self.newMessages
@@ -483,6 +484,7 @@ TODO
         self.openDatabase()
         self.getHashesFromDatabase()
         self.hashesToSend = None
+        self.newMessages = []
 
         while (self.notDone):
 
@@ -499,3 +501,8 @@ TODO
                     self.setState(self.STATE_WRITE_HELO)
                     self.handleServerConnection(cs)
                     cs.close()
+                self.notDone = False
+
+        self.closeDatabase()
+        return self.newMessages
+
