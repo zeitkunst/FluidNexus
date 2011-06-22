@@ -237,11 +237,21 @@ class FluidNexusNewMessageDialog(QtGui.QDialog):
 
         self.connect(self.ui.cancelButton, QtCore.SIGNAL("clicked()"), self.closeDialog)
         self.connect(self, QtCore.SIGNAL("saveButtonClicked"), self.parent.newMessageSaveButtonClicked)
+        self.connect(self.ui.fileSelectionButton, QtCore.SIGNAL("clicked()"), self.selectFile)
+
+        self.ui.previewLabel.hide()
+        self.ui.previewImage.hide()
 
     def closeDialog(self):
         # TODO
         # Ask for confirmation if the data has changed
         self.close()
+
+    def selectFile(self):
+        """Choose a file to include as an attachment."""
+        filename = QtGui.QFileDialog.getOpenFileName(self, self.trUtf8("Choose file for attachment"), os.getcwd());
+        if (filename is not None):
+            self.ui.fileSelectedLabel.setText(filename)
 
     def saveButtonClicked(self):
         print "save button clicked"
@@ -280,7 +290,7 @@ class FluidNexusDesktop(QtGui.QMainWindow):
 
         self.ourHashes = []
 
-        self.statusBar().showMessage("Messages loaded.")
+        self.statusBar().showMessage(self.trUtf8("Messages loaded."))
         
         self.settings = QtCore.QSettings("fluidnexus.net", "Fluid Nexus")
        
@@ -457,7 +467,7 @@ class FluidNexusDesktop(QtGui.QMainWindow):
             tb.setFocusProxy(self)
             self.ui.FluidNexusVBoxLayout.insertWidget(0, tb)
 
-        self.statusBar().showMessage("New messages received.")
+        self.statusBar().showMessage(self.trUtf8("New messages received."))
 
     def deleteMessage(self, hashToDelete):
         """Delete the selected hash and remove from display."""
@@ -483,7 +493,7 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         self.YES = "Yes"
         self.NO = "No"
         message = QtGui.QMessageBox(self)
-        message.setText('Do you really want to delete this message?')
+        message.setText(self.trUtf8("Do you really want to delete this message?"))
         message.setWindowTitle('FluidNexus')
         message.setIcon(QtGui.QMessageBox.Question)
         message.addButton(self.YES, QtGui.QMessageBox.AcceptRole)
