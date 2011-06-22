@@ -46,7 +46,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="generalTab">
     <attribute name="title">
@@ -68,7 +68,7 @@
      </property>
      <layout class="QFormLayout" name="networkFormLayout">
       <item row="0" column="1">
-       <widget class="QCheckBox" name="bluetoothCheckbox">
+       <widget class="QCheckBox" name="bluetoothEnabled">
         <property name="text">
          <string>Bluetooth</string>
         </property>
@@ -119,7 +119,7 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QComboBox" name="comboBox">
+       <widget class="QComboBox" name="bluetoothScanFrequency">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -204,8 +204,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
+     <x>308</x>
+     <y>324</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -220,8 +220,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
+     <x>376</x>
+     <y>330</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
@@ -229,5 +229,41 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>bluetoothScanFrequency</sender>
+   <signal>activated(int)</signal>
+   <receiver>FluidNexusPreferences</receiver>
+   <slot>bluetoothScanFrequencyChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>169</x>
+     <y>61</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>444</x>
+     <y>173</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>bluetoothEnabled</sender>
+   <signal>stateChanged(int)</signal>
+   <receiver>FluidNexusPreferences</receiver>
+   <slot>bluetoothChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>90</x>
+     <y>63</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>83</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
+ <slots>
+  <slot>bluetoothScanFrequencyChanged(int)</slot>
+  <slot>bluetoothChanged(int)</slot>
+ </slots>
 </ui>

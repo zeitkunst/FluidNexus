@@ -260,15 +260,42 @@ class FluidNexusNewMessageDialog(QtGui.QDialog):
         self.close()
 
 class FluidNexusPreferencesDialog(QtGui.QDialog):
-    def __init__(self, parent=None, title = None, message = None):
-        QtGui.QDialog.__init__(self, parent)
+    bluetoothScanFrequencies = [5, 10, 30, 60, 120, 300, 600, 1200, 1800, 3600]
 
+    def __init__(self, parent=None, logPath = "FluidNexus.log", level = logging.ERROR, settings = None):
+        QtGui.QDialog.__init__(self, parent)
+        
+        self.logPath = logPath
+        self.logLevel = level
+        self.logger = Log.getLogger(logPath = self.logPath, level = self.logLevel)
         self.parent = parent
+        self.settings = settings
 
         self.ui = Ui_FluidNexusPreferences()
         self.ui.setupUi(self)
 
-        #self.connect(self.ui.cancelButton, QtCore.SIGNAL("clicked()"), self.closeDialog)
+        self.preferencesToChange = {}
+
+    def reject(self):
+        self.logger.debug("Rejecting")
+        QtGui.QDialog.reject(self)
+
+    def accept(self):
+        self.logger.debug("Accepting")
+
+        for key in self.preferencesToChange.keys():
+            self.settings.setValue(key, self.preferencesToChange[key])
+        QtGui.QDialog.accept(self)
+
+    def bluetoothChanged(self, value):
+        self.preferencesToChange["network/bluetooth"] = value
+
+    def bluetoothScanFrequencyChanged(self, index):
+        # TODO
+        # It would be nice to get the disambiguation paramter, but that's not likely...
+        # Remember that if we change the number of options in the UI, we have to change the number of options here as well
+        self.preferencesToChange["bluetooth/bluetoothScanFrequency"] = self.bluetoothScanFrequencies[index]
+
 
     def closeDialog(self):
         # TODO
@@ -326,6 +353,7 @@ class FluidNexusDesktop(QtGui.QMainWindow):
 
         # Setup logging
         self.logger = Log.getLogger(logPath = self.logPath, level = level)
+        self.logLevel = level
 
         self.logger.debug("FluidNexus desktop version has started.")
 
@@ -396,17 +424,16 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         os.chmod(self.dataDir, stat.S_IREAD | stat.S_IWRITE | stat.S_IEXEC)
 
     def __startNetworkThreads(self):
-        self.serverThread = FluidNexusServerQt(parent = self, dataDir = self.dataDir, databaseType = "pysqlite2", logPath = self.logPath)
+        self.serverThread = FluidNexusServerQt(parent = self, dataDir = self.dataDir, databaseType = "pysqlite2", logPath = self.logPath, level = self.logLevel)
         self.serverThread.start()
 
-        self.clientThread = FluidNexusClientQt(parent = self, dataDir = self.dataDir, databaseType = "pysqlite2", logPath = self.logPath)
+        self.clientThread = FluidNexusClientQt(parent = self, dataDir = self.dataDir, databaseType = "pysqlite2", logPath = self.logPath, level = self.logLevel)
         self.clientThread.start()
 
 
     def __stopNetworkThreads(self):
-        self.serverThread.wait()
+        #self.statusBar().showMessage(self.trUtf8("Waiting for network threads to stop."))
         self.serverThread.quit()
-        self.clientThread.wait()
         self.clientThread.quit()
 
     def setupDisplay(self):
@@ -466,7 +493,7 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         self.newMessageDialog.exec_()
 
     def handlePreferences(self):
-        self.preferencesDialog = FluidNexusPreferencesDialog(parent = self)
+        self.preferencesDialog = FluidNexusPreferencesDialog(parent = self, logPath = self.logPath, level = self.logLevel,  settings = self.settings)
         self.preferencesDialog.exec_()
 
 
