@@ -25,6 +25,16 @@ import os
 import re
 import hashlib
 
+# Other imports
+from sqlalchemy import create_engine, desc
+from sqlalchemy import Table, Column, Integer, String, Boolean, Float, MetaData, ForeignKey
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
+from sqlalchemy.orm.attributes import instance_dict
+
+Base = declarative_base()
+
 # my imports
 import Log
 
@@ -87,6 +97,148 @@ except ImportError:
     #sys.stderr = sys.stdout = log
 
     onPhone = False
+
+
+class Messages(Base):
+    __tablename__ = 'messages'
+
+    id = Column('id', Integer, primary_key=True)
+    message_type = Column('type', Integer, nullable = False, default = 0)
+    title = Column('title', String, nullable = False)
+    content = Column('content', String, nullable = False)
+    message_hash = Column('hash', String(length = 64), nullable = False, unique = True)
+    time = Column('time', Float, default = float(0.0))
+    attachment_path = Column('attachment_path', String, default = "")
+    attachment_mimetype = Column('attachment_mimetype', String, default = "")
+    mine = Column('mine', Boolean, default = 0)
+
+    def __repr__(self):
+        return "<Messages('%d', '%s', '%s', '%s', '%f', '%s', '%s', '%s')>" % (self.message_type, self.title, self.content, self.message_hash, self.time, self.attachment_path, self.attachment_mimetype, self.mine)
+
+class Blacklist(Base):
+    __tablename__ = 'blacklist'
+
+    id = Column('id', Integer, primary_key=True)
+    message_type = Column('message_type', Integer, nullable = False, default = 0)
+    title = Column('title', String)
+    message_hash = Column('hash', String(length = 64))
+    time = Column('time', Float)
+
+    def __repr__(self):
+        return "<Blacklist('%d', '%s', '%s', '%f')>" % (self.message_type, self.title, self.message_hash, self.time)
+
+class FluidNexusDatabaseNew(object):
+    """Uses sqlalchemy to work with the Fluid Nexus database."""
+
+    def __init__(self, databaseDir = dataPath, databaseType = "e32", databaseName = 'FluidNexus.db', logPath = "FluidNexus.log"):
+        """Initialization method that makes sure the database file and directory exist, and creates/opens the database file, and prepares the database view."""
+
+        self.logger = Log.getLogger(logPath = logPath)
+        #self.logger = Logger(os.path.join(databaseDir, u'FluidNexus.log'), prefix = 'database: ')
+        #sys.stderr = sys.stdout = self.logger
+
+        self.databaseDir = databaseDir
+        self.databaseName = databaseName
+        
+        if not os.path.isdir(databaseDir):
+            os.makedirs(databaseDir)
+
+        self.databaseType = databaseType
+
+        self.__setupSQLAlchemy()
+
+    def __setupSQLAlchemy(self, echo = True):
+        path = os.path.join(self.databaseDir, self.databaseName)
+        self.engine = create_engine('sqlite:///%s' % path, echo=echo)
+
+        Base.metadata.create_all(self.engine)
+
+        Session = sessionmaker(bind=self.engine)
+        self.session = Session()
+
+    def addDummyData(self):
+        """Add some dummy data to the database."""
+        # Insert some dummy data
+        # This is from text messages listed in the TxTMob CHI paper
+        title = u'Run'
+        content = u'Run against Bush in progress (just went through times sq).  media march starts at 7, 52nd and broadway'
+        now = time.time()
+        message_hash = hashlib.sha256(title + content).hexdigest()
+        self.session.add(Messages(title = title, content = content, time = now, message_hash = message_hash))
+
+        title = u'Federal agents'
+        content = u'Video dispatch. Federal agents trailing activists at 6th Ave and 9th St. Situation tense.'
+        message_hash = hashlib.sha256(title + content).hexdigest()
+        now = time.time()
+        self.session.add(Messages(title = title, content = content, time = now, message_hash = message_hash))
+
+        title = u'Mobilize to dine'
+        content = u'CT delegation @ Maison (7th Ave. & 53rd).  Outdoor dining area.  Try to get people there.'
+        message_hash = hashlib.sha256(title + content).hexdigest()
+        now = time.time()
+        self.session.add(Messages(title = title, content = content, time = now, message_hash = message_hash))
+        self.session.commit()
+
+    def hashes(self):
+        """Get a list of hashes from the database, ordered by time desc."""
+
+        hashes = []
+        for message_hash in self.session.query(Messages.message_hash).order_by(desc(Messages.time)):
+            hashes.append(message_hash[0])
+
+        return hashes
+
+    def addMine(self, message_type = 0, title = "", content = "", attachment_filename = None, attachment_mimetype = None):
+        """Add one of our own messages to the database."""
+        message_hash = hashlib.sha256(title + content).hexdigest()
+        now = time.time()
+        if (attachment_filename is not None):
+            message = Messages(message_type = message_type, title = title, content = content, message_hash = message_hash, time = now, attachment_filename = attachment_filename, attachment_mimetype = attachment_mimetype, mine = True)
+        else:
+            message = Messages(message_type = message_type, title = title, content = content, message_hash = message_hash, time = now, mine = True)
+
+        self.session.add(message)
+        self.session.commit()
+
+    def addReceived(self, message_type = 0, title = "", content = "", timestamp = time.time(), attachment_filename = None, attachment_mimetype = None):
+        """Add one of our own messages to the database."""
+        message_hash = hashlib.sha256(title + content).hexdigest()
+        if (attachment_filename is not None):
+            message = Messages(message_type = message_type, title = title, content = content, message_hash = message_hash, time = timestamp, attachment_filename = attachment_filename, attachment_mimetype = attachment_mimetype, mine = False)
+        else:
+            message = Messages(message_type = message_type, title = title, content = content, message_hash = message_hash, time = timestamp, mine = False)
+
+        self.session.add(message)
+        self.session.commit()
+
+    def lookForMessageByHash(self, message_hash):
+        """Look for the given hash in the database, returning True if found, False otherwise."""
+        try:
+            result = self.session.query(Messages).filter(Messages.message_hash == message_hash).one()
+            return True
+        except NoResultFound, e:
+            return False
+        except MultipleResultsFound, e:
+            self.logger.error("Multiple results found for hash %s; this should never happen!" % message_hash)
+            return False
+    
+    def removeByMessageHash(self, message_hash):
+        """Remove an item by the given message hash."""
+        self.session.query(Messages).filter(Messages.message_hash == message_hash).delete()
+        self.session.commit()
+
+    def all(self, limit = None):
+        """Return all of the items in the database,  with optional limit."""
+        if (limit is not None):
+            rows = self.session.query(Messages).order_by(desc(Messages.time)).all()[0:limit]
+        else:
+            rows = self.session.query(Messages).order_by(desc(Messages.time)).all()
+
+        results = []
+        for row in rows:
+            results.append(instance_dict(row))
+
+        return results 
 
 ################################################################################
 ############        DATABASE CLASS                                ##############
