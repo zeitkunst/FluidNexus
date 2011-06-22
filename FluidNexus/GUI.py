@@ -32,7 +32,16 @@ DEFAULTS = {
     "database": {
         "type": "pysqlite2",
         "name": "FluidNexus.db"
+    },
+    
+    "network": {
+        "bluetoothEnabled": 2
+    },
+
+    "bluetooth": {
+        "scanFrequency": 300
     }
+
 }
 
 # Strangely, the QTreeWidgetItemIterator doesn't provide a python iterable
@@ -93,8 +102,9 @@ class FluidNexusServerQt(QtCore.QThread):
         if (newMessages != []):
             self.emit(QtCore.SIGNAL("newMessages"), newMessages)
 
+
 class FluidNexusClientQt(QtCore.QThread):
-    def __init__(self, dataDir = None, databaseType = None, logPath = "FluidNexus.log", parent = None, level = logging.WARN):
+    def __init__(self, dataDir = None, databaseType = None, logPath = "FluidNexus.log", parent = None, level = logging.WARN, scanFrequency = 300):
         QtCore.QThread.__init__(self, parent)
 
         self.databaseDir = dataDir
@@ -102,6 +112,7 @@ class FluidNexusClientQt(QtCore.QThread):
         self.parent = parent
         self.logger = Log.getLogger(logPath = logPath, level = level)
 
+        self.scanFrequency = scanFrequency
 
         self.btClient = BluetoothClientVer3(databaseDir = dataDir, databaseType = databaseType, logPath = logPath)
 
@@ -109,6 +120,7 @@ class FluidNexusClientQt(QtCore.QThread):
         self.connect(self, QtCore.SIGNAL("started()"), self.handleStarted)
         self.connect(self, QtCore.SIGNAL("finished()"), self.handleFinished)
         self.connect(self, QtCore.SIGNAL("terminated()"), self.handleTerminated)
+        self.connect(self.parent, QtCore.SIGNAL("bluetoothScanFrequencyChanged(QVariant)"), self.handleBluetoothScanFrequencyChanged)
 
     def handleStarted(self):
         self.logger.debug("BluetoothClientThread started")
@@ -119,6 +131,9 @@ class FluidNexusClientQt(QtCore.QThread):
 
     def handleTerminated(self):
         self.logger.debug("BluetoothClientThread terminated")
+
+    def handleBluetoothScanFrequencyChanged(self, value):
+        self.scanFrequency = value.toInt()[0]
 
     def cleanup(self):
         """Cleanup after ourselves."""
@@ -132,6 +147,9 @@ class FluidNexusClientQt(QtCore.QThread):
 
         if (newMessages != []):
             self.emit(QtCore.SIGNAL("newMessages"), newMessages)
+
+        self.logger.debug("Sleeping for %d seconds" % self.scanFrequency)
+        self.sleep(self.scanFrequency)
 
 class MessageTextBrowser(QtGui.QWidget):
     """Wrapper around the text browser that adds some useful stuff for us."""
@@ -261,6 +279,12 @@ class FluidNexusNewMessageDialog(QtGui.QDialog):
 
 class FluidNexusPreferencesDialog(QtGui.QDialog):
     bluetoothScanFrequencies = [5, 10, 30, 60, 120, 300, 600, 1200, 1800, 3600]
+    
+    GENERAL_TAB = 0
+    NETWORK_TAB = 1
+    BLUETOOTH_TAB = 2
+    ZEROCONF_TAB = 3
+    ADHOC_TAB = 4
 
     def __init__(self, parent=None, logPath = "FluidNexus.log", level = logging.ERROR, settings = None):
         QtGui.QDialog.__init__(self, parent)
@@ -270,10 +294,33 @@ class FluidNexusPreferencesDialog(QtGui.QDialog):
         self.logger = Log.getLogger(logPath = self.logPath, level = self.logLevel)
         self.parent = parent
         self.settings = settings
-
         self.ui = Ui_FluidNexusPreferences()
         self.ui.setupUi(self)
 
+        self.preferencesToChange = {}
+        self.__updatePreferencesDialog()
+
+
+    def __networkPreferencesUpdate(self):
+        bluetooth = self.settings.value("network/bluetooth", 2).toInt()[0]
+
+        if (bluetooth == 2):
+            self.ui.bluetoothEnabled.setCheckState(QtCore.Qt.Checked)
+        else:
+            self.ui.bluetoothEnabled.setCheckState(QtCore.Qt.Unchecked)
+
+    def __bluetoothPreferencesUpdate(self):
+        bluetoothScanFrequency = self.settings.value("bluetooth/scanFrequency", 300).toInt()[0]
+        index = self.bluetoothScanFrequencies.index(bluetoothScanFrequency)
+        self.ui.bluetoothScanFrequency.setCurrentIndex(index)
+
+    def __updatePreferencesDialog(self):
+        """Update the preferences dialog based on our settings."""
+        
+        self.ui.FluidNexusPreferencesTabWidget.setTabEnabled(self.ZEROCONF_TAB, False)
+        self.ui.FluidNexusPreferencesTabWidget.setTabEnabled(self.ADHOC_TAB, False)
+        self.__networkPreferencesUpdate()
+        self.__bluetoothPreferencesUpdate()
         self.preferencesToChange = {}
 
     def reject(self):
@@ -289,12 +336,17 @@ class FluidNexusPreferencesDialog(QtGui.QDialog):
 
     def bluetoothChanged(self, value):
         self.preferencesToChange["network/bluetooth"] = value
+        if (value == 2):
+            self.ui.FluidNexusPreferencesTabWidget.setTabEnabled(self.BLUETOOTH_TAB, True)
+        else:
+            self.ui.FluidNexusPreferencesTabWidget.setTabEnabled(self.BLUETOOTH_TAB, False)
 
     def bluetoothScanFrequencyChanged(self, index):
         # TODO
         # It would be nice to get the disambiguation paramter, but that's not likely...
         # Remember that if we change the number of options in the UI, we have to change the number of options here as well
-        self.preferencesToChange["bluetooth/bluetoothScanFrequency"] = self.bluetoothScanFrequencies[index]
+        self.preferencesToChange["bluetooth/scanFrequency"] = self.bluetoothScanFrequencies[index]
+        self.parent.emit(QtCore.SIGNAL("bluetoothScanFrequencyChanged(QVariant)"), self.bluetoothScanFrequencies[index])
 
 
     def closeDialog(self):
@@ -381,6 +433,7 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         # Start the network threads
         self.__startNetworkThreads()
 
+
     def __setupDefaultSettings(self):
         self.settings.clear()
 
@@ -426,8 +479,9 @@ class FluidNexusDesktop(QtGui.QMainWindow):
     def __startNetworkThreads(self):
         self.serverThread = FluidNexusServerQt(parent = self, dataDir = self.dataDir, databaseType = "pysqlite2", logPath = self.logPath, level = self.logLevel)
         self.serverThread.start()
-
-        self.clientThread = FluidNexusClientQt(parent = self, dataDir = self.dataDir, databaseType = "pysqlite2", logPath = self.logPath, level = self.logLevel)
+        
+        scanFrequency = self.settings.value("bluetooth/scanFrequency", 300).toInt()[0]
+        self.clientThread = FluidNexusClientQt(parent = self, dataDir = self.dataDir, databaseType = "pysqlite2", logPath = self.logPath, level = self.logLevel, scanFrequency = scanFrequency)
         self.clientThread.start()
 
 
@@ -488,7 +542,6 @@ class FluidNexusDesktop(QtGui.QMainWindow):
             self.showing = True
 
     def handleNewMessage(self):
-        print "new message"
         self.newMessageDialog = FluidNexusNewMessageDialog(parent = self)
         self.newMessageDialog.exec_()
 
@@ -665,34 +718,6 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         self.settings.setValue("outgoing/enabled", pickle.dumps(self.enabledHash))
         self.settings.sync()
 
-    def deleteIncomingMessage(self):
-        # TODO
-        # Disable the delete button if nothing else is selected
-
-        # Get current item, delete from database
-        indices = self.ui.incomingMessagesList.selectedIndexes()
-        currentItem = self.incomingMessagesModel.itemFromIndex(indices[0])
-        row = currentItem.row()
-        hash = str(self.incomingMessagesModel.item(row, column = 0).text())
-        title = str(self.incomingMessagesModel.item(row, column = 1).text())
-        self.incomingMessagesModel.removeRow(row)
-
-        self.database.remove_by_hash(hash)
-
-        # Clear message text area
-        te = self.ui.incomingMessageText
-        te.clear()
-
-        # Update status bar
-        self.statusBar().showMessage("'%s' deleted." % title)
-
-        # Emit signal to deadvertise hash
-        self.emit(QtCore.SIGNAL("incomingMessageDeleted"), hash)
-
-
-    def showNewMessageWindow(self):
-        self.newMessageDialog = FluidNexusNewMessageDialog(parent = self)
-        self.newMessageDialog.exec_()
 
     def newMessageSaveButtonClicked(self, message_title, message_content):
         message_hash = unicode(hashlib.sha256(unicode(message_title) + unicode(message_content)).hexdigest())

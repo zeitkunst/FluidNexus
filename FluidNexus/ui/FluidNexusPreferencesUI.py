@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'FluidNexus/ui/FluidNexusPreferences.ui'
 #
-# Created: Wed Jun 22 12:42:23 2011
+# Created: Wed Jun 22 17:13:05 2011
 #      by: PyQt4 UI code generator 4.8.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -89,7 +89,7 @@ class Ui_FluidNexusPreferences(object):
         self.FluidNexusPreferencesTabWidget.addTab(self.adhocWifiTab, _fromUtf8(""))
 
         self.retranslateUi(FluidNexusPreferences)
-        self.FluidNexusPreferencesTabWidget.setCurrentIndex(1)
+        self.FluidNexusPreferencesTabWidget.setCurrentIndex(0)
         QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("accepted()")), FluidNexusPreferences.accept)
         QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("rejected()")), FluidNexusPreferences.reject)
         QtCore.QObject.connect(self.bluetoothScanFrequency, QtCore.SIGNAL(_fromUtf8("activated(int)")), FluidNexusPreferences.bluetoothScanFrequencyChanged)

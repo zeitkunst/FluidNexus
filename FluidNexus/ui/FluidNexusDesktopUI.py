@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'FluidNexus/ui/FluidNexusDesktop.ui'
 #
-# Created: Wed Jun 22 12:42:23 2011
+# Created: Wed Jun 22 17:13:05 2011
 #      by: PyQt4 UI code generator 4.8.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -78,7 +78,10 @@ class Ui_FluidNexus(object):
         self.FluidNexusToolbar.setWindowTitle(QtGui.QApplication.translate("FluidNexus", "FluidNexusToolbar", None, QtGui.QApplication.UnicodeUTF8))
         self.actionAbout.setText(QtGui.QApplication.translate("FluidNexus", "&About FluidNexus...", None, QtGui.QApplication.UnicodeUTF8))
         self.actionNewMessage.setText(QtGui.QApplication.translate("FluidNexus", "&New Message...", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionNewMessage.setShortcut(QtGui.QApplication.translate("FluidNexus", "Ctrl+N", None, QtGui.QApplication.UnicodeUTF8))
         self.actionQuit.setText(QtGui.QApplication.translate("FluidNexus", "&Quit...", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionQuit.setShortcut(QtGui.QApplication.translate("FluidNexus", "Ctrl+Q", None, QtGui.QApplication.UnicodeUTF8))
         self.actionPreferences.setText(QtGui.QApplication.translate("FluidNexus", "&Preferences...", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionPreferences.setShortcut(QtGui.QApplication.translate("FluidNexus", "Ctrl+P", None, QtGui.QApplication.UnicodeUTF8))
 
 import FluidNexus_rc
