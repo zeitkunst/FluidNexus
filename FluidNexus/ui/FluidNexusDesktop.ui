@@ -100,12 +100,12 @@
     </iconset>
    </property>
    <property name="text">
-    <string>New Message...</string>
+    <string>&amp;New Message...</string>
    </property>
   </action>
   <action name="actionQuit">
    <property name="text">
-    <string>Quit...</string>
+    <string>&amp;Quit...</string>
    </property>
   </action>
  </widget>

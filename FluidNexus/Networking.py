@@ -273,6 +273,10 @@ TODO
         cs = None
         self.setState(self.STATE_START)
 
+    def removeHash(self, hashToRemove):
+        self.logger.debug("Removing has from local list: " + hashToRemove)
+        self.ourHashes.remove(hashToRemove)
+
     def handleClientConnection(self, cs):
         """Handle a connection on the client socket.
         
@@ -411,6 +415,9 @@ TODO
         cs = None
         self.setState(self.STATE_START)
 
+    def removeHash(self, hashToRemove):
+        self.logger.debug("Removing has from local list: " + hashToRemove)
+        self.ourHashes.remove(hashToRemove)
 
     def handleServerConnection(self, cs):
         """HELO            Write           Read

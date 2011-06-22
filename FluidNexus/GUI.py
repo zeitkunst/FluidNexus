@@ -11,6 +11,7 @@ import time
 
 # External library imports
 from PyQt4 import QtCore, QtGui
+import textile
 
 # My library imports
 from ui.FluidNexusDesktopUI import Ui_FluidNexus
@@ -24,6 +25,7 @@ import Log
 # * Interface is not automatically updated in insert of new TextBrowser in gnome on Lucid...why is that?
 # * Also, on Lucid gnome get a "QThread: Destoryed while thread is still running" error when doing File...Quit
 # * Deal with sqlite thread stuff...why can't I call a thread's method to close the database connection opened in that thread?  And do I even need to close the connection on thread quit?
+# * Decide whether or not textile is the best way to format our info in these TextBrowsers
 # 
 DEFAULTS = {
     "database": {
@@ -81,6 +83,7 @@ class FluidNexusServerQt(QtCore.QThread):
         """Cleanup after ourselves."""
         self.btServer.cleanup()
 
+
     def run(self):
         newMessages = self.btServer.run()
 
@@ -118,13 +121,16 @@ class FluidNexusClientQt(QtCore.QThread):
         """Cleanup after ourselves."""
         self.btClient.cleanup()
 
+    def removeHash(self, hashToRemove):
+        self.btServer.removeHash(hashToRemove)
+
     def run(self):
         newMessages = self.btClient.run()
 
         if (newMessages != []):
             self.emit(QtCore.SIGNAL("newMessages"), newMessages)
 
-class MessageTextBrowser(QtGui.QTextBrowser):
+class MessageTextBrowser(QtGui.QWidget):
     """Wrapper around the text browser that adds some useful stuff for us."""
 
     mine_text = """
@@ -137,7 +143,7 @@ class MessageTextBrowser(QtGui.QTextBrowser):
             <td>%2</td>
         </tr>
         <tr>
-            <td align='right'>%3&nbsp;&nbsp;&nbsp;<img src=':/icons/icons/32x32/menu_delete.png' width='32' height='32'/></td>
+            <td align='right'>%3&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage"><img src=':/icons/icons/32x32/menu_delete.png' width='32' height='32'/></a></td>
         </tr>
     </table>
     """
@@ -152,7 +158,7 @@ class MessageTextBrowser(QtGui.QTextBrowser):
             <td>%2</td>
         </tr>
         <tr>
-            <td align='right'>%3&nbsp;&nbsp;&nbsp;<img src=':/icons/icons/32x32/menu_delete.png' width='32' height='32'/></td>
+            <td align='right'>%3&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage"><img src=':/icons/icons/32x32/menu_delete.png' width='32' height='32'/></a></td>
         </tr>
 
     </table>
@@ -160,7 +166,14 @@ class MessageTextBrowser(QtGui.QTextBrowser):
 
     def __init__(self, parent = None, mine = False, message_title = "Testing title", message_content = "Testing content", message_type = 0, message_hash = None, message_timestamp = time.time(), logPath = "FluidNexus.log", level = logging.WARN):
         QtGui.QWidget.__init__(self, parent)
-        QtCore.QObject.connect(self, QtCore.SIGNAL("textChanged()"), self.setHeight)
+        self.setLayout(QtGui.QVBoxLayout())
+        self.tb = QtGui.QTextBrowser()
+        self.layout().addWidget(self.tb)
+        self.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.Fixed)
+
+        self.parent = parent
+
+        QtCore.QObject.connect(self.tb, QtCore.SIGNAL("anchorClicked(QUrl)"), self.checkAnchor)
         self.logger = Log.getLogger(logPath = logPath, level = level)
 
         self.setMessageHash(message_hash)
@@ -172,11 +185,15 @@ class MessageTextBrowser(QtGui.QTextBrowser):
         else:
             s = QtCore.QString(self.other_text).arg(message_title, message_content, message_timestamp)
 
-        self.setHtml(s)
+        self.tb.setHtml(s)
+        # Whether to open links automatically
+        self.tb.setOpenLinks(False)
+        QtCore.QObject.connect(self.tb, QtCore.SIGNAL("textChanged()"), self.setHeight)
+
 
     def __setupUI(self):
         """Setup some UI parameters."""
-        self.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.Fixed)
+        pass
 
     def setMessageHash(self, message_hash):
         self.message_hash = message_hash
@@ -186,14 +203,20 @@ class MessageTextBrowser(QtGui.QTextBrowser):
 
     def setHeight(self):
         #print dir(self.document())
-        self.document().setTextWidth(self.width() - 2)
-        height = self.document().size().toSize().height() + 5
-        height = int(height * 0.2)
-        self.setMinimumHeight(height)
-        self.setMaximumHeight(height)
+        self.tb.document().setTextWidth(self.width() - 2)
+        height = self.tb.document().size().toSize().height() + 5
+        self.tb.setMinimumHeight(height)
+        self.tb.setMaximumHeight(height)
 
     def mousePressEvent(self, e):
-        print self.getMessageHash()
+        pass
+
+    def checkAnchor(self, anchor):
+        """Handle anchor links here."""
+
+        if (anchor.scheme() == "fluidnexus"):
+            if (anchor.host() == "deletemessage"):
+                self.parent.deleteMessage(self.getMessageHash())
 
 class FluidNexusNewMessageDialog(QtGui.QDialog):
     def __init__(self, parent=None, title = None, message = None):
@@ -253,6 +276,8 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         self.ui = Ui_FluidNexus()
         self.ui.setupUi(self)
 
+        self.ourHashes = []
+
         self.statusBar().showMessage("Messages loaded.")
         
         self.settings = QtCore.QSettings("fluidnexus.net", "Fluid Nexus")
@@ -277,6 +302,7 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         # This method of laying out things was cribbed from choqok
         # TODO
         # Still doesn't resize the textbrowsers properly though...
+        self.ui.FluidNexusScrollArea.setWidgetResizable(True);
         verticalLayout_2 = QtGui.QVBoxLayout(self.ui.scrollAreaWidgetContents)
         verticalLayout_2.setMargin(1)
 
@@ -355,14 +381,22 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         """Setup our display with a bunch of text browsers."""
 
         self.database.all()
-        for item in self.database:
+
+        # TODO
+        # Not ideal or quick...probably need to refactor
+        items = [item for item in self.database]
+        items.reverse()
+        self.ourHashes.extend(items)
+
+        for item in items:
             message_timestamp = item[2]
             message_hash = item[6]
             message_title = item[4]
             message_content = item[5]
             message_mine = item[8]
 
-            tb = MessageTextBrowser(parent = self, mine = message_mine, message_title = message_title, message_content = message_content, message_hash = message_hash, message_timestamp = time.ctime(message_timestamp), logPath = self.logPath)
+            tb = MessageTextBrowser(parent = self, mine = message_mine, message_title = message_title, message_content = textile.textile(message_content), message_hash = message_hash, message_timestamp = time.ctime(message_timestamp), logPath = self.logPath)
+            tb.setFocusProxy(self)
             self.ui.FluidNexusVBoxLayout.insertWidget(0, tb)
 
     def setupActions(self):
@@ -416,8 +450,27 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         """Slot for when an incoming message was added by the server thread."""
         self.logger.debug("New messages received: " + str(newMessages))
         for message in newMessages:
-            tb = MessageTextBrowser(parent = self, mine = 0, message_title = message["message_title"], message_content = message["message_content"], message_hash = message["message_hash"], message_timestamp = time.ctime(message["message_timestamp"]), logPath = self.logPath)
+            tb = MessageTextBrowser(parent = self, mine = 0, message_title = message["message_title"], message_content = textile.textile(message["message_content"]), message_hash = message["message_hash"], message_timestamp = time.ctime(message["message_timestamp"]), logPath = self.logPath)
+            self.ourHashes.append(message["message_hash"])
+            tb.setFocusProxy(self)
             self.ui.FluidNexusVBoxLayout.insertWidget(0, tb)
+
+    def deleteMessage(self, hashToDelete):
+        """Delete the selected hash and remove from display."""
+
+        numItems = self.ui.FluidNexusVBoxLayout.count()
+        
+        #Find a particular widget with the given hash.  This is a pain to do, and the searching algorithm can probably better, but here it goes.
+        for index in xrange(0, numItems):
+            currentWidget = self.ui.FluidNexusVBoxLayout.itemAt(index).widget()
+            if (currentWidget.getMessageHash() == hashToDelete):
+                self.logger.debug("Got message to delete hash: " + hashToDelete)
+                self.ui.FluidNexusVBoxLayout.removeWidget(currentWidget)
+                currentWidget.close()
+                self.database.remove_by_hash(hashToDelete)
+                self.serverThread.removeHash(hashToDelete)
+                self.clientThread.removeHash(hashToDelete)
+                break
 
 
     def incomingMessageClicked(self, index):
@@ -564,8 +617,10 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         message_hash = unicode(hashlib.md5(unicode(message_title) + unicode(message_content)).hexdigest())
 
         self.database.add_new(u"00:00", 0, unicode(message_title), unicode(message_content), message_hash, u"00:00")
-
-        tb = MessageTextBrowser(parent = self, mine = 1, message_title = message_title, message_content = message_content, message_hash = message_hash, message_timestamp = time.ctime(time.time()), logPath = self.logPath)
+        
+        message_content = unicode(message_content)
+        tb = MessageTextBrowser(parent = self, mine = 1, message_title = message_title, message_content = textile.textile(message_content), message_hash = message_hash, message_timestamp = time.ctime(time.time()), logPath = self.logPath)
+        tb.setFocusProxy(self)
 
         self.ui.FluidNexusVBoxLayout.insertWidget(0, tb)
 
