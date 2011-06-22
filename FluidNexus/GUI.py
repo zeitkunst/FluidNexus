@@ -83,6 +83,8 @@ class FluidNexusServerQt(QtCore.QThread):
         """Cleanup after ourselves."""
         self.btServer.cleanup()
 
+    def removeHash(self, hashToRemove):
+        self.btServer.removeHash(hashToRemove)
 
     def run(self):
         newMessages = self.btServer.run()
@@ -122,7 +124,7 @@ class FluidNexusClientQt(QtCore.QThread):
         self.btClient.cleanup()
 
     def removeHash(self, hashToRemove):
-        self.btServer.removeHash(hashToRemove)
+        self.btClient.removeHash(hashToRemove)
 
     def run(self):
         newMessages = self.btClient.run()
@@ -467,13 +469,28 @@ class FluidNexusDesktop(QtGui.QMainWindow):
             currentWidget = self.ui.FluidNexusVBoxLayout.itemAt(index).widget()
             if (currentWidget.getMessageHash() == hashToDelete):
                 self.logger.debug("Got message to delete hash: " + hashToDelete)
-                self.ui.FluidNexusVBoxLayout.removeWidget(currentWidget)
-                currentWidget.close()
-                self.database.remove_by_hash(hashToDelete)
-                self.serverThread.removeHash(hashToDelete)
-                self.clientThread.removeHash(hashToDelete)
+                response = self.confirmDialogDelete()
+                if (response == self.YES):
+                    self.ui.FluidNexusVBoxLayout.removeWidget(currentWidget)
+                    currentWidget.close()
+                    self.database.remove_by_hash(hashToDelete)
+                    self.serverThread.removeHash(hashToDelete)
+                    self.clientThread.removeHash(hashToDelete)
                 break
 
+    def confirmDialogDelete(self):
+        """Create a delete confirmation dialog."""
+        self.YES = "Yes"
+        self.NO = "No"
+        message = QtGui.QMessageBox(self)
+        message.setText('Do you really want to delete this message?')
+        message.setWindowTitle('FluidNexus')
+        message.setIcon(QtGui.QMessageBox.Question)
+        message.addButton(self.YES, QtGui.QMessageBox.AcceptRole)
+        message.addButton(self.NO, QtGui.QMessageBox.RejectRole)
+        message.exec_()
+        response = message.clickedButton().text()
+        return response
 
     def incomingMessageClicked(self, index):
         currentItem = self.incomingMessagesModel.itemFromIndex(index)
