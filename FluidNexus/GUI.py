@@ -455,6 +455,8 @@ class FluidNexusDesktop(QtGui.QMainWindow):
             tb.setFocusProxy(self)
             self.ui.FluidNexusVBoxLayout.insertWidget(0, tb)
 
+        self.statusBar().showMessage("New messages received.")
+
     def deleteMessage(self, hashToDelete):
         """Delete the selected hash and remove from display."""
 
@@ -614,9 +616,9 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         self.newMessageDialog.exec_()
 
     def newMessageSaveButtonClicked(self, message_title, message_content):
-        message_hash = unicode(hashlib.md5(unicode(message_title) + unicode(message_content)).hexdigest())
+        message_hash = unicode(hashlib.sha256(unicode(message_title) + unicode(message_content)).hexdigest())
 
-        self.database.add_new(u"00:00", 0, unicode(message_title), unicode(message_content), message_hash, u"00:00")
+        self.database.add_new(u"00:00", 0, unicode(message_title), unicode(message_content), message_hash)
         
         message_content = unicode(message_content)
         tb = MessageTextBrowser(parent = self, mine = 1, message_title = message_title, message_content = textile.textile(message_content), message_hash = message_hash, message_timestamp = time.ctime(time.time()), logPath = self.logPath)

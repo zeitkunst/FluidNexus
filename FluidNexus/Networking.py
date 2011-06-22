@@ -222,8 +222,8 @@ class Networking(object):
         self.newMessages = []
         if (fields != []):
             for message in fields[0][1]: 
-                message_hash = hashlib.md5(unicode(message.message_title) + unicode(message.message_content)).hexdigest()
-                self.database.add_received("foo", message.message_timestamp, 0, message.message_title, message.message_content, message_hash, "(123, 123, 123, 123)")
+                message_hash = hashlib.sha256(unicode(message.message_title) + unicode(message.message_content)).hexdigest()
+                self.database.add_received("foo", message.message_timestamp, 0, message.message_title, message.message_content, message_hash)
                 newMessage = {"message_hash": message_hash, "message_timestamp": message.message_timestamp, "message_title": message.message_title, "message_content": message.message_content}
                 self.newMessages.append(newMessage)
 
