@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'FluidNexus/ui/FluidNexusNewMessage.ui'
 #
-# Created: Wed Jun 22 02:15:39 2011
+# Created: Wed Jun 22 03:12:22 2011
 #      by: PyQt4 UI code generator 4.8.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -18,6 +18,9 @@ class Ui_FluidNexusNewMessage(object):
     def setupUi(self, FluidNexusNewMessage):
         FluidNexusNewMessage.setObjectName(_fromUtf8("FluidNexusNewMessage"))
         FluidNexusNewMessage.resize(384, 533)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(_fromUtf8(":/icons/icons/fluid_nexus_icon.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        FluidNexusNewMessage.setWindowIcon(icon)
         self.horizontalLayout = QtGui.QHBoxLayout(FluidNexusNewMessage)
         self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
         self.formLayout = QtGui.QFormLayout()
@@ -90,3 +93,4 @@ class Ui_FluidNexusNewMessage(object):
         self.cancelButton.setText(QtGui.QApplication.translate("FluidNexusNewMessage", "Cancel", None, QtGui.QApplication.UnicodeUTF8))
         self.saveButton.setText(QtGui.QApplication.translate("FluidNexusNewMessage", "Save", None, QtGui.QApplication.UnicodeUTF8))
 
+import FluidNexus_rc

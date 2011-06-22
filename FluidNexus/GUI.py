@@ -17,6 +17,7 @@ import textile
 from ui.FluidNexusDesktopUI import Ui_FluidNexus
 from ui.FluidNexusNewMessageUI import Ui_FluidNexusNewMessage
 from ui.FluidNexusAboutUI import Ui_FluidNexusAbout
+from ui.FluidNexusPreferencesUI import Ui_FluidNexusPreferences
 from Database import FluidNexusDatabase
 from Networking import BluetoothServerVer3, BluetoothClientVer3
 import Log
@@ -258,6 +259,23 @@ class FluidNexusNewMessageDialog(QtGui.QDialog):
         self.emit(QtCore.SIGNAL("saveButtonClicked"), self.ui.newMessageTitle.text(), self.ui.newMessageBody.document().toPlainText())
         self.close()
 
+class FluidNexusPreferencesDialog(QtGui.QDialog):
+    def __init__(self, parent=None, title = None, message = None):
+        QtGui.QDialog.__init__(self, parent)
+
+        self.parent = parent
+
+        self.ui = Ui_FluidNexusPreferences()
+        self.ui.setupUi(self)
+
+        #self.connect(self.ui.cancelButton, QtCore.SIGNAL("clicked()"), self.closeDialog)
+
+    def closeDialog(self):
+        # TODO
+        # Ask for confirmation if the data has changed
+        self.close()
+
+
 class FluidNexusAboutDialog(QtGui.QDialog):
 
     aboutText = """Copyright 2008-2011 Nicholas A. Knouf
@@ -386,7 +404,9 @@ class FluidNexusDesktop(QtGui.QMainWindow):
 
 
     def __stopNetworkThreads(self):
+        self.serverThread.wait()
         self.serverThread.quit()
+        self.clientThread.wait()
         self.clientThread.quit()
 
     def setupDisplay(self):
@@ -416,6 +436,7 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         self.connect(self.ui.actionAbout, QtCore.SIGNAL('triggered()'), self.displayAbout)
         self.connect(self.ui.actionQuit, QtCore.SIGNAL('triggered()'), self.handleQuit)
         self.connect(self.ui.actionNewMessage, QtCore.SIGNAL('triggered()'), self.handleNewMessage)
+        self.connect(self.ui.actionPreferences, QtCore.SIGNAL('triggered()'), self.handlePreferences)
 
     def setupSysTray(self):
         """Setup the systray."""
@@ -443,6 +464,10 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         print "new message"
         self.newMessageDialog = FluidNexusNewMessageDialog(parent = self)
         self.newMessageDialog.exec_()
+
+    def handlePreferences(self):
+        self.preferencesDialog = FluidNexusPreferencesDialog(parent = self)
+        self.preferencesDialog.exec_()
 
 
     def handleQuit(self):

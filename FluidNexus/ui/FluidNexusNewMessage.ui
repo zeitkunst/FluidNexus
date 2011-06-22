@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>New Message</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="res/FluidNexus.qrc">
+    <normaloff>:/icons/icons/fluid_nexus_icon.png</normaloff>:/icons/icons/fluid_nexus_icon.png</iconset>
+  </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
     <layout class="QFormLayout" name="formLayout">
@@ -147,7 +151,9 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="res/FluidNexus.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>saveButton</sender>

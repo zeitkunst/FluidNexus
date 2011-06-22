@@ -56,15 +56,16 @@
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
-     <string>File</string>
+     <string>&amp;File</string>
     </property>
     <addaction name="actionNewMessage"/>
+    <addaction name="actionPreferences"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
-     <string>Help</string>
+     <string>&amp;Help</string>
     </property>
     <addaction name="actionAbout"/>
    </widget>
@@ -90,7 +91,7 @@
      <normaloff>:/icons/icons/fluid_nexus_icon.png</normaloff>:/icons/icons/fluid_nexus_icon.png</iconset>
    </property>
    <property name="text">
-    <string>About FluidNexus...</string>
+    <string>&amp;About FluidNexus...</string>
    </property>
   </action>
   <action name="actionNewMessage">
@@ -106,6 +107,11 @@
   <action name="actionQuit">
    <property name="text">
     <string>&amp;Quit...</string>
+   </property>
+  </action>
+  <action name="actionPreferences">
+   <property name="text">
+    <string>&amp;Preferences...</string>
    </property>
   </action>
  </widget>

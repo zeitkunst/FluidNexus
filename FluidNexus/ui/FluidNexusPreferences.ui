@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>FluidNexusPreferences</class>
+ <widget class="QDialog" name="FluidNexusPreferences">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>452</width>
+    <height>357</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Fluid Nexus Preferences</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="res/FluidNexus.qrc">
+    <normaloff>:/icons/icons/fluid_nexus_icon.png</normaloff>:/icons/icons/fluid_nexus_icon.png</iconset>
+  </property>
+  <widget class="QDialogButtonBox" name="buttonBox">
+   <property name="geometry">
+    <rect>
+     <x>90</x>
+     <y>310</y>
+     <width>341</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Save</set>
+   </property>
+  </widget>
+  <widget class="QTabWidget" name="FluidNexusPreferencesTabWidget">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>421</width>
+     <height>291</height>
+    </rect>
+   </property>
+   <property name="currentIndex">
+    <number>0</number>
+   </property>
+   <widget class="QWidget" name="generalTab">
+    <attribute name="title">
+     <string>General</string>
+    </attribute>
+   </widget>
+   <widget class="QWidget" name="networkTab">
+    <attribute name="title">
+     <string>Network</string>
+    </attribute>
+    <widget class="QWidget" name="formLayoutWidget">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>391</width>
+       <height>231</height>
+      </rect>
+     </property>
+     <layout class="QFormLayout" name="networkFormLayout">
+      <item row="0" column="1">
+       <widget class="QCheckBox" name="bluetoothCheckbox">
+        <property name="text">
+         <string>Bluetooth</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QCheckBox" name="zeroconfCheckbox">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Zeroconf</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QCheckBox" name="adhocCheckbox">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Ad-hoc Wifi</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="bluetoothTab">
+    <attribute name="title">
+     <string>Bluetooth</string>
+    </attribute>
+    <widget class="QWidget" name="formLayoutWidget_2">
+     <property name="geometry">
+      <rect>
+       <x>9</x>
+       <y>9</y>
+       <width>391</width>
+       <height>241</height>
+      </rect>
+     </property>
+     <layout class="QFormLayout" name="formLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="scanFrequencyLabel">
+        <property name="text">
+         <string>Scan Frequency:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="comboBox">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <item>
+         <property name="text">
+          <string comment="5">5 seconds</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string comment="10">10 seconds</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string comment="30">30 seconds</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string comment="60">1 minute</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string comment="120">2 minutes</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string comment="300">5 minutes</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string comment="600">10 minutes</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string comment="1200">20 minutes</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string comment="1800">30 minutes</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string comment="3600">1 hour</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="zeroconfTab">
+    <attribute name="title">
+     <string>Zeroconf</string>
+    </attribute>
+   </widget>
+   <widget class="QWidget" name="adhocWifiTab">
+    <attribute name="title">
+     <string>Ad-hoc Wifi</string>
+    </attribute>
+   </widget>
+  </widget>
+ </widget>
+ <resources>
+  <include location="res/FluidNexus.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>FluidNexusPreferences</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>FluidNexusPreferences</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
