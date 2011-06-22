@@ -428,6 +428,9 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         # Setup actions
         self.setupActions()
 
+        # Setup signals
+        self.__setupSignals()
+
         self.setupSysTray()
 
         # Start the network threads
@@ -459,7 +462,9 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         self.databaseType = unicode(self.settings.value("database/type").toString())
         self.database = FluidNexusDatabase(databaseDir = self.dataDir, databaseType = "pysqlite2", logPath = self.logPath)
 
-
+    def __setupSignals(self):
+        """Setup the signals we listen to."""
+        pass
 
     def __setupAppData(self):
         """ Setup the application data directory in the home directory."""

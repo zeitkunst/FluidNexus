@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'FluidNexus/ui/FluidNexusPreferences.ui'
 #
-# Created: Wed Jun 22 17:13:05 2011
+# Created: Wed Jun 22 17:24:43 2011
 #      by: PyQt4 UI code generator 4.8.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -36,9 +36,10 @@ class Ui_FluidNexusPreferences(object):
         self.networkTab = QtGui.QWidget()
         self.networkTab.setObjectName(_fromUtf8("networkTab"))
         self.formLayoutWidget = QtGui.QWidget(self.networkTab)
-        self.formLayoutWidget.setGeometry(QtCore.QRect(10, 10, 391, 231))
+        self.formLayoutWidget.setGeometry(QtCore.QRect(10, 10, 393, 231))
         self.formLayoutWidget.setObjectName(_fromUtf8("formLayoutWidget"))
         self.networkFormLayout = QtGui.QFormLayout(self.formLayoutWidget)
+        self.networkFormLayout.setFieldGrowthPolicy(QtGui.QFormLayout.ExpandingFieldsGrow)
         self.networkFormLayout.setObjectName(_fromUtf8("networkFormLayout"))
         self.bluetoothEnabled = QtGui.QCheckBox(self.formLayoutWidget)
         self.bluetoothEnabled.setObjectName(_fromUtf8("bluetoothEnabled"))
@@ -51,6 +52,22 @@ class Ui_FluidNexusPreferences(object):
         self.adhocCheckbox.setEnabled(False)
         self.adhocCheckbox.setObjectName(_fromUtf8("adhocCheckbox"))
         self.networkFormLayout.setWidget(2, QtGui.QFormLayout.FieldRole, self.adhocCheckbox)
+        self.networkInfo = QtGui.QPlainTextEdit(self.formLayoutWidget)
+        palette = QtGui.QPalette()
+        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255, 0))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Active, QtGui.QPalette.Base, brush)
+        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255, 0))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Inactive, QtGui.QPalette.Base, brush)
+        brush = QtGui.QBrush(QtGui.QColor(244, 244, 244))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Base, brush)
+        self.networkInfo.setPalette(palette)
+        self.networkInfo.setFrameShape(QtGui.QFrame.NoFrame)
+        self.networkInfo.setFrameShadow(QtGui.QFrame.Plain)
+        self.networkInfo.setObjectName(_fromUtf8("networkInfo"))
+        self.networkFormLayout.setWidget(3, QtGui.QFormLayout.FieldRole, self.networkInfo)
         self.FluidNexusPreferencesTabWidget.addTab(self.networkTab, _fromUtf8(""))
         self.bluetoothTab = QtGui.QWidget()
         self.bluetoothTab.setObjectName(_fromUtf8("bluetoothTab"))
@@ -99,11 +116,14 @@ class Ui_FluidNexusPreferences(object):
     def retranslateUi(self, FluidNexusPreferences):
         FluidNexusPreferences.setWindowTitle(QtGui.QApplication.translate("FluidNexusPreferences", "Fluid Nexus Preferences", None, QtGui.QApplication.UnicodeUTF8))
         self.FluidNexusPreferencesTabWidget.setTabText(self.FluidNexusPreferencesTabWidget.indexOf(self.generalTab), QtGui.QApplication.translate("FluidNexusPreferences", "General", None, QtGui.QApplication.UnicodeUTF8))
+        self.bluetoothEnabled.setToolTip(QtGui.QApplication.translate("FluidNexusPreferences", "Whether or not the Bluetooth client/server is enabled", None, QtGui.QApplication.UnicodeUTF8))
         self.bluetoothEnabled.setText(QtGui.QApplication.translate("FluidNexusPreferences", "Bluetooth", None, QtGui.QApplication.UnicodeUTF8))
         self.zeroconfCheckbox.setText(QtGui.QApplication.translate("FluidNexusPreferences", "Zeroconf", None, QtGui.QApplication.UnicodeUTF8))
         self.adhocCheckbox.setText(QtGui.QApplication.translate("FluidNexusPreferences", "Ad-hoc Wifi", None, QtGui.QApplication.UnicodeUTF8))
+        self.networkInfo.setPlainText(QtGui.QApplication.translate("FluidNexusPreferences", "If you make changes to these values you must restart the program for the changes to take effect.", None, QtGui.QApplication.UnicodeUTF8))
         self.FluidNexusPreferencesTabWidget.setTabText(self.FluidNexusPreferencesTabWidget.indexOf(self.networkTab), QtGui.QApplication.translate("FluidNexusPreferences", "Network", None, QtGui.QApplication.UnicodeUTF8))
         self.scanFrequencyLabel.setText(QtGui.QApplication.translate("FluidNexusPreferences", "Scan Frequency:", None, QtGui.QApplication.UnicodeUTF8))
+        self.bluetoothScanFrequency.setToolTip(QtGui.QApplication.translate("FluidNexusPreferences", "How often to scan for nearby devices.  Lower values will severely impact battery life.", None, QtGui.QApplication.UnicodeUTF8))
         self.bluetoothScanFrequency.setItemText(0, QtGui.QApplication.translate("FluidNexusPreferences", "5 seconds", None, QtGui.QApplication.UnicodeUTF8))
         self.bluetoothScanFrequency.setItemText(1, QtGui.QApplication.translate("FluidNexusPreferences", "10 seconds", None, QtGui.QApplication.UnicodeUTF8))
         self.bluetoothScanFrequency.setItemText(2, QtGui.QApplication.translate("FluidNexusPreferences", "30 seconds", None, QtGui.QApplication.UnicodeUTF8))

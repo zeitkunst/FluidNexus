@@ -62,13 +62,19 @@
       <rect>
        <x>10</x>
        <y>10</y>
-       <width>391</width>
+       <width>393</width>
        <height>231</height>
       </rect>
      </property>
      <layout class="QFormLayout" name="networkFormLayout">
+      <property name="fieldGrowthPolicy">
+       <enum>QFormLayout::ExpandingFieldsGrow</enum>
+      </property>
       <item row="0" column="1">
        <widget class="QCheckBox" name="bluetoothEnabled">
+        <property name="toolTip">
+         <string>Whether or not the Bluetooth client/server is enabled</string>
+        </property>
         <property name="text">
          <string>Bluetooth</string>
         </property>
@@ -91,6 +97,56 @@
         </property>
         <property name="text">
          <string>Ad-hoc Wifi</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QPlainTextEdit" name="networkInfo">
+        <property name="palette">
+         <palette>
+          <active>
+           <colorrole role="Base">
+            <brush brushstyle="SolidPattern">
+             <color alpha="0">
+              <red>255</red>
+              <green>255</green>
+              <blue>255</blue>
+             </color>
+            </brush>
+           </colorrole>
+          </active>
+          <inactive>
+           <colorrole role="Base">
+            <brush brushstyle="SolidPattern">
+             <color alpha="0">
+              <red>255</red>
+              <green>255</green>
+              <blue>255</blue>
+             </color>
+            </brush>
+           </colorrole>
+          </inactive>
+          <disabled>
+           <colorrole role="Base">
+            <brush brushstyle="SolidPattern">
+             <color alpha="255">
+              <red>244</red>
+              <green>244</green>
+              <blue>244</blue>
+             </color>
+            </brush>
+           </colorrole>
+          </disabled>
+         </palette>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="plainText">
+         <string>If you make changes to these values you must restart the program for the changes to take effect.</string>
         </property>
        </widget>
       </item>
@@ -125,6 +181,9 @@
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="toolTip">
+         <string>How often to scan for nearby devices.  Lower values will severely impact battery life.</string>
         </property>
         <item>
          <property name="text">

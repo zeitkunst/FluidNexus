@@ -257,7 +257,7 @@ TODO
         self.serverSocket = BluetoothSocket(RFCOMM)
         self.serverSocket.bind(("", PORT_ANY))
         self.serverSocket.listen(numConnections)
-        self.serverSocket.setblocking(blocking)
+        #self.serverSocket.setblocking(blocking)
         self.clientSockets = []
 
     def setupService(self):
@@ -357,7 +357,7 @@ TODO
                     pass
             elif (currentState == self.STATE_WAITING):
                 # See if any sockets are ready to read
-                rr, rw, ie = select.select(self.clientSockets, [], [], 10)
+                rr, rw, ie = select.select(self.clientSockets, [], [], 60)
 
                 # If a socket is ready to read, then pass off to method that handles the connection
                 if (rr != []):
@@ -365,8 +365,8 @@ TODO
                         self.setState(self.STATE_READ_HELO)
                         self.handleClientConnection(cs)
                         self.clientSockets.remove(cs)
+                        self.notDone = False
                 
-                self.notDone = False
 
         self.closeDatabase()
         return self.newMessages
