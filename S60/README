@@ -1,0 +1,39 @@
+Fluid Nexus v0.01
+
+Nick Knouf with Bruno Vianna and Luis Ayuso
+http://fluidnexus.net
+fluidnexus@fluidnexus.net
+
+This software is ALPHA QUALITY and should only be used at your own risk.  More detailed instructions about theory, motivation, installation, and use can be found on the website.
+
+#############################################################################
+#   INSTALLATION
+#############################################################################
+
+At the moment, the installation of Fluid Nexus is not easy nor quick.  We recommend that if you do not have experience installing and using third-party software on your phone that you wait for a later release of Fluid Nexus.
+
+1.  Download both the Python interpreter ("PythonForS60_") _and_ the Python Script Shell ("PythonScriptShell_") for your particular mobile phone, depending on what version of Symbian you use (1st, 2nd, or 3rd Edition): http://opensource.nokia.com/projects/pythonfors60/
+
+2.  Install these programs on your phone using your favorite method: Bluetooth, data cable, etc.
+
+3.  Download the Fluid Nexus archive.
+
+4.  Transfer the files "FluidNexusClient.py" and "FluidNexusServer.py" to your phone.  If using the Bluetooth to transfer the files, install them as "Python Script" _not_ "Python Library Module".
+
+5.  The next steps are different based on what type of phone you are running:
+    * For 1st or 2nd Edition: install FluidNexus.sis.
+    * For 3rd Edition: install the rest of the scripts in the archive.
+
+6.  To run the application:
+    * For 1st or 2nd Edition: Select "Fluid Nexus" from the menu
+    * For 3rd Edition: Start the "Python" application.  From the "Options" menu, select "Run Script".  Navigate to a file called "my\default.py".  Select this script to start the application.
+
+#############################################################################
+#   CAVEATS
+#############################################################################
+
+ * The application, client, and server consume a large amount of phone resources.  I have taken some attempts to reduce the consumption, but you will likely have to restart your phone after an hour or so of using Fluid Nexus.
+ * Sometimes messages are not sent even though the application finds other phones running Fluid Nexus.  This is either a bug or a problem in Bluetooth service discovery.
+ * New messages do not automatically appear in your message list.  You have to restart the application to see them.
+
+Each of these caveats will hopefully be addressed in the next version of Fluid Nexus.

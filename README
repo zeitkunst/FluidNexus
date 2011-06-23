@@ -11,3 +11,14 @@ The software has been testing on Ubuntu Maverick with python 2.6.6 and requires 
 To run, type "./FluidNexus.py"; for help, type "./FluidNexus.py --help".
 
 The Nokia Series 60 port is on hold for the moment; archived code can be found in the "S60" directory.
+
+= TODO =
+
+* Fix TextBrowser size in GUI
+* Finish move to SQLAlchemy
+* Add option to edit created messages
+* Finish implementation of attachments
+* Shutdown server/client threads properly on GUI exist
+* Start server/client threads in headless version; shutdown properly by catching interrupts
+* Implement zeroconf
+* Implement ad-hoc wifi
