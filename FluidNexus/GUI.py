@@ -666,11 +666,11 @@ class FluidNexusDesktop(QtGui.QMainWindow):
     def __startNetworkThreads(self):
 
         if (self.bluetoothEnabled):
-            self.bluetoothServerThread = FluidNexusServerQt(parent = self, dataDir = self.dataDir, databaseType = "pysqlite2", logPath = self.logPath, level = self.logLevel)
+            self.bluetoothServerThread = FluidNexusServerQt(parent = self, dataDir = self.dataDir, databaseType = "pysqlite2", attachmentsPath = self.attachmentsPath, logPath = self.logPath, level = self.logLevel)
             self.bluetoothServerThread.start()
             
             scanFrequency = self.settings.value("bluetooth/scanFrequency", 300).toInt()[0]
-            self.bluetoothClientThread = FluidNexusClientQt(parent = self, dataDir = self.dataDir, databaseType = "pysqlite2", logPath = self.logPath, level = self.logLevel, scanFrequency = scanFrequency)
+            self.bluetoothClientThread = FluidNexusClientQt(parent = self, dataDir = self.dataDir, databaseType = "pysqlite2", attachmentsPath = self.attachmentsPath, logPath = self.logPath, level = self.logLevel, scanFrequency = scanFrequency)
             self.bluetoothClientThread.start()
 
 
