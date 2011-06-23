@@ -127,8 +127,8 @@ class Blacklist(Base):
     def __repr__(self):
         return "<Blacklist('%d', '%s', '%s', '%f')>" % (self.message_type, self.title, self.message_hash, self.time)
 
-class FluidNexusDatabaseNew(object):
-    """Uses sqlalchemy to work with the Fluid Nexus database."""
+class FluidNexusDatabase(object):
+    """Uses sqlalchemy and ORM to work with the Fluid Nexus database."""
 
     def __init__(self, databaseDir = dataPath, databaseType = "e32", databaseName = 'FluidNexus.db', logPath = "FluidNexus.log"):
         """Initialization method that makes sure the database file and directory exist, and creates/opens the database file, and prepares the database view."""
@@ -211,7 +211,7 @@ class FluidNexusDatabaseNew(object):
         self.session.add(message)
         self.session.commit()
 
-    def lookForMessageByHash(self, message_hash):
+    def checkForMessageByHash(self, message_hash):
         """Look for the given hash in the database, returning True if found, False otherwise."""
         try:
             result = self.session.query(Messages).filter(Messages.message_hash == message_hash).one()
@@ -221,10 +221,44 @@ class FluidNexusDatabaseNew(object):
         except MultipleResultsFound, e:
             self.logger.error("Multiple results found for hash %s; this should never happen!" % message_hash)
             return False
-    
+
+    def getMessageByHash(self, message_hash):
+        """Get a message for a given hash."""
+        try:
+            result = self.session.query(Messages).filter(Messages.message_hash == message_hash).one()
+            return instance_dict(result)
+        except NoResultFound, e:
+            return None
+        except MultipleResultsFound, e:
+            self.logger.error("Multiple results found for hash %s; this should never happen!" % message_hash)
+            return None
+
+    def getMessageByHashORM(self, message_hash):
+        """Get a message for a given hash."""
+        try:
+            result = self.session.query(Messages).filter(Messages.message_hash == message_hash).one()
+            return result
+        except NoResultFound, e:
+            return None
+        except MultipleResultsFound, e:
+            self.logger.error("Multiple results found for hash %s; this should never happen!" % message_hash)
+            return None
+
+
     def removeByMessageHash(self, message_hash):
         """Remove an item by the given message hash."""
         self.session.query(Messages).filter(Messages.message_hash == message_hash).delete()
+        self.session.commit()
+
+    def updateByMessageHash(self, message_hash = "", new_message_hash = "", new_title = "", new_content = "", new_timestamp = 0.0):
+        """Update an item by a message hash with a new hash."""
+        message = self.getMessageByHashORM(message_hash)
+        message.message_hash = new_message_hash
+        message.title = new_title
+        message.content = new_content
+        message.timestamp = new_timestamp
+
+        self.session.merge(message)
         self.session.commit()
 
     def all(self, limit = None):
@@ -240,12 +274,17 @@ class FluidNexusDatabaseNew(object):
 
         return results 
 
+    def close(self):
+        """Close the database, committing if needed."""
+        self.session.commit()
+        self.session.close()
+
 ################################################################################
 ############        DATABASE CLASS                                ##############
 ############  Stores every data in system                         ##############
 ################################################################################
 
-class FluidNexusDatabase:
+class FluidNexusDatabaseOld:
     """Provide a light wrapper around the standard database functions.  We could probably make this more robust and make it an actual wrapper around both e32db and sqlite, but not right now...
 
     @TODO@ Make this a wrapper around pysqlite as well"""

@@ -91,15 +91,17 @@ class Networking(object):
     def getHashesFromDatabase(self):
         """Get the current list of hashes from the database."""
 
-        self.database.services()
+        self.ourHashes = self.database.hashes()
 
-        self.ourHashes = []
+    def addHash(self, hashToAdd):
+        self.ourHashes.append(hashToAdd)
 
-        for item in self.database:
-            # @TODO@ This can break if we change the database schema
+    def removeHash(self, hashToRemove):
+        self.ourHashes.remove(hashToRemove)
 
-            # Get the last item (the hash)
-            self.ourHashes.append('%s' % str(item[-1]))
+    def replaceHash(self, hashToReplace, newHash):
+        self.ourHashes.remove(hashToReplace)
+        self.ourHashes.append(newHash)
 
     def readCommand(self, cs):
         """Read a command from the socket.
@@ -169,10 +171,10 @@ class Networking(object):
 
         for currentHash in self.hashesToSend:
             m = messages.message.add()
-            data = self.database.returnItemBasedOnHash(currentHash)
-            m.message_timestamp = data[2]
-            m.message_title = data[4]
-            m.message_content = data[5]
+            data = self.database.getMessageByHash(currentHash)
+            m.message_timestamp = data['time']
+            m.message_title = data['title']
+            m.message_content = data['content']
             m.message_type = FluidNexus_pb2.FluidNexusMessage.TEXT
 
         self.logger.debug("Sending messages: " + str(messages))
@@ -223,7 +225,7 @@ class Networking(object):
         if (fields != []):
             for message in fields[0][1]: 
                 message_hash = hashlib.sha256(unicode(message.message_title) + unicode(message.message_content)).hexdigest()
-                self.database.add_received("foo", message.message_timestamp, 0, message.message_title, message.message_content, message_hash)
+                self.database.addReceived(timestamp = message.message_timestamp, title = message.message_title, content = message.message_content)
                 newMessage = {"message_hash": message_hash, "message_timestamp": message.message_timestamp, "message_title": message.message_title, "message_content": message.message_content}
                 self.newMessages.append(newMessage)
 
@@ -273,9 +275,6 @@ TODO
         cs = None
         self.setState(self.STATE_START)
 
-    def removeHash(self, hashToRemove):
-        self.logger.debug("Removing has from local list: " + hashToRemove)
-        self.ourHashes.remove(hashToRemove)
 
     def handleClientConnection(self, cs):
         """Handle a connection on the client socket.
@@ -414,10 +413,6 @@ TODO
         cs.close()
         cs = None
         self.setState(self.STATE_START)
-
-    def removeHash(self, hashToRemove):
-        self.logger.debug("Removing has from local list: " + hashToRemove)
-        self.ourHashes.remove(hashToRemove)
 
     def handleServerConnection(self, cs):
         """HELO            Write           Read
