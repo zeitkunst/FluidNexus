@@ -243,7 +243,7 @@ class Networking(object):
                     attachmentFP = open(message_attachment_path, "wb")
                     attachmentFP.write(message.message_attachment)
                     attachmentFP.close()
-                    self.database.addReceived(timestamp = message.message_timestamp, title = message.message_title, content = message.message_content, attachment_path = message_attachment_path, attachment_original_filename = message.attachment_original_filename)
+                    self.database.addReceived(timestamp = message.message_timestamp, title = message.message_title, content = message.message_content, attachment_path = message_attachment_path, attachment_original_filename = message.message_attachment_original_filename)
                     pass
                 else:
                     self.database.addReceived(timestamp = message.message_timestamp, title = message.message_title, content = message.message_content)
