@@ -176,6 +176,16 @@ class Networking(object):
             m.message_title = data['title']
             m.message_content = data['content']
             m.message_type = FluidNexus_pb2.FluidNexusMessage.TEXT
+            if (data["attachment_path"] != ""):
+                self.logger.debug("ATTACHMENT")
+                m.message_attachment_original_filename = data["attachment_original_filename"]
+
+                # TODO
+                # Error handling :-)
+                attachmentDataFP = fp.open(os.realpath(data["attachment_path"]), 'rb')
+                attachmentData = attachmentDataFP.read()
+                attachmentDataFP.close()
+                m.message_attachment = attachmentData
 
         self.logger.debug("Sending messages: " + str(messages))
 
