@@ -214,11 +214,12 @@ class MessageTextBrowser(QtGui.QTextBrowser):
         self.setMessageContent(message_content)
         self.setMessageTimestamp(message_timestamp)
 
+        self.connect(self, QtCore.SIGNAL("textChanged()"), self.setHeight)
         self.setTextBrowserHTML()
         self.adjustSize()        
         self.setHeight()
 
-        QtCore.QObject.connect(self, QtCore.SIGNAL("textChanged()"), self.setHeight)
+        #self.connect(self, QtCore.SIGNAL("resizeEvent(QResizeEvent)"), self.resizeEvent)
 
 
     def setTextBrowserHTML(self):
@@ -261,9 +262,12 @@ class MessageTextBrowser(QtGui.QTextBrowser):
         margins = self.contentsMargins()
 
         width = self.size().width() - margins.left() - margins.right() - self.document().documentMargin() * 2
-        self.document().setPageSize(QtCore.QSizeF(width, -1))
+        #self.document().setPageSize(QtCore.QSizeF(width, -1))
+        #self.document().setTextWidth(self.width() - 2)
+        self.document().setTextWidth(width)
 
         height = self.document().size().height() + margins.top() + margins.bottom()
+        #height = self.document().size().height() + 2
         self.setMinimumHeight(height)
         self.setMaximumHeight(height)
 
@@ -300,6 +304,11 @@ class MessageTextBrowser(QtGui.QTextBrowser):
             self.setMessageHash(new_message_hash)
             self.setMessageTimestamp(message_timestamp)
             self.setTextBrowserHTML()
+
+    # TODO
+    # This does make things the proper size, but then we get recursion errors...and I don't know how to stop the recursion.
+    #def resizeEvent(self, event):
+    #    self.setHeight()
 
 class FluidNexusNewMessageDialog(QtGui.QDialog):
     def __init__(self, parent=None, title = None, content = None):
@@ -526,7 +535,6 @@ class FluidNexusDesktop(QtGui.QMainWindow):
 
     def __setupSignals(self):
         """Setup the signals we listen to."""
-        self.connect(self.ui.FluidNexusScrollArea, QtCore.SIGNAL("resizeEvent(QResizeEvent)"), self.resizeEvent)
 
     def resizeEvent(self, event):
         if (event.oldSize() != self.ui.centralwidget.size()):
