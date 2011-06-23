@@ -238,7 +238,7 @@ class Networking(object):
             for message in fields[0][1]: 
                 message_hash = hashlib.sha256(unicode(message.message_title) + unicode(message.message_content)).hexdigest()
 
-                if (message.attachment_original_path != ""):
+                if (message.message_attachment_original_filename != ""):
                     message_attachment_path = os.path.join(self.attachmentsPath, message_hash)
                     attachmentFP = open(message_attachment_path, "wb")
                     attachmentFP.write(message.message_attachment)
