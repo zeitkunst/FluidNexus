@@ -20,6 +20,7 @@ Data is sent over bluetooth without any transport layer encryption.  This is som
 
 = TODO =
 
+* Refactor GUI to only do server/client thread stuff if a network modality is set
 * Fix TextBrowser size in GUI
 * * Almost there...still off by a bit
 * Figure out why ScrollArea won't resize to fill parent
