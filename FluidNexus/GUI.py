@@ -504,6 +504,13 @@ class FluidNexusDesktop(QtGui.QMainWindow):
 
         self.setupSysTray()
 
+        # Set our enabled/disabled network modalities; we'll refer to these values throughout the course of the program
+        bluetooth = self.settings.value("network/bluetooth", 2).toInt()[0]
+        if (bluetooth == 2): 
+            self.bluetoothEnabled = True
+        else:
+            self.bluetoothEnabled = False
+
         # Start the network threads
         self.__startNetworkThreads()
 
@@ -557,18 +564,20 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         os.chmod(self.dataDir, stat.S_IREAD | stat.S_IWRITE | stat.S_IEXEC)
 
     def __startNetworkThreads(self):
-        self.serverThread = FluidNexusServerQt(parent = self, dataDir = self.dataDir, databaseType = "pysqlite2", logPath = self.logPath, level = self.logLevel)
-        self.serverThread.start()
-        
-        scanFrequency = self.settings.value("bluetooth/scanFrequency", 300).toInt()[0]
-        self.clientThread = FluidNexusClientQt(parent = self, dataDir = self.dataDir, databaseType = "pysqlite2", logPath = self.logPath, level = self.logLevel, scanFrequency = scanFrequency)
-        self.clientThread.start()
+
+        if (self.bluetoothEnabled):
+            self.bluetoothServerThread = FluidNexusServerQt(parent = self, dataDir = self.dataDir, databaseType = "pysqlite2", logPath = self.logPath, level = self.logLevel)
+            self.bluetoothServerThread.start()
+            
+            scanFrequency = self.settings.value("bluetooth/scanFrequency", 300).toInt()[0]
+            self.bluetoothClientThread = FluidNexusClientQt(parent = self, dataDir = self.dataDir, databaseType = "pysqlite2", logPath = self.logPath, level = self.logLevel, scanFrequency = scanFrequency)
+            self.bluetoothClientThread.start()
 
 
     def __stopNetworkThreads(self):
-        #self.statusBar().showMessage(self.trUtf8("Waiting for network threads to stop."))
-        self.serverThread.quit()
-        self.clientThread.quit()
+        if (self.bluetoothEnabled):
+            self.bluetoothServerThread.quit()
+            self.bluetoothClientThread.quit()
 
     def setupDisplay(self):
         """Setup our display with a bunch of text browsers."""
@@ -652,9 +661,18 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         self.statusBar().showMessage(self.trUtf8("New messages received."))
 
     def replaceHash(self, hashToReplace, newHash):
-        self.serverThread.replaceHash(hashToReplace, newHash)
-        self.clientThread.replaceHash(hashToReplace, newHash)
+        """Replace a hash in our threads."""
 
+        if (self.bluetoothEnabled):
+            self.bluetoothServerThread.replaceHash(hashToReplace, newHash)
+            self.bluetoothClientThread.replaceHash(hashToReplace, newHash)
+    
+    def removeHash(self, hashToRemove):
+        """Remove a hash from our threads."""
+
+        if (self.bluetoothEnabled):
+            self.bluetoothServerThread.removeHash(hashToRemove)
+            self.bluetoothClientThread.removeHash(hashToRemove)
 
     def deleteMessage(self, hashToDelete):
         """Delete the selected hash and remove from display."""
@@ -671,8 +689,6 @@ class FluidNexusDesktop(QtGui.QMainWindow):
                     self.ui.FluidNexusVBoxLayout.removeWidget(currentWidget)
                     currentWidget.close()
                     self.database.removeByMessageHash(hashToDelete)
-                    self.serverThread.removeHash(hashToDelete)
-                    self.clientThread.removeHash(hashToDelete)
                 break
 
     def confirmDialogDelete(self):
@@ -693,7 +709,7 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         message_hash = unicode(hashlib.sha256(unicode(message_title) + unicode(message_content)).hexdigest())
 
         self.database.addMine(title = unicode(message_title), content = unicode(message_content))
-        self.threadsAddHash(message_hash)
+        self.addHash(message_hash)
         
         message_content = unicode(message_content)
         tb = MessageTextBrowser(parent = self, mine = 1, message_title = message_title, message_content = textile.textile(message_content), message_hash = message_hash, message_timestamp = time.time(), logPath = self.logPath)
@@ -701,9 +717,12 @@ class FluidNexusDesktop(QtGui.QMainWindow):
 
         self.ui.FluidNexusVBoxLayout.insertWidget(0, tb)
 
-    def threadsAddHash(self, message_hash):
-        self.serverThread.addHash(message_hash)
-        self.clientThread.addHash(message_hash)
+    def addHash(self, message_hash):
+        """Add a hash to our threads."""
+
+        if (self.bluetoothEnabled):
+            self.bluetoothServerThread.addHash(message_hash)
+            self.bluetoothClientThread.addHash(message_hash)
 
 def start():
     app = QtGui.QApplication(sys.argv)
