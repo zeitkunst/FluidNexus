@@ -364,9 +364,9 @@ class MessageTextBrowser(QtGui.QTextBrowser):
                 message_filename = unicode(message_filename)
                 fullPath, extension = os.path.splitext(message_filename)
                 attachment_original_filename = os.path.basename(message_filename)
-                attachment_path = os.path.join(self.parent.attachmentsDir, new_message_hash) + extension
+                attachment_path = os.path.join(self.parent.attachmentsPath, new_message_hash) + extension
 
-                os.unlink(os.path.join(self.parent.attachmentsDir, self.getMessageHash()))
+                os.unlink(os.path.join(self.parent.attachmentsPath, self.getMessageHash()))
 
                 # TODO
                 # This will break on windows and needs to be fixed
@@ -653,13 +653,13 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         else:
             self.dataDir = os.path.join(homeDir, ".FluidNexus")
 
-        self.attachmentsDir  = os.path.join(self.dataDir, "attachments")
+        self.attachmentsPath  = os.path.join(self.dataDir, "attachments")
         
         if not os.path.isdir(self.dataDir):
             os.makedirs(self.dataDir)
 
-        if not os.path.isdir(self.attachmentsDir):
-            os.makedirs(self.attachmentsDir)
+        if not os.path.isdir(self.attachmentsPath):
+            os.makedirs(self.attachmentsPath)
 
         os.chmod(self.dataDir, stat.S_IREAD | stat.S_IWRITE | stat.S_IEXEC)
 
@@ -829,7 +829,7 @@ class FluidNexusDesktop(QtGui.QMainWindow):
             message_filename = unicode(message_filename)
             fullPath, extension = os.path.splitext(message_filename)
             attachment_original_filename = os.path.basename(message_filename)
-            attachment_path = os.path.join(self.attachmentsDir, message_hash) + extension
+            attachment_path = os.path.join(self.attachmentsPath, message_hash) + extension
             # TODO
             # This will break on windows and needs to be fixed
             os.symlink(message_filename, attachment_path)
