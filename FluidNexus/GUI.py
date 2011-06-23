@@ -64,7 +64,7 @@ class TreeIter(QtGui.QTreeWidgetItemIterator):
             raise StopIteration
 
 class FluidNexusServerQt(QtCore.QThread):
-    def __init__(self, dataDir = None, databaseType = None, attachmentsPath = attachmentsPath, logPath = "FluidNexus.log", parent = None, level = logging.WARN):
+    def __init__(self, dataDir = None, databaseType = None, attachmentsPath = None, logPath = "FluidNexus.log", parent = None, level = logging.WARN):
         QtCore.QThread.__init__(self, parent)
 
         self.databaseDir = dataDir
@@ -113,7 +113,7 @@ class FluidNexusServerQt(QtCore.QThread):
 
 
 class FluidNexusClientQt(QtCore.QThread):
-    def __init__(self, dataDir = None, databaseType = None, attachmentsPath = attachmentsPath, logPath = "FluidNexus.log", parent = None, level = logging.WARN, scanFrequency = 300):
+    def __init__(self, dataDir = None, databaseType = None, attachmentsPath = None, logPath = "FluidNexus.log", parent = None, level = logging.WARN, scanFrequency = 300):
         QtCore.QThread.__init__(self, parent)
 
         self.databaseDir = dataDir
