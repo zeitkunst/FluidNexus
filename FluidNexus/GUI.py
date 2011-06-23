@@ -64,16 +64,17 @@ class TreeIter(QtGui.QTreeWidgetItemIterator):
             raise StopIteration
 
 class FluidNexusServerQt(QtCore.QThread):
-    def __init__(self, dataDir = None, databaseType = None, logPath = "FluidNexus.log", parent = None, level = logging.WARN):
+    def __init__(self, dataDir = None, databaseType = None, attachmentsPath = attachmentsPath, logPath = "FluidNexus.log", parent = None, level = logging.WARN):
         QtCore.QThread.__init__(self, parent)
 
         self.databaseDir = dataDir
         self.databaseType = databaseType
+        self.attachmentsPath = attachmentsPath
         self.parent = parent
         self.logger = Log.getLogger(logPath = logPath, level = level)
 
 
-        self.btServer = BluetoothServerVer3(databaseDir = dataDir, databaseType = databaseType, logPath = logPath)
+        self.btServer = BluetoothServerVer3(databaseDir = dataDir, databaseType = databaseType, attachmentsPath = attachmentsPath, logPath = logPath)
 
         self.connect(self, QtCore.SIGNAL("newMessages"), self.parent.newMessages)
         self.connect(self, QtCore.SIGNAL("started()"), self.handleStarted)
@@ -112,17 +113,18 @@ class FluidNexusServerQt(QtCore.QThread):
 
 
 class FluidNexusClientQt(QtCore.QThread):
-    def __init__(self, dataDir = None, databaseType = None, logPath = "FluidNexus.log", parent = None, level = logging.WARN, scanFrequency = 300):
+    def __init__(self, dataDir = None, databaseType = None, attachmentsPath = attachmentsPath, logPath = "FluidNexus.log", parent = None, level = logging.WARN, scanFrequency = 300):
         QtCore.QThread.__init__(self, parent)
 
         self.databaseDir = dataDir
         self.databaseType = databaseType
+        self.attachmentsPath = attachmentsPath
         self.parent = parent
         self.logger = Log.getLogger(logPath = logPath, level = level)
 
         self.scanFrequency = scanFrequency
 
-        self.btClient = BluetoothClientVer3(databaseDir = dataDir, databaseType = databaseType, logPath = logPath)
+        self.btClient = BluetoothClientVer3(databaseDir = dataDir, databaseType = databaseType, attachmentsPath = attachmentsPath, logPath = logPath)
 
         self.connect(self, QtCore.SIGNAL("newMessages"), self.parent.newMessages)
         self.connect(self, QtCore.SIGNAL("started()"), self.handleStarted)

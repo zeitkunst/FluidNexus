@@ -63,11 +63,12 @@ class Networking(object):
     state = STATE_START
 
 
-    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", logPath = "FluidNexus.log", level = logging.DEBUG):
+    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsPath = ".", logPath = "FluidNexus.log", level = logging.DEBUG):
         self.logger = Log.getLogger(logPath = logPath, level = level)
 
         self.databaseDir = databaseDir
         self.databaseType = databaseType
+        self.attachmentsPath = attachmentsPath
 
     def openDatabase(self):
         self.database = FluidNexusDatabase(databaseDir = self.databaseDir, databaseType = self.databaseType)
@@ -182,12 +183,13 @@ class Networking(object):
 
                 # TODO
                 # Error handling :-)
-                attachmentDataFP = fp.open(os.realpath(data["attachment_path"]), 'rb')
+                attachmentDataFP = open(os.path.realpath(data["attachment_path"]), 'rb')
                 attachmentData = attachmentDataFP.read()
                 attachmentDataFP.close()
                 m.message_attachment = attachmentData
 
-        self.logger.debug("Sending messages: " + str(messages))
+        #self.logger.debug("Sending messages: " + str(messages))
+        self.logger.debug("Sending messages...")
 
         messagesSerialized = messages.SerializeToString()
         messagesSerializedSize = len(messagesSerialized)
@@ -235,7 +237,16 @@ class Networking(object):
         if (fields != []):
             for message in fields[0][1]: 
                 message_hash = hashlib.sha256(unicode(message.message_title) + unicode(message.message_content)).hexdigest()
-                self.database.addReceived(timestamp = message.message_timestamp, title = message.message_title, content = message.message_content)
+
+                if (message.attachment_original_path != ""):
+                    message_attachment_path = os.path.join(self.attachmentsPath, message_hash)
+                    attachmentFP = open(message_attachment_path, "wb")
+                    attachmentFP.write(message.message_attachment)
+                    attachmentFP.close()
+                    self.database.addReceived(timestamp = message.message_timestamp, title = message.message_title, content = message.message_content, attachment_path = message_attachment_path, attachment_original_filename = message.attachment_original_filename)
+                    pass
+                else:
+                    self.database.addReceived(timestamp = message.message_timestamp, title = message.message_title, content = message.message_content)
                 newMessage = {"message_hash": message_hash, "message_timestamp": message.message_timestamp, "message_title": message.message_title, "message_content": message.message_content}
                 self.newMessages.append(newMessage)
 
@@ -252,8 +263,8 @@ TODO
 * Deal with different libraries such as lightblue."""
 
 
-    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", logPath = "FluidNexus.log", level = logging.DEBUG, numConnections = 5):
-        super(BluetoothServerVer3, self).__init__(databaseDir = databaseDir, databaseType = databaseType, logPath = logPath, level = level)
+    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsPath = ".", logPath = "FluidNexus.log", level = logging.DEBUG, numConnections = 5):
+        super(BluetoothServerVer3, self).__init__(databaseDir = databaseDir, databaseType = databaseType, attachmentsPath = attachmentsPath, logPath = logPath, level = level)
 
         # Do initial setup
         self.setupServerSockets(numConnections = numConnections)
@@ -389,8 +400,8 @@ TODO
 * Deal with different libraries such as lightblue."""
 
 
-    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", logPath = "FluidNexus.log", level = logging.DEBUG, numConnections = 5):
-        super(BluetoothClientVer3, self).__init__(databaseDir = databaseDir, databaseType = databaseType, logPath = logPath, level = level)
+    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsPath = ".", logPath = "FluidNexus.log", level = logging.DEBUG, numConnections = 5):
+        super(BluetoothClientVer3, self).__init__(databaseDir = databaseDir, databaseType = databaseType, attachmentsPath = attachmentsPath, logPath = logPath, level = level)
         self.setState(self.STATE_START)
 
     def doDeviceDiscovery(self):
