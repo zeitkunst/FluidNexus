@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'FluidNexus/ui/FluidNexusAbout.ui'
 #
-# Created: Thu Jun 23 14:53:54 2011
+# Created: Thu Jun 23 15:20:25 2011
 #      by: PyQt4 UI code generator 4.8.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -127,7 +127,7 @@ class Ui_FluidNexusAbout(object):
     def retranslateUi(self, FluidNexusAbout):
         FluidNexusAbout.setWindowTitle(QtGui.QApplication.translate("FluidNexusAbout", "About Fluid Nexus", None, QtGui.QApplication.UnicodeUTF8))
         self.AboutDialogTitle.setText(QtGui.QApplication.translate("FluidNexusAbout", "Fluid Nexus", None, QtGui.QApplication.UnicodeUTF8))
-        self.AboutDialogVersion.setText(QtGui.QApplication.translate("FluidNexusAbout", "Version 0.1Alpha", None, QtGui.QApplication.UnicodeUTF8))
+        self.AboutDialogVersion.setText(QtGui.QApplication.translate("FluidNexusAbout", "Version 0.1 Alpha", None, QtGui.QApplication.UnicodeUTF8))
         self.AboutDialogLink.setText(QtGui.QApplication.translate("FluidNexusAbout", "<a href=\"http://fluidnexus.net\">http://fluidnexus.net</a>", None, QtGui.QApplication.UnicodeUTF8))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.AboutDialogAboutTab), QtGui.QApplication.translate("FluidNexusAbout", "About", None, QtGui.QApplication.UnicodeUTF8))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.AboutDialogCreditsTab), QtGui.QApplication.translate("FluidNexusAbout", "Credits", None, QtGui.QApplication.UnicodeUTF8))

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'FluidNexus/ui/FluidNexusDesktop.ui'
 #
-# Created: Thu Jun 23 14:53:55 2011
+# Created: Thu Jun 23 15:20:26 2011
 #      by: PyQt4 UI code generator 4.8.1
 #
 # WARNING! All changes made in this file will be lost!

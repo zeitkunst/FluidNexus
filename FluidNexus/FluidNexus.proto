@@ -28,6 +28,7 @@ message FluidNexusMessage {
 
     optional MessageType message_type = 7;
     optional bytes message_attachment = 8;
+    optional string message_attachment_original_filename = 9;
 }
 
 message FluidNexusMessages {

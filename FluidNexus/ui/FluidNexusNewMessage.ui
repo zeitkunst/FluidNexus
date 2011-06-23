@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>384</width>
-    <height>533</height>
+    <height>362</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -66,8 +66,27 @@
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
         <widget class="QPushButton" name="fileSelectionButton">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="text">
           <string>Choose File...</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="fileRemoveButton">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Remove File</string>
          </property>
         </widget>
        </item>
@@ -87,23 +106,6 @@
       </layout>
      </item>
      <item row="3" column="0">
-      <widget class="QLabel" name="previewLabel">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="text">
-        <string>Preview:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <widget class="QGraphicsView" name="previewImage">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="0">
       <spacer name="horizontalSpacer_2">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -116,7 +118,7 @@
        </property>
       </spacer>
      </item>
-     <item row="4" column="1">
+     <item row="3" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout_3">
        <item>
         <spacer name="horizontalSpacer">
@@ -162,8 +164,8 @@
    <slot>saveButtonClicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>353</x>
-     <y>253</y>
+     <x>377</x>
+     <y>508</y>
     </hint>
     <hint type="destinationlabel">
      <x>379</x>

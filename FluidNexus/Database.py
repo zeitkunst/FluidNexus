@@ -109,7 +109,7 @@ class Messages(Base):
     message_hash = Column('hash', String(length = 64), nullable = False, unique = True)
     time = Column('time', Float, default = float(0.0))
     attachment_path = Column('attachment_path', String, default = "")
-    attachment_mimetype = Column('attachment_mimetype', String, default = "")
+    attachment_original_filename = Column('attachment_original_filename', String, default = "")
     mine = Column('mine', Boolean, default = 0)
 
     def __repr__(self):
@@ -188,23 +188,23 @@ class FluidNexusDatabase(object):
 
         return hashes
 
-    def addMine(self, message_type = 0, title = "", content = "", attachment_filename = None, attachment_mimetype = None):
+    def addMine(self, message_type = 0, title = "", content = "", attachment_path = None, attachment_original_filename = None):
         """Add one of our own messages to the database."""
         message_hash = hashlib.sha256(title + content).hexdigest()
         now = time.time()
-        if (attachment_filename is not None):
-            message = Messages(message_type = message_type, title = title, content = content, message_hash = message_hash, time = now, attachment_filename = attachment_filename, attachment_mimetype = attachment_mimetype, mine = True)
+        if (attachment_path is not None):
+            message = Messages(message_type = message_type, title = title, content = content, message_hash = message_hash, time = now, attachment_path = attachment_path, attachment_original_filename = attachment_original_filename, mine = True)
         else:
             message = Messages(message_type = message_type, title = title, content = content, message_hash = message_hash, time = now, mine = True)
 
         self.session.add(message)
         self.session.commit()
 
-    def addReceived(self, message_type = 0, title = "", content = "", timestamp = time.time(), attachment_filename = None, attachment_mimetype = None):
+    def addReceived(self, message_type = 0, title = "", content = "", timestamp = time.time(), attachment_path = None, attachment_original_filename = None):
         """Add one of our own messages to the database."""
         message_hash = hashlib.sha256(title + content).hexdigest()
-        if (attachment_filename is not None):
-            message = Messages(message_type = message_type, title = title, content = content, message_hash = message_hash, time = timestamp, attachment_filename = attachment_filename, attachment_mimetype = attachment_mimetype, mine = False)
+        if (attachment_path is not None):
+            message = Messages(message_type = message_type, title = title, content = content, message_hash = message_hash, time = timestamp, attachment_path = attachment_path, attachment_original_filename = attachment_original_filename, mine = False)
         else:
             message = Messages(message_type = message_type, title = title, content = content, message_hash = message_hash, time = timestamp, mine = False)
 
@@ -250,13 +250,15 @@ class FluidNexusDatabase(object):
         self.session.query(Messages).filter(Messages.message_hash == message_hash).delete()
         self.session.commit()
 
-    def updateByMessageHash(self, message_hash = "", new_message_hash = "", new_title = "", new_content = "", new_timestamp = 0.0):
+    def updateByMessageHash(self, message_hash = "", new_message_hash = "", new_title = "", new_content = "", new_timestamp = 0.0, new_attachment_path = "", new_attachment_original_filename = ""):
         """Update an item by a message hash with a new hash."""
         message = self.getMessageByHashORM(message_hash)
         message.message_hash = new_message_hash
         message.title = new_title
         message.content = new_content
         message.timestamp = new_timestamp
+        message.attachment_path = new_attachment_path
+        message.attachment_original_filename = new_attachment_original_filename
 
         self.session.merge(message)
         self.session.commit()

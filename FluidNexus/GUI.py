@@ -183,6 +183,21 @@ class MessageTextBrowser(QtGui.QTextBrowser):
     </table>
     """
 
+    mine_text_attachment = """
+    <table width='100%'>
+        <tr>
+        <td width='40' rowspan='3'><img src=':/icons/icons/32x32/menu_enable_outgoing.png' width='32' height='32' /></td>
+        <td><h3>%1</h3></td>
+        </tr>
+        <tr>
+            <td>%2</td>
+        </tr>
+        <tr>
+            <td align='right'>%4&nbsp;&nbsp;&nbsp;%3&nbsp;&nbsp;&nbsp;<a href="fluidnexus://editmessage">Edit</a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage"><img src=':/icons/icons/32x32/menu_delete.png' width='32' height='32'/></a></td>
+        </tr>
+    </table>
+    """
+
     other_text = """
     <table width='100%'>
         <tr>
@@ -199,7 +214,24 @@ class MessageTextBrowser(QtGui.QTextBrowser):
     </table>
     """
 
-    def __init__(self, parent = None, mine = False, message_title = "Testing title", message_content = "Testing content", message_type = 0, message_hash = None, message_timestamp = time.time(), logPath = "FluidNexus.log", level = logging.WARN):
+    other_text_attachment = """
+    <table width='100%'>
+        <tr>
+        <td width='40' rowspan='3'><img src=':/icons/icons/fluid_nexus_icon.png' width='32' height='32' /></td>
+            <td><h3>%1</h3></td>
+        </tr>
+        <tr>
+            <td>%2</td>
+        </tr>
+        <tr>
+            <td align='right'>%4&nbsp;&nbsp;&nbsp;%3&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage"><img src=':/icons/icons/32x32/menu_delete.png' width='32' height='32'/></a></td>
+        </tr>
+
+    </table>
+    """
+
+
+    def __init__(self, parent = None, mine = False, message_title = "Testing title", message_content = "Testing content", message_type = 0, message_hash = None, message_timestamp = time.time(), attachment_path = None, attachment_original_filename = None, logPath = "FluidNexus.log", level = logging.WARN):
         QtGui.QWidget.__init__(self, parent)
         self.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
 
@@ -213,6 +245,8 @@ class MessageTextBrowser(QtGui.QTextBrowser):
         self.setMessageTitle(message_title)
         self.setMessageContent(message_content)
         self.setMessageTimestamp(message_timestamp)
+        self.setMessageAttachmentPath(attachment_path)
+        self.setMessageAttachmentOriginalFilename(attachment_original_filename)
 
         self.connect(self, QtCore.SIGNAL("textChanged()"), self.setHeight)
         self.setTextBrowserHTML()
@@ -225,10 +259,16 @@ class MessageTextBrowser(QtGui.QTextBrowser):
     def setTextBrowserHTML(self):
         """Set our HTML content with the instance values."""
 
-        if (self.mine):
-            s = QtCore.QString(self.mine_text).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()))
+        if (self.getMessageAttachmentPath() is None):
+            if (self.mine):
+                s = QtCore.QString(self.mine_text).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()))
+            else:
+                s = QtCore.QString(self.other_text).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()))
         else:
-            s = QtCore.QString(self.other_text).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()))
+            if (self.mine):
+                s = QtCore.QString(self.mine_text_attachment).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()), self.getMessageAttachmentOriginalFilename())
+            else:
+                s = QtCore.QString(self.other_text_attachment).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()), self.getMessageAttachmentOriginalFilename())
 
         self.setHtml(s)
         # Whether to open links automatically
@@ -246,6 +286,12 @@ class MessageTextBrowser(QtGui.QTextBrowser):
     def setMessageTimestamp(self, message_timestamp):
         self.message_timestamp = message_timestamp
 
+    def setMessageAttachmentPath(self, attachment_path):
+        self.attachment_path = attachment_path
+
+    def setMessageAttachmentOriginalFilename(self, attachment_original_filename):
+        self.attachment_original_filename = attachment_original_filename
+
     def getMessageHash(self):
         return self.message_hash
 
@@ -257,6 +303,12 @@ class MessageTextBrowser(QtGui.QTextBrowser):
 
     def getMessageTimestamp(self):
         return self.message_timestamp
+
+    def getMessageAttachmentPath(self):
+        return self.attachment_path
+
+    def getMessageAttachmentOriginalFilename(self):
+        return self.attachment_original_filename
 
     def setHeight(self):
         margins = self.contentsMargins()
@@ -286,24 +338,49 @@ class MessageTextBrowser(QtGui.QTextBrowser):
                 stripped_content = re.sub('<[^<]+?>', '', self.getMessageContent())
                 lines = stripped_content.split('\n')
                 stripped_content = '\n'.join([line.strip() for line in lines])
-                self.newMessageDialog = FluidNexusNewMessageDialog(parent = self, title = self.getMessageTitle(), content = stripped_content)
+                self.newMessageDialog = FluidNexusNewMessageDialog(parent = self, title = self.getMessageTitle(), content = stripped_content, attachment_original_path = os.path.realpath(self.getMessageAttachmentPath()))
                 self.newMessageDialog.exec_()
     
-    def newMessageSaveButtonClicked(self, message_title, message_content):
+    def newMessageSaveButtonClicked(self, message_title, message_content, message_filename):
         """Respond to the new (edit) message save button."""
         new_message_hash = unicode(hashlib.sha256(unicode(message_title) + unicode(message_content)).hexdigest())
         message_title = unicode(message_title)
         message_content = unicode(message_content)
         if (new_message_hash != self.getMessageHash()):
-            message_timestamp = time.time()
-            self.parent.database.updateByMessageHash(message_hash = self.getMessageHash(), new_message_hash = new_message_hash, new_content = message_content, new_title = message_title, new_timestamp = message_timestamp)
-            self.parent.replaceHash(self.getMessageHash(), new_message_hash)
+            if (message_filename is None):
+                message_timestamp = time.time()
+                self.parent.database.updateByMessageHash(message_hash = self.getMessageHash(), new_message_hash = new_message_hash, new_content = message_content, new_title = message_title, new_timestamp = message_timestamp)
+                self.parent.replaceHash(self.getMessageHash(), new_message_hash)
+    
+                self.setMessageTitle(message_title)
+                self.setMessageContent(textile.textile(message_content))
+                self.setMessageHash(new_message_hash)
+                self.setMessageTimestamp(message_timestamp)
+                self.setTextBrowserHTML()
+            else:
+                # Get relevant infos about the file
+                message_filename = unicode(message_filename)
+                fullPath, extension = os.path.splitext(message_filename)
+                attachment_original_filename = os.path.basename(message_filename)
+                attachment_path = os.path.join(self.parent.attachmentsDir, new_message_hash) + extension
 
-            self.setMessageTitle(message_title)
-            self.setMessageContent(textile.textile(message_content))
-            self.setMessageHash(new_message_hash)
-            self.setMessageTimestamp(message_timestamp)
-            self.setTextBrowserHTML()
+                os.unlink(os.path.join(self.parent.attachmentsDir, self.getMessageHash()))
+
+                # TODO
+                # This will break on windows and needs to be fixed
+                os.symlink(message_filename, attachment_path)
+
+                message_timestamp = time.time()
+                self.parent.database.updateByMessageHash(message_hash = self.getMessageHash(), new_message_hash = new_message_hash, new_content = message_content, new_title = message_title, new_timestamp = message_timestamp, new_attachment_path = attachment_path, new_attachment_original_filename = attachment_original_filename)
+                self.parent.replaceHash(self.getMessageHash(), new_message_hash)
+
+                self.setMessageTitle(message_title)
+                self.setMessageContent(textile.textile(message_content))
+                self.setMessageHash(new_message_hash)
+                self.setMessageTimestamp(message_timestamp)
+                self.setMessageAttachmentPath(attachment_path)
+                self.setMessageAttachmentOriginalFilename(attachment_original_filename)
+                self.setTextBrowserHTML()
 
     # TODO
     # This does make things the proper size, but then we get recursion errors...and I don't know how to stop the recursion.
@@ -311,7 +388,7 @@ class MessageTextBrowser(QtGui.QTextBrowser):
     #    self.setHeight()
 
 class FluidNexusNewMessageDialog(QtGui.QDialog):
-    def __init__(self, parent=None, title = None, content = None):
+    def __init__(self, parent=None, title = None, content = None, attachment_original_path = None):
         QtGui.QDialog.__init__(self, parent)
 
         self.parent = parent
@@ -328,9 +405,15 @@ class FluidNexusNewMessageDialog(QtGui.QDialog):
         self.connect(self.ui.cancelButton, QtCore.SIGNAL("clicked()"), self.closeDialog)
         self.connect(self, QtCore.SIGNAL("saveButtonClicked"), self.parent.newMessageSaveButtonClicked)
         self.connect(self.ui.fileSelectionButton, QtCore.SIGNAL("clicked()"), self.selectFile)
+        self.connect(self.ui.fileRemoveButton, QtCore.SIGNAL("clicked()"), self.removeFile)
 
-        self.ui.previewLabel.hide()
-        self.ui.previewImage.hide()
+        if (attachment_original_path is not None):
+            self.filename = attachment_original_path
+            self.ui.fileSelectedLabel.setText(QtCore.QString(self.filename))
+            self.ui.fileRemoveButton.show()
+        else:
+            self.filename = None
+            self.ui.fileRemoveButton.hide()
 
     def closeDialog(self):
         # TODO
@@ -342,9 +425,19 @@ class FluidNexusNewMessageDialog(QtGui.QDialog):
         filename = QtGui.QFileDialog.getOpenFileName(self, self.trUtf8("Choose file for attachment"), os.getcwd());
         if (filename is not None):
             self.ui.fileSelectedLabel.setText(filename)
+            self.filename = filename
+            self.ui.fileRemoveButton.show()
+
+    def removeFile(self):
+        """Remove a file from consideration."""
+        # TODO
+        # Add dialog for confirmation
+        self.filename = None
+        self.ui.fileSelectedLabel.setText("")
+        self.ui.fileRemoveButton.hide()
 
     def saveButtonClicked(self):
-        self.emit(QtCore.SIGNAL("saveButtonClicked"), self.ui.newMessageTitle.text(), self.ui.newMessageBody.document().toPlainText())
+        self.emit(QtCore.SIGNAL("saveButtonClicked"), self.ui.newMessageTitle.text(), self.ui.newMessageBody.document().toPlainText(), self.filename)
         self.close()
 
 class FluidNexusPreferencesDialog(QtGui.QDialog):
@@ -557,9 +650,14 @@ class FluidNexusDesktop(QtGui.QMainWindow):
             self.dataDir = os.path.join(homeDir, "FluidNexusData")
         else:
             self.dataDir = os.path.join(homeDir, ".FluidNexus")
+
+        self.attachmentsDir  = os.path.join(self.dataDir, "attachments")
         
         if not os.path.isdir(self.dataDir):
             os.makedirs(self.dataDir)
+
+        if not os.path.isdir(self.attachmentsDir):
+            os.makedirs(self.attachmentsDir)
 
         os.chmod(self.dataDir, stat.S_IREAD | stat.S_IWRITE | stat.S_IEXEC)
 
@@ -593,8 +691,13 @@ class FluidNexusDesktop(QtGui.QMainWindow):
             message_title = item['title']
             message_content = item['content']
             message_mine = item['mine']
+            attachment_path = item['attachment_path']
+            attachment_original_filename = item['attachment_original_filename']
 
-            tb = MessageTextBrowser(parent = self, mine = message_mine, message_title = message_title, message_content = textile.textile(message_content), message_hash = message_hash, message_timestamp = message_timestamp, logPath = self.logPath)
+            if (attachment_path == ""):
+                tb = MessageTextBrowser(parent = self, mine = message_mine, message_title = message_title, message_content = textile.textile(message_content), message_hash = message_hash, message_timestamp = message_timestamp, logPath = self.logPath)
+            else:
+                tb = MessageTextBrowser(parent = self, mine = message_mine, message_title = message_title, message_content = textile.textile(message_content), message_hash = message_hash, message_timestamp = message_timestamp, attachment_path = attachment_path, attachment_original_filename = attachment_original_filename, logPath = self.logPath)
             tb.setFocusProxy(self)
             self.ui.FluidNexusVBoxLayout.insertWidget(0, tb)
 
@@ -687,6 +790,8 @@ class FluidNexusDesktop(QtGui.QMainWindow):
                 response = self.confirmDialogDelete()
                 if (response == self.YES):
                     self.ui.FluidNexusVBoxLayout.removeWidget(currentWidget)
+                    if (currentWidget.getMessageAttachmentPath() is not None):
+                        os.unlink(currentWidget.getMessageAttachmentPath())
                     currentWidget.close()
                     self.database.removeByMessageHash(hashToDelete)
                 break
@@ -705,17 +810,42 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         response = message.clickedButton().text()
         return response
 
-    def newMessageSaveButtonClicked(self, message_title, message_content):
+    def newMessageSaveButtonClicked(self, message_title, message_content, message_filename):
         message_hash = unicode(hashlib.sha256(unicode(message_title) + unicode(message_content)).hexdigest())
 
-        self.database.addMine(title = unicode(message_title), content = unicode(message_content))
-        self.addHash(message_hash)
-        
-        message_content = unicode(message_content)
-        tb = MessageTextBrowser(parent = self, mine = 1, message_title = message_title, message_content = textile.textile(message_content), message_hash = message_hash, message_timestamp = time.time(), logPath = self.logPath)
-        tb.setFocusProxy(self)
+        if (message_filename is None):
+            self.database.addMine(title = unicode(message_title), content = unicode(message_content))
+            self.addHash(message_hash)
+            
+            message_content = unicode(message_content)
+            tb = MessageTextBrowser(parent = self, mine = 1, message_title = message_title, message_content = textile.textile(message_content), message_hash = message_hash, message_timestamp = time.time(), logPath = self.logPath)
+            tb.setFocusProxy(self)
 
-        self.ui.FluidNexusVBoxLayout.insertWidget(0, tb)
+            self.ui.FluidNexusVBoxLayout.insertWidget(0, tb)
+        else:
+            # Get relevant infos about the file
+            message_filename = unicode(message_filename)
+            fullPath, extension = os.path.splitext(message_filename)
+            attachment_original_filename = os.path.basename(message_filename)
+            attachment_path = os.path.join(self.attachmentsDir, message_hash) + extension
+            # TODO
+            # This will break on windows and needs to be fixed
+            os.symlink(message_filename, attachment_path)
+
+            # Add the hash
+            self.addHash(message_hash)
+
+            # Convert QString to unicode
+            message_content = unicode(message_content)
+
+            # Add to database
+            self.database.addMine(title = unicode(message_title), content = unicode(message_content), attachment_path = attachment_path, attachment_original_filename = attachment_original_filename + extension)
+
+            # Update display
+            tb = MessageTextBrowser(parent = self, mine = 1, message_title = message_title, message_content = textile.textile(message_content), message_hash = message_hash, message_timestamp = time.time(), attachment_path = attachment_path, attachment_original_filename = attachment_original_filename + extension, logPath = self.logPath)
+            tb.setFocusProxy(self)
+
+            self.ui.FluidNexusVBoxLayout.insertWidget(0, tb)
 
     def addHash(self, message_hash):
         """Add a hash to our threads."""

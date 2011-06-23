@@ -76,7 +76,7 @@
         <item>
          <widget class="QLabel" name="AboutDialogVersion">
           <property name="text">
-           <string>Version 0.1Alpha</string>
+           <string>Version 0.1 Alpha</string>
           </property>
          </widget>
         </item>
@@ -273,8 +273,8 @@
  </widget>
  <resources>
   <include location="res/FluidNexus.qrc"/>
-  <include location="../../../../../../../../res/FluidNexus.qrc"/>
-  <include location="../../../../../../../../.designer/backup/res/FluidNexus.qrc"/>
+  <include location="res/FluidNexus.qrc"/>
+  <include location="res/FluidNexus.qrc"/>
  </resources>
  <connections>
   <connection>

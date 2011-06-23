@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'FluidNexus/ui/FluidNexusNewMessage.ui'
 #
-# Created: Thu Jun 23 14:53:55 2011
+# Created: Thu Jun 23 15:20:27 2011
 #      by: PyQt4 UI code generator 4.8.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -17,7 +17,7 @@ except AttributeError:
 class Ui_FluidNexusNewMessage(object):
     def setupUi(self, FluidNexusNewMessage):
         FluidNexusNewMessage.setObjectName(_fromUtf8("FluidNexusNewMessage"))
-        FluidNexusNewMessage.resize(384, 533)
+        FluidNexusNewMessage.resize(384, 362)
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(_fromUtf8(":/icons/icons/fluid_nexus_icon.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         FluidNexusNewMessage.setWindowIcon(icon)
@@ -46,24 +46,29 @@ class Ui_FluidNexusNewMessage(object):
         self.verticalLayout_3 = QtGui.QVBoxLayout()
         self.verticalLayout_3.setObjectName(_fromUtf8("verticalLayout_3"))
         self.fileSelectionButton = QtGui.QPushButton(FluidNexusNewMessage)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.fileSelectionButton.sizePolicy().hasHeightForWidth())
+        self.fileSelectionButton.setSizePolicy(sizePolicy)
         self.fileSelectionButton.setObjectName(_fromUtf8("fileSelectionButton"))
         self.verticalLayout_3.addWidget(self.fileSelectionButton)
+        self.fileRemoveButton = QtGui.QPushButton(FluidNexusNewMessage)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.fileRemoveButton.sizePolicy().hasHeightForWidth())
+        self.fileRemoveButton.setSizePolicy(sizePolicy)
+        self.fileRemoveButton.setObjectName(_fromUtf8("fileRemoveButton"))
+        self.verticalLayout_3.addWidget(self.fileRemoveButton)
         self.fileSelectedLabel = QtGui.QLabel(FluidNexusNewMessage)
         self.fileSelectedLabel.setMaximumSize(QtCore.QSize(300, 16777215))
         self.fileSelectedLabel.setText(_fromUtf8(""))
         self.fileSelectedLabel.setObjectName(_fromUtf8("fileSelectedLabel"))
         self.verticalLayout_3.addWidget(self.fileSelectedLabel)
         self.formLayout.setLayout(2, QtGui.QFormLayout.FieldRole, self.verticalLayout_3)
-        self.previewLabel = QtGui.QLabel(FluidNexusNewMessage)
-        self.previewLabel.setEnabled(True)
-        self.previewLabel.setObjectName(_fromUtf8("previewLabel"))
-        self.formLayout.setWidget(3, QtGui.QFormLayout.LabelRole, self.previewLabel)
-        self.previewImage = QtGui.QGraphicsView(FluidNexusNewMessage)
-        self.previewImage.setEnabled(True)
-        self.previewImage.setObjectName(_fromUtf8("previewImage"))
-        self.formLayout.setWidget(3, QtGui.QFormLayout.FieldRole, self.previewImage)
         spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
-        self.formLayout.setItem(4, QtGui.QFormLayout.LabelRole, spacerItem)
+        self.formLayout.setItem(3, QtGui.QFormLayout.LabelRole, spacerItem)
         self.horizontalLayout_3 = QtGui.QHBoxLayout()
         self.horizontalLayout_3.setObjectName(_fromUtf8("horizontalLayout_3"))
         spacerItem1 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
@@ -74,7 +79,7 @@ class Ui_FluidNexusNewMessage(object):
         self.saveButton = QtGui.QPushButton(FluidNexusNewMessage)
         self.saveButton.setObjectName(_fromUtf8("saveButton"))
         self.horizontalLayout_3.addWidget(self.saveButton)
-        self.formLayout.setLayout(4, QtGui.QFormLayout.FieldRole, self.horizontalLayout_3)
+        self.formLayout.setLayout(3, QtGui.QFormLayout.FieldRole, self.horizontalLayout_3)
         self.horizontalLayout.addLayout(self.formLayout)
         self.titleLabel.setBuddy(self.newMessageTitle)
         self.messageLabel.setBuddy(self.newMessageBody)
@@ -89,7 +94,7 @@ class Ui_FluidNexusNewMessage(object):
         self.messageLabel.setText(QtGui.QApplication.translate("FluidNexusNewMessage", "&Message:", None, QtGui.QApplication.UnicodeUTF8))
         self.attachmentLabel.setText(QtGui.QApplication.translate("FluidNexusNewMessage", "Attachment:", None, QtGui.QApplication.UnicodeUTF8))
         self.fileSelectionButton.setText(QtGui.QApplication.translate("FluidNexusNewMessage", "Choose File...", None, QtGui.QApplication.UnicodeUTF8))
-        self.previewLabel.setText(QtGui.QApplication.translate("FluidNexusNewMessage", "Preview:", None, QtGui.QApplication.UnicodeUTF8))
+        self.fileRemoveButton.setText(QtGui.QApplication.translate("FluidNexusNewMessage", "Remove File", None, QtGui.QApplication.UnicodeUTF8))
         self.cancelButton.setText(QtGui.QApplication.translate("FluidNexusNewMessage", "Cancel", None, QtGui.QApplication.UnicodeUTF8))
         self.saveButton.setText(QtGui.QApplication.translate("FluidNexusNewMessage", "Save", None, QtGui.QApplication.UnicodeUTF8))
 
