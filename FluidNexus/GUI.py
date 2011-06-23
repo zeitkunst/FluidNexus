@@ -526,7 +526,12 @@ class FluidNexusDesktop(QtGui.QMainWindow):
 
     def __setupSignals(self):
         """Setup the signals we listen to."""
-        pass
+        self.connect(self.ui.FluidNexusScrollArea, QtCore.SIGNAL("resizeEvent(QResizeEvent)"), self.resizeEvent)
+
+    def resizeEvent(self, event):
+        if (event.oldSize() != self.ui.centralwidget.size()):
+            self.ui.FluidNexusScrollArea.resize(self.ui.centralwidget.size())
+
 
     def __setupAppData(self):
         """ Setup the application data directory in the home directory."""
@@ -691,7 +696,6 @@ class FluidNexusDesktop(QtGui.QMainWindow):
     def threadsAddHash(self, message_hash):
         self.serverThread.addHash(message_hash)
         self.clientThread.addHash(message_hash)
-
 
 def start():
     app = QtGui.QApplication(sys.argv)

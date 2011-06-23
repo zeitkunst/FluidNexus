@@ -18,19 +18,17 @@
     <normaloff>:/icons/icons/fluid_nexus_icon.png</normaloff>:/icons/icons/fluid_nexus_icon.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
    <widget class="QScrollArea" name="FluidNexusScrollArea">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>0</y>
-      <width>380</width>
-      <height>563</height>
-     </rect>
-    </property>
     <property name="sizePolicy">
      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-      <horstretch>1</horstretch>
-      <verstretch>1</verstretch>
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
      </sizepolicy>
     </property>
     <property name="verticalScrollBarPolicy">
@@ -47,9 +45,15 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>374</width>
-       <height>557</height>
+       <width>16</width>
+       <height>16</height>
       </rect>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
     </widget>
    </widget>

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'FluidNexus/ui/FluidNexusDesktop.ui'
 #
-# Created: Thu Jun 23 01:47:49 2011
+# Created: Thu Jun 23 03:51:23 2011
 #      by: PyQt4 UI code generator 4.8.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -22,12 +22,17 @@ class Ui_FluidNexus(object):
         icon.addPixmap(QtGui.QPixmap(_fromUtf8(":/icons/icons/fluid_nexus_icon.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         FluidNexus.setWindowIcon(icon)
         self.centralwidget = QtGui.QWidget(FluidNexus)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.centralwidget.sizePolicy().hasHeightForWidth())
+        self.centralwidget.setSizePolicy(sizePolicy)
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
         self.FluidNexusScrollArea = QtGui.QScrollArea(self.centralwidget)
         self.FluidNexusScrollArea.setGeometry(QtCore.QRect(0, 0, 380, 563))
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
-        sizePolicy.setHorizontalStretch(1)
-        sizePolicy.setVerticalStretch(1)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.FluidNexusScrollArea.sizePolicy().hasHeightForWidth())
         self.FluidNexusScrollArea.setSizePolicy(sizePolicy)
         self.FluidNexusScrollArea.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
@@ -36,6 +41,11 @@ class Ui_FluidNexus(object):
         self.FluidNexusScrollArea.setObjectName(_fromUtf8("FluidNexusScrollArea"))
         self.scrollAreaWidgetContents = QtGui.QWidget(self.FluidNexusScrollArea)
         self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 374, 557))
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.scrollAreaWidgetContents.sizePolicy().hasHeightForWidth())
+        self.scrollAreaWidgetContents.setSizePolicy(sizePolicy)
         self.scrollAreaWidgetContents.setObjectName(_fromUtf8("scrollAreaWidgetContents"))
         self.FluidNexusScrollArea.setWidget(self.scrollAreaWidgetContents)
         FluidNexus.setCentralWidget(self.centralwidget)
