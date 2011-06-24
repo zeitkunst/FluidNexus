@@ -344,8 +344,8 @@ class MessageTextBrowser(QtGui.QTextBrowser):
                 self.newMessageDialog = FluidNexusNewMessageDialog(parent = self, title = self.getMessageTitle(), content = stripped_content, attachment_original_path = os.path.realpath(self.getMessageAttachmentPath()))
                 self.newMessageDialog.exec_()
         elif (anchor.scheme() == "file"):
-            print anchor
             QtGui.QDesktopServices.openUrl(anchor)
+
     def newMessageSaveButtonClicked(self, message_title, message_content, message_filename):
         """Respond to the new (edit) message save button."""
         new_message_hash = unicode(hashlib.sha256(unicode(message_title) + unicode(message_content)).hexdigest())

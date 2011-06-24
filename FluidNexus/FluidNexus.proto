@@ -21,8 +21,8 @@ message FluidNexusMessage {
     // Do we want to do it this way, or use mime-types?
     enum MessageType {
         TEXT = 0;
-        IMAGE = 1;
-        AUDIO = 2;
+        AUDIO = 1;
+        IMAGE = 2;
         VIDEO = 3;
     }
 

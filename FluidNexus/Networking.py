@@ -229,7 +229,7 @@ class Networking(object):
         messages = FluidNexus_pb2.FluidNexusMessages()
         messages.ParseFromString(data)
 
-        self.logger.debug("Received messages: " + str(messages))
+        #self.logger.debug("Received messages: " + str(messages))
 
         # Go through the received messages and add any that were sent
         fields = messages.ListFields()
