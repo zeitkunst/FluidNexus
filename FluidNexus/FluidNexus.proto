@@ -1,7 +1,7 @@
 package FluidNexus;
 
 option java_package = "net.fluidnexus.FluidNexus";
-option java_outer_classname = "FluidNexusProtos";
+option java_outer_classname = "Protos";
 option optimize_for = LITE_RUNTIME;
 
 //"create table FluidNexusData (_id integer primary key autoincrement,    source varchar(32), time bigint, type integer, title varchar(40), data long     varchar, hash varchar(32), cellID varchar(20), mine bit);";

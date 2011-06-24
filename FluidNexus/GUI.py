@@ -64,17 +64,17 @@ class TreeIter(QtGui.QTreeWidgetItemIterator):
             raise StopIteration
 
 class FluidNexusServerQt(QtCore.QThread):
-    def __init__(self, dataDir = None, databaseType = None, attachmentsPath = None, logPath = "FluidNexus.log", parent = None, level = logging.WARN):
+    def __init__(self, dataDir = None, databaseType = None, attachmentsDir = None, logPath = "FluidNexus.log", parent = None, level = logging.WARN):
         QtCore.QThread.__init__(self, parent)
 
         self.databaseDir = dataDir
         self.databaseType = databaseType
-        self.attachmentsPath = attachmentsPath
+        self.attachmentsDir = attachmentsDir
         self.parent = parent
         self.logger = Log.getLogger(logPath = logPath, level = level)
 
 
-        self.btServer = BluetoothServerVer3(databaseDir = dataDir, databaseType = databaseType, attachmentsPath = attachmentsPath, logPath = logPath)
+        self.btServer = BluetoothServerVer3(databaseDir = dataDir, databaseType = databaseType, attachmentsDir = attachmentsDir, logPath = logPath)
 
         self.connect(self, QtCore.SIGNAL("newMessages"), self.parent.newMessages)
         self.connect(self, QtCore.SIGNAL("started()"), self.handleStarted)
@@ -113,18 +113,18 @@ class FluidNexusServerQt(QtCore.QThread):
 
 
 class FluidNexusClientQt(QtCore.QThread):
-    def __init__(self, dataDir = None, databaseType = None, attachmentsPath = None, logPath = "FluidNexus.log", parent = None, level = logging.WARN, scanFrequency = 300):
+    def __init__(self, dataDir = None, databaseType = None, attachmentsDir = None, logPath = "FluidNexus.log", parent = None, level = logging.WARN, scanFrequency = 300):
         QtCore.QThread.__init__(self, parent)
 
         self.databaseDir = dataDir
         self.databaseType = databaseType
-        self.attachmentsPath = attachmentsPath
+        self.attachmentsDir = attachmentsDir
         self.parent = parent
         self.logger = Log.getLogger(logPath = logPath, level = level)
 
         self.scanFrequency = scanFrequency
 
-        self.btClient = BluetoothClientVer3(databaseDir = dataDir, databaseType = databaseType, attachmentsPath = attachmentsPath, logPath = logPath)
+        self.btClient = BluetoothClientVer3(databaseDir = dataDir, databaseType = databaseType, attachmentsDir = attachmentsDir, logPath = logPath)
 
         self.connect(self, QtCore.SIGNAL("newMessages"), self.parent.newMessages)
         self.connect(self, QtCore.SIGNAL("started()"), self.handleStarted)
@@ -195,7 +195,7 @@ class MessageTextBrowser(QtGui.QTextBrowser):
             <td>%2</td>
         </tr>
         <tr>
-            <td align='right'>%4&nbsp;&nbsp;&nbsp;%3&nbsp;&nbsp;&nbsp;<a href="fluidnexus://editmessage">Edit</a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage"><img src=':/icons/icons/32x32/menu_delete.png' width='32' height='32'/></a></td>
+            <td align='left'><a href='%5'>%4</a>&nbsp;&nbsp;&nbsp;%3&nbsp;&nbsp;&nbsp;<a href="fluidnexus://editmessage">Edit</a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage"><img src=':/icons/icons/32x32/menu_delete.png' width='32' height='32'/></a></td>
         </tr>
     </table>
     """
@@ -226,7 +226,7 @@ class MessageTextBrowser(QtGui.QTextBrowser):
             <td>%2</td>
         </tr>
         <tr>
-            <td align='right'>%4&nbsp;&nbsp;&nbsp;%3&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage"><img src=':/icons/icons/32x32/menu_delete.png' width='32' height='32'/></a></td>
+            <td align='left'><a href='%5'>%4</a>&nbsp;&nbsp;&nbsp;%3&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage"><img src=':/icons/icons/32x32/menu_delete.png' width='32' height='32'/></a></td>
         </tr>
 
     </table>
@@ -268,9 +268,10 @@ class MessageTextBrowser(QtGui.QTextBrowser):
                 s = QtCore.QString(self.other_text).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()))
         else:
             if (self.mine):
-                s = QtCore.QString(self.mine_text_attachment).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()), self.getMessageAttachmentOriginalFilename())
+                s = QtCore.QString(self.mine_text_attachment).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()), self.getMessageAttachmentOriginalFilename(), "file:///" + self.getMessageAttachmentPath())
             else:
-                s = QtCore.QString(self.other_text_attachment).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()), self.getMessageAttachmentOriginalFilename())
+                print self.getMessageAttachmentPath()
+                s = QtCore.QString(self.other_text_attachment).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()), self.getMessageAttachmentOriginalFilename(), "file:///" + self.getMessageAttachmentPath())
 
         self.setHtml(s)
         # Whether to open links automatically
@@ -342,7 +343,9 @@ class MessageTextBrowser(QtGui.QTextBrowser):
                 stripped_content = '\n'.join([line.strip() for line in lines])
                 self.newMessageDialog = FluidNexusNewMessageDialog(parent = self, title = self.getMessageTitle(), content = stripped_content, attachment_original_path = os.path.realpath(self.getMessageAttachmentPath()))
                 self.newMessageDialog.exec_()
-    
+        elif (anchor.scheme() == "file"):
+            print anchor
+            QtGui.QDesktopServices.openUrl(anchor)
     def newMessageSaveButtonClicked(self, message_title, message_content, message_filename):
         """Respond to the new (edit) message save button."""
         new_message_hash = unicode(hashlib.sha256(unicode(message_title) + unicode(message_content)).hexdigest())
@@ -364,9 +367,9 @@ class MessageTextBrowser(QtGui.QTextBrowser):
                 message_filename = unicode(message_filename)
                 fullPath, extension = os.path.splitext(message_filename)
                 attachment_original_filename = os.path.basename(message_filename)
-                attachment_path = os.path.join(self.parent.attachmentsPath, new_message_hash) + extension
+                attachment_path = os.path.join(self.parent.attachmentsDir, new_message_hash) + extension
 
-                os.unlink(os.path.join(self.parent.attachmentsPath, self.getMessageHash()))
+                os.unlink(os.path.join(self.parent.attachmentsDir, self.getMessageHash()))
 
                 # TODO
                 # This will break on windows and needs to be fixed
@@ -653,24 +656,24 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         else:
             self.dataDir = os.path.join(homeDir, ".FluidNexus")
 
-        self.attachmentsPath  = os.path.join(self.dataDir, "attachments")
+        self.attachmentsDir  = os.path.join(self.dataDir, "attachments")
         
         if not os.path.isdir(self.dataDir):
             os.makedirs(self.dataDir)
 
-        if not os.path.isdir(self.attachmentsPath):
-            os.makedirs(self.attachmentsPath)
+        if not os.path.isdir(self.attachmentsDir):
+            os.makedirs(self.attachmentsDir)
 
         os.chmod(self.dataDir, stat.S_IREAD | stat.S_IWRITE | stat.S_IEXEC)
 
     def __startNetworkThreads(self):
 
         if (self.bluetoothEnabled):
-            self.bluetoothServerThread = FluidNexusServerQt(parent = self, dataDir = self.dataDir, databaseType = "pysqlite2", attachmentsPath = self.attachmentsPath, logPath = self.logPath, level = self.logLevel)
+            self.bluetoothServerThread = FluidNexusServerQt(parent = self, dataDir = self.dataDir, databaseType = "pysqlite2", attachmentsDir = self.attachmentsDir, logPath = self.logPath, level = self.logLevel)
             self.bluetoothServerThread.start()
             
             scanFrequency = self.settings.value("bluetooth/scanFrequency", 300).toInt()[0]
-            self.bluetoothClientThread = FluidNexusClientQt(parent = self, dataDir = self.dataDir, databaseType = "pysqlite2", attachmentsPath = self.attachmentsPath, logPath = self.logPath, level = self.logLevel, scanFrequency = scanFrequency)
+            self.bluetoothClientThread = FluidNexusClientQt(parent = self, dataDir = self.dataDir, databaseType = "pysqlite2", attachmentsDir = self.attachmentsDir, logPath = self.logPath, level = self.logLevel, scanFrequency = scanFrequency)
             self.bluetoothClientThread.start()
 
 
@@ -829,7 +832,7 @@ class FluidNexusDesktop(QtGui.QMainWindow):
             message_filename = unicode(message_filename)
             fullPath, extension = os.path.splitext(message_filename)
             attachment_original_filename = os.path.basename(message_filename)
-            attachment_path = os.path.join(self.attachmentsPath, message_hash) + extension
+            attachment_path = os.path.join(self.attachmentsDir, message_hash) + extension
             # TODO
             # This will break on windows and needs to be fixed
             os.symlink(message_filename, attachment_path)
@@ -841,10 +844,10 @@ class FluidNexusDesktop(QtGui.QMainWindow):
             message_content = unicode(message_content)
 
             # Add to database
-            self.database.addMine(title = unicode(message_title), content = unicode(message_content), attachment_path = attachment_path, attachment_original_filename = attachment_original_filename + extension)
+            self.database.addMine(title = unicode(message_title), content = unicode(message_content), attachment_path = attachment_path, attachment_original_filename = attachment_original_filename)
 
             # Update display
-            tb = MessageTextBrowser(parent = self, mine = 1, message_title = message_title, message_content = textile.textile(message_content), message_hash = message_hash, message_timestamp = time.time(), attachment_path = attachment_path, attachment_original_filename = attachment_original_filename + extension, logPath = self.logPath)
+            tb = MessageTextBrowser(parent = self, mine = 1, message_title = message_title, message_content = textile.textile(message_content), message_hash = message_hash, message_timestamp = time.time(), attachment_path = attachment_path, attachment_original_filename = attachment_original_filename, logPath = self.logPath)
             tb.setFocusProxy(self)
 
             self.ui.FluidNexusVBoxLayout.insertWidget(0, tb)

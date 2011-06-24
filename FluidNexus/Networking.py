@@ -63,12 +63,12 @@ class Networking(object):
     state = STATE_START
 
 
-    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsPath = ".", logPath = "FluidNexus.log", level = logging.DEBUG):
+    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsDir = ".", logPath = "FluidNexus.log", level = logging.DEBUG):
         self.logger = Log.getLogger(logPath = logPath, level = level)
 
         self.databaseDir = databaseDir
         self.databaseType = databaseType
-        self.attachmentsPath = attachmentsPath
+        self.attachmentsDir = attachmentsDir
 
     def openDatabase(self):
         self.database = FluidNexusDatabase(databaseDir = self.databaseDir, databaseType = self.databaseType)
@@ -239,7 +239,7 @@ class Networking(object):
                 message_hash = hashlib.sha256(unicode(message.message_title) + unicode(message.message_content)).hexdigest()
 
                 if (message.message_attachment_original_filename != ""):
-                    message_attachment_path = os.path.join(self.attachmentsPath, message_hash)
+                    message_attachment_path = os.path.join(self.attachmentsDir, message_hash)
                     attachmentFP = open(message_attachment_path, "wb")
                     attachmentFP.write(message.message_attachment)
                     attachmentFP.close()
@@ -263,8 +263,8 @@ TODO
 * Deal with different libraries such as lightblue."""
 
 
-    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsPath = ".", logPath = "FluidNexus.log", level = logging.DEBUG, numConnections = 5):
-        super(BluetoothServerVer3, self).__init__(databaseDir = databaseDir, databaseType = databaseType, attachmentsPath = attachmentsPath, logPath = logPath, level = level)
+    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsDir = ".", logPath = "FluidNexus.log", level = logging.DEBUG, numConnections = 5):
+        super(BluetoothServerVer3, self).__init__(databaseDir = databaseDir, databaseType = databaseType, attachmentsDir = attachmentsDir, logPath = logPath, level = level)
 
         # Do initial setup
         self.setupServerSockets(numConnections = numConnections)
@@ -400,8 +400,8 @@ TODO
 * Deal with different libraries such as lightblue."""
 
 
-    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsPath = ".", logPath = "FluidNexus.log", level = logging.DEBUG, numConnections = 5):
-        super(BluetoothClientVer3, self).__init__(databaseDir = databaseDir, databaseType = databaseType, attachmentsPath = attachmentsPath, logPath = logPath, level = level)
+    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsDir = ".", logPath = "FluidNexus.log", level = logging.DEBUG, numConnections = 5):
+        super(BluetoothClientVer3, self).__init__(databaseDir = databaseDir, databaseType = databaseType, attachmentsDir = attachmentsDir, logPath = logPath, level = level)
         self.setState(self.STATE_START)
 
     def doDeviceDiscovery(self):
