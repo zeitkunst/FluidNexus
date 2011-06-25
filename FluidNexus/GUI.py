@@ -367,13 +367,14 @@ class MessageTextBrowser(QtGui.QTextBrowser):
                 message_filename = unicode(message_filename)
                 fullPath, extension = os.path.splitext(message_filename)
                 attachment_original_filename = os.path.basename(message_filename)
-                attachment_path = os.path.join(self.parent.attachmentsDir, new_message_hash) + extension
+                #attachment_path = os.path.join(self.parent.attachmentsDir, new_message_hash) + extension
+                attachment_path = message_filename
 
-                os.unlink(os.path.join(self.parent.attachmentsDir, self.getMessageHash()))
+                #os.unlink(os.path.join(self.parent.attachmentsDir, self.getMessageHash()))
 
                 # TODO
                 # This will break on windows and needs to be fixed
-                os.symlink(message_filename, attachment_path)
+                #os.symlink(message_filename, attachment_path)
 
                 message_timestamp = time.time()
                 self.parent.database.updateByMessageHash(message_hash = self.getMessageHash(), new_message_hash = new_message_hash, new_content = message_content, new_title = message_title, new_timestamp = message_timestamp, new_attachment_path = attachment_path, new_attachment_original_filename = attachment_original_filename)
@@ -761,7 +762,11 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         """Slot for when an incoming message was added by the server thread."""
         self.logger.debug("New messages received: " + str(newMessages))
         for message in newMessages:
-            tb = MessageTextBrowser(parent = self, mine = 0, message_title = message["message_title"], message_content = textile.textile(message["message_content"]), message_hash = message["message_hash"], message_timestamp = message["message_timestamp"], logPath = self.logPath)
+            if (message["message_attachment_path"] == ""):
+                tb = MessageTextBrowser(parent = self, mine = 0, message_title = message["message_title"], message_content = textile.textile(message["message_content"]), message_hash = message["message_hash"], message_timestamp = message["message_timestamp"], logPath = self.logPath)
+            else:
+                tb = MessageTextBrowser(parent = self, mine = 0, message_title = message["message_title"], message_content = textile.textile(message["message_content"]), message_hash = message["message_hash"], message_timestamp = message["message_timestamp"], attachment_path = message["message_attachment_path"], attachment_original_filename = message["message_attachment_original_filename"], logPath = self.logPath)
+
             self.ourHashes.append(message["message_hash"])
             tb.setFocusProxy(self)
             self.ui.FluidNexusVBoxLayout.insertWidget(0, tb)
@@ -832,10 +837,12 @@ class FluidNexusDesktop(QtGui.QMainWindow):
             message_filename = unicode(message_filename)
             fullPath, extension = os.path.splitext(message_filename)
             attachment_original_filename = os.path.basename(message_filename)
-            attachment_path = os.path.join(self.attachmentsDir, message_hash) + extension
+            #attachment_path = os.path.join(self.attachmentsDir, message_hash) + extension
+            attachment_path = message_filename
+
             # TODO
             # This will break on windows and needs to be fixed
-            os.symlink(message_filename, attachment_path)
+            #os.symlink(message_filename, attachment_path)
 
             # Add the hash
             self.addHash(message_hash)
