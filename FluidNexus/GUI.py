@@ -341,7 +341,10 @@ class MessageTextBrowser(QtGui.QTextBrowser):
                 stripped_content = re.sub('<[^<]+?>', '', self.getMessageContent())
                 lines = stripped_content.split('\n')
                 stripped_content = '\n'.join([line.strip() for line in lines])
-                self.newMessageDialog = FluidNexusNewMessageDialog(parent = self, title = self.getMessageTitle(), content = stripped_content, attachment_original_path = os.path.realpath(self.getMessageAttachmentPath()))
+                if (self.getMessageAttachmentPath() is None):
+                    self.newMessageDialog = FluidNexusNewMessageDialog(parent = self, title = self.getMessageTitle(), content = stripped_content)
+                else:
+                    self.newMessageDialog = FluidNexusNewMessageDialog(parent = self, title = self.getMessageTitle(), content = stripped_content, attachment_original_path = os.path.realpath(self.getMessageAttachmentPath()))
                 self.newMessageDialog.exec_()
         elif (anchor.scheme() == "file"):
             QtGui.QDesktopServices.openUrl(anchor)
@@ -549,6 +552,15 @@ Fluid Nexus is not designed as a general-purpose piece of software; rather, it i
 
 
 class FluidNexusDesktop(QtGui.QMainWindow):
+    """Main class for interacting with the desktop version of the software."""
+
+    # Global values for the view modes
+    VIEW_ALL = 0
+    VIEW_OUTGOING = 1
+    VIEW_BLACKLIST = 2
+
+    viewMode = VIEW_ALL
+
     def __init__(self, parent=None, level = logging.WARN):
         QtGui.QWidget.__init__(self, parent)
         self.ui = Ui_FluidNexus()
@@ -592,11 +604,11 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         self.ui.FluidNexusVBoxLayout.setMargin(1)
         verticalLayout_2.addLayout(self.ui.FluidNexusVBoxLayout)
 
-        # Setup display
-        self.setupDisplay()
-
         # Setup actions
         self.setupActions()
+
+        # Setup display
+        self.handleViewAll()
 
         # Setup signals
         self.__setupSignals()
@@ -688,7 +700,12 @@ class FluidNexusDesktop(QtGui.QMainWindow):
 
         # TODO
         # Not ideal or quick...probably need to refactor
-        items = self.database.all()
+        if (self.viewMode == self.VIEW_ALL):
+            items = self.database.all()
+        elif (self.viewMode == self.VIEW_OUTGOING):
+            items = self.database.outgoing()
+        elif (self.viewMode == self.VIEW_BLACKLIST):
+            items = self.database.blacklist()
         items.reverse()
 
         for item in items:
@@ -714,6 +731,10 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         self.connect(self.ui.actionNewMessage, QtCore.SIGNAL('triggered()'), self.handleNewMessage)
         self.connect(self.ui.actionPreferences, QtCore.SIGNAL('triggered()'), self.handlePreferences)
 
+        self.connect(self.ui.actionViewAll, QtCore.SIGNAL('triggered()'), self.handleViewAll)
+        self.connect(self.ui.actionViewOutgoing, QtCore.SIGNAL('triggered()'), self.handleViewOutgoing)
+        self.connect(self.ui.actionViewBlacklist, QtCore.SIGNAL('triggered()'), self.handleViewBlacklist)
+
     def setupSysTray(self):
         """Setup the systray."""
         self.showing = True
@@ -736,6 +757,18 @@ class FluidNexusDesktop(QtGui.QMainWindow):
             self.show()
             self.showing = True
 
+    def deleteTextBrowserWidgets(self):
+        """Delete all of the text browser widgets in preparation for repopulating.
+
+        TODO:
+        * this is probably _really_ inefficient..."""
+
+        numItems = self.ui.FluidNexusVBoxLayout.count()
+        
+        for index in xrange(0, numItems):
+            currentWidget = self.ui.FluidNexusVBoxLayout.itemAt(index).widget()
+            currentWidget.close()
+
     def handleNewMessage(self):
         self.newMessageDialog = FluidNexusNewMessageDialog(parent = self)
         self.newMessageDialog.exec_()
@@ -743,6 +776,24 @@ class FluidNexusDesktop(QtGui.QMainWindow):
     def handlePreferences(self):
         self.preferencesDialog = FluidNexusPreferencesDialog(parent = self, logPath = self.logPath, level = self.logLevel,  settings = self.settings)
         self.preferencesDialog.exec_()
+
+    def handleViewAll(self):
+        self.changeToolbarCheckedState(self.viewMode, self.VIEW_ALL)
+        self.viewMode = self.VIEW_ALL
+        self.deleteTextBrowserWidgets()
+        self.setupDisplay()
+
+    def handleViewOutgoing(self):
+        self.changeToolbarCheckedState(self.viewMode, self.VIEW_OUTGOING)
+        self.viewMode = self.VIEW_OUTGOING
+        self.deleteTextBrowserWidgets()
+        self.setupDisplay()
+
+    def handleViewBlacklist(self):
+        self.changeToolbarCheckedState(self.viewMode, self.VIEW_BLACKLIST)
+        self.viewMode = self.VIEW_BLACKLIST
+        self.deleteTextBrowserWidgets()
+        self.setupDisplay()
 
 
     def handleQuit(self):
@@ -752,6 +803,16 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         self.sysTray.hide()
         self.database.close()
         self.close()
+
+    def changeToolbarCheckedState(self, old, new):
+        """Change the checked state of the toolbar buttons from the old to the new."""
+        # TODO
+        # Perhaps a better way of doing this rather than hard-coding it?
+        actions = ["actionViewAll", "actionViewOutgoing", "actionViewBlacklist"]
+        oldAction = getattr(self.ui, actions[old])
+        newAction = getattr(self.ui, actions[new])
+        oldAction.setChecked(False)
+        newAction.setChecked(True)
 
     def displayAbout(self):
         """Display our about box."""

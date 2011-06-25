@@ -283,6 +283,32 @@ class FluidNexusDatabase(object):
 
         return results 
 
+    def outgoing(self, limit = None):
+        """Return outgoing items in the database,  with optional limit."""
+        if (limit is not None):
+            rows = self.session.query(Messages).filter(Messages.mine == True).order_by(desc(Messages.time)).all()[0:limit]
+        else:
+            rows = self.session.query(Messages).filter(Messages.mine == True).order_by(desc(Messages.time)).all()
+
+        results = []
+        for row in rows:
+            results.append(instance_dict(row))
+
+        return results 
+
+    def blacklist(self, limit = None):
+        """Return blacklisted items in the database,  with optional limit."""
+        if (limit is not None):
+            rows = self.session.query(Messages).filter(Messages.blacklist == True).order_by(desc(Messages.time)).all()[0:limit]
+        else:
+            rows = self.session.query(Messages).filter(Messages.blacklist == True).order_by(desc(Messages.time)).all()
+
+        results = []
+        for row in rows:
+            results.append(instance_dict(row))
+
+        return results 
+
     def close(self):
         """Close the database, committing if needed."""
         self.session.commit()

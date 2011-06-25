@@ -6,4 +6,5 @@ do
     pyuic4 $file -o $file_ui
 done
 
+echo "Generating resource file"
 pyrcc4 -py2 -o "FluidNexus/ui/FluidNexus_rc.py" "FluidNexus/ui/res/FluidNexus.qrc"

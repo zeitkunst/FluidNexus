@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'FluidNexus/ui/FluidNexusDesktop.ui'
 #
-# Created: Sat Jun 25 16:54:37 2011
+# Created: Sat Jun 25 17:17:17 2011
 #      by: PyQt4 UI code generator 4.8.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -79,16 +79,19 @@ class Ui_FluidNexus(object):
         self.actionPreferences.setIcon(icon2)
         self.actionPreferences.setObjectName(_fromUtf8("actionPreferences"))
         self.actionViewAll = QtGui.QAction(FluidNexus)
+        self.actionViewAll.setCheckable(True)
         icon3 = QtGui.QIcon()
         icon3.addPixmap(QtGui.QPixmap(_fromUtf8(":/icons/icons/32x32/menu_all.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionViewAll.setIcon(icon3)
         self.actionViewAll.setObjectName(_fromUtf8("actionViewAll"))
         self.actionViewOutgoing = QtGui.QAction(FluidNexus)
+        self.actionViewOutgoing.setCheckable(True)
         icon4 = QtGui.QIcon()
         icon4.addPixmap(QtGui.QPixmap(_fromUtf8(":/icons/icons/32x32/menu_outgoing.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionViewOutgoing.setIcon(icon4)
         self.actionViewOutgoing.setObjectName(_fromUtf8("actionViewOutgoing"))
         self.actionViewBlacklist = QtGui.QAction(FluidNexus)
+        self.actionViewBlacklist.setCheckable(True)
         icon5 = QtGui.QIcon()
         icon5.addPixmap(QtGui.QPixmap(_fromUtf8(":/icons/icons/32x32/menu_blacklist.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionViewBlacklist.setIcon(icon5)

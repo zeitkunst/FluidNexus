@@ -153,6 +153,9 @@
    </property>
   </action>
   <action name="actionViewAll">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="res/FluidNexus.qrc">
      <normaloff>:/icons/icons/32x32/menu_all.png</normaloff>:/icons/icons/32x32/menu_all.png</iconset>
@@ -165,6 +168,9 @@
    </property>
   </action>
   <action name="actionViewOutgoing">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="res/FluidNexus.qrc">
      <normaloff>:/icons/icons/32x32/menu_outgoing.png</normaloff>:/icons/icons/32x32/menu_outgoing.png</iconset>
@@ -177,6 +183,9 @@
    </property>
   </action>
   <action name="actionViewBlacklist">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="res/FluidNexus.qrc">
      <normaloff>:/icons/icons/32x32/menu_blacklist.png</normaloff>:/icons/icons/32x32/menu_blacklist.png</iconset>

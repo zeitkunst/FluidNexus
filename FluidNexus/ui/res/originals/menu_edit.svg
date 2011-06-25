@@ -61,7 +61,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -79,9 +79,9 @@
        sodipodi:ry="6.3769879"
        d="m 43.550163,18.353283 a 17.342297,6.3769879 0 1 1 -34.6845929,0 17.342297,6.3769879 0 1 1 34.6845929,0 z"
        transform="matrix(15.602794,0,0,15.260627,-47.487372,228.30941)"
-       inkscape:export-filename="/home/nknouf/Documents/Research/Projects/FluidNexus/code/FluidNexus/ui/res/originals/menu_edit.png"
-       inkscape:export-xdpi="21.290001"
-       inkscape:export-ydpi="21.290001" />
+       inkscape:export-filename="/home/nknouf/Documents/Research/Projects/FluidNexus/code/FluidNexus/FluidNexus/ui/res/icons/32x32/menu_edit.png"
+       inkscape:export-xdpi="5.3200002"
+       inkscape:export-ydpi="5.3200002" />
     <text
        xml:space="preserve"
        style="font-size:687.56896973000004891px;font-style:normal;font-weight:normal;fill:#84302d;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
@@ -89,9 +89,9 @@
        y="655.6438"
        id="text3620"
        transform="scale(0.92042646,1.0864529)"
-       inkscape:export-filename="/home/nknouf/Documents/Research/Projects/FluidNexus/code/FluidNexus/ui/res/originals/menu_edit.png"
-       inkscape:export-xdpi="21.290001"
-       inkscape:export-ydpi="21.290001"><tspan
+       inkscape:export-filename="/home/nknouf/Documents/Research/Projects/FluidNexus/code/FluidNexus/FluidNexus/ui/res/icons/32x32/menu_edit.png"
+       inkscape:export-xdpi="5.3200002"
+       inkscape:export-ydpi="5.3200002"><tspan
          sodipodi:role="line"
          id="tspan3622"
          x="189.84227"
