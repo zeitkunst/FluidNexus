@@ -190,7 +190,7 @@ class FluidNexusDatabase(object):
 
     def addMine(self, message_type = 0, title = "", content = "", attachment_path = None, attachment_original_filename = None):
         """Add one of our own messages to the database."""
-        message_hash = hashlib.sha256(title + content).hexdigest()
+        message_hash = hashlib.sha256(title.encode("utf-8") + content.encode("utf-8")).hexdigest()
         now = time.time()
         if (attachment_path is not None):
             message = Messages(message_type = message_type, title = title, content = content, message_hash = message_hash, time = now, attachment_path = attachment_path, attachment_original_filename = attachment_original_filename, mine = True)
@@ -202,7 +202,7 @@ class FluidNexusDatabase(object):
 
     def addReceived(self, message_type = 0, title = "", content = "", timestamp = time.time(), attachment_path = None, attachment_original_filename = None):
         """Add one of our own messages to the database."""
-        message_hash = hashlib.sha256(title + content).hexdigest()
+        message_hash = hashlib.sha256(title.encode("utf-8") + content.encode("utf-8")).hexdigest()
         if (attachment_path is not None):
             message = Messages(message_type = message_type, title = title, content = content, message_hash = message_hash, time = timestamp, attachment_path = attachment_path, attachment_original_filename = attachment_original_filename, mine = False)
         else:

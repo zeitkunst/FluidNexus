@@ -821,7 +821,12 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         return response
 
     def newMessageSaveButtonClicked(self, message_title, message_content, message_filename):
-        message_hash = unicode(hashlib.sha256(unicode(message_title) + unicode(message_content)).hexdigest())
+        print type(message_title.toUtf8())
+        print message_title.toUtf8()
+        print type(message_title.toUtf8())
+        print unicode(message_title)
+
+        message_hash = unicode(hashlib.sha256(unicode(message_title).encode("utf-8") + unicode(message_content).encode("utf-8")).hexdigest())
 
         if (message_filename is None):
             self.database.addMine(title = unicode(message_title), content = unicode(message_content))

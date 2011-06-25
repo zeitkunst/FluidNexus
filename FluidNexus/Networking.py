@@ -236,7 +236,7 @@ class Networking(object):
         self.newMessages = []
         if (fields != []):
             for message in fields[0][1]: 
-                message_hash = hashlib.sha256(unicode(message.message_title) + unicode(message.message_content)).hexdigest()
+                message_hash = hashlib.sha256(message.message_title.encode("utf-8") + message.message_content.encode("utf-8")).hexdigest()
 
                 if (message.message_attachment_original_filename != ""):
                     message_attachment_path = os.path.join(self.attachmentsDir, message_hash)

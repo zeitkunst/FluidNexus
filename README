@@ -23,8 +23,6 @@ Data is sent over bluetooth without any transport layer encryption.  This is som
 * Fix TextBrowser size in GUI
 * * Almost there...still off by a bit
 * Add option to move message(s) to blacklist, view/edit blacklist
-* Work on UI for attachments
-* * Add link for attachment
 * Shutdown server/client threads properly on GUI exist
 * Start server/client threads in headless version; shutdown properly by catching interrupts
 * Implement zeroconf
