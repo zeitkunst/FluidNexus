@@ -173,14 +173,14 @@ class MessageTextBrowser(QtGui.QTextBrowser):
     mine_text = """
     <table width='100%'>
         <tr>
-        <td width='40' rowspan='3'><img src=':/icons/icons/32x32/menu_enable_outgoing.png' width='32' height='32' /></td>
+        <td width='40' rowspan='3'><img src=':/icons/icons/32x32/menu_outgoing.png' width='32'/></td>
         <td><h3>%1</h3></td>
         </tr>
         <tr>
             <td>%2</td>
         </tr>
         <tr>
-            <td align='right'>%3&nbsp;&nbsp;&nbsp;<a href="fluidnexus://editmessage">Edit</a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage"><img src=':/icons/icons/32x32/menu_delete.png' width='32' height='32'/></a></td>
+            <td align='right'>%3&nbsp;&nbsp;&nbsp;<a href="fluidnexus://editmessage">Edit</a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage"><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
         </tr>
     </table>
     """
@@ -188,14 +188,14 @@ class MessageTextBrowser(QtGui.QTextBrowser):
     mine_text_attachment = """
     <table width='100%'>
         <tr>
-        <td width='40' rowspan='3'><img src=':/icons/icons/32x32/menu_enable_outgoing.png' width='32' height='32' /></td>
+        <td width='40' rowspan='3'><img src=':/icons/icons/32x32/menu_outgoing.png' width='32' /></td>
         <td><h3>%1</h3></td>
         </tr>
         <tr>
             <td>%2</td>
         </tr>
         <tr>
-            <td align='left'><a href='%5'>%4</a>&nbsp;&nbsp;&nbsp;%3&nbsp;&nbsp;&nbsp;<a href="fluidnexus://editmessage">Edit</a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage"><img src=':/icons/icons/32x32/menu_delete.png' width='32' height='32'/></a></td>
+            <td align='left'><a href='%5'>%4</a>&nbsp;&nbsp;&nbsp;%3&nbsp;&nbsp;&nbsp;<a href="fluidnexus://editmessage">Edit</a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage"><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
         </tr>
     </table>
     """
@@ -203,14 +203,14 @@ class MessageTextBrowser(QtGui.QTextBrowser):
     other_text = """
     <table width='100%'>
         <tr>
-        <td width='40' rowspan='3'><img src=':/icons/icons/fluid_nexus_icon.png' width='32' height='32' /></td>
+        <td width='40' rowspan='3'><img src=':/icons/icons/32x32/menu_all.png' width='32'  /></td>
             <td><h3>%1</h3></td>
         </tr>
         <tr>
             <td>%2</td>
         </tr>
         <tr>
-            <td align='right'>%3&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage"><img src=':/icons/icons/32x32/menu_delete.png' width='32' height='32'/></a></td>
+            <td align='right'>%3&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage"><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
         </tr>
 
     </table>
@@ -219,14 +219,14 @@ class MessageTextBrowser(QtGui.QTextBrowser):
     other_text_attachment = """
     <table width='100%'>
         <tr>
-        <td width='40' rowspan='3'><img src=':/icons/icons/fluid_nexus_icon.png' width='32' height='32' /></td>
+        <td width='40' rowspan='3'><img src=':/icons/icons/32x32/menu_all.png' width='32' /></td>
             <td><h3>%1</h3></td>
         </tr>
         <tr>
             <td>%2</td>
         </tr>
         <tr>
-            <td align='left'><a href='%5'>%4</a>&nbsp;&nbsp;&nbsp;%3&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage"><img src=':/icons/icons/32x32/menu_delete.png' width='32' height='32'/></a></td>
+            <td align='left'><a href='%5'>%4</a>&nbsp;&nbsp;&nbsp;%3&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage"><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
         </tr>
 
     </table>

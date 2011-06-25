@@ -1,5 +1,9 @@
 <RCC>
   <qresource prefix="icons">
+    <file>icons/32x32/menu_all.png</file>
+    <file>icons/32x32/menu_outgoing.png</file>
+    <file>icons/32x32/menu_blacklist.png</file>
+    <file>icons/32x32/menu_preferences.png</file>
     <file>icons/fluid_nexus_icon.png</file>
     <file>icons/32x32/menu_add.png</file>
     <file>icons/32x32/menu_delete.png</file>

@@ -111,9 +111,10 @@ class Messages(Base):
     attachment_path = Column('attachment_path', String, default = "")
     attachment_original_filename = Column('attachment_original_filename', String, default = "")
     mine = Column('mine', Boolean, default = 0)
+    blacklist = Column('blacklist', Boolean, default = 0)
 
     def __repr__(self):
-        return "<Messages('%d', '%s', '%s', '%s', '%f', '%s', '%s', '%s')>" % (self.message_type, self.title, self.content, self.message_hash, self.time, self.attachment_path, self.attachment_mimetype, self.mine)
+        return "<Messages('%d', '%s', '%s', '%s', '%f', '%s', '%s', '%s', '%s')>" % (self.message_type, self.title, self.content, self.message_hash, self.time, self.attachment_path, self.attachment_mimetype, self.mine, self.blacklist)
 
 class Blacklist(Base):
     __tablename__ = 'blacklist'
@@ -263,12 +264,18 @@ class FluidNexusDatabase(object):
         self.session.merge(message)
         self.session.commit()
 
-    def all(self, limit = None):
+    def all(self, limit = None, includeBlacklist = False):
         """Return all of the items in the database,  with optional limit."""
         if (limit is not None):
-            rows = self.session.query(Messages).order_by(desc(Messages.time)).all()[0:limit]
+            if (includeBlacklist):
+                rows = self.session.query(Messages).order_by(desc(Messages.time)).all()[0:limit]
+            else:
+                rows = self.session.query(Messages).filter(Messages.blacklist == False).order_by(desc(Messages.time)).all()[0:limit]
         else:
-            rows = self.session.query(Messages).order_by(desc(Messages.time)).all()
+            if (includeBlacklist):
+                rows = self.session.query(Messages).order_by(desc(Messages.time)).all()
+            else:
+                rows = self.session.query(Messages).filter(Messages.blacklist == False).order_by(desc(Messages.time)).all()
 
         results = []
         for row in rows:

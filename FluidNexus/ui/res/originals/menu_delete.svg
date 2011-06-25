@@ -13,8 +13,8 @@
    height="1052.3622047"
    id="svg4232"
    version="1.1"
-   inkscape:version="0.47 r22583"
-   sodipodi:docname="menu_add.svg"
+   inkscape:version="0.48.1 r9760"
+   sodipodi:docname="menu_delete.svg"
    inkscape:export-filename="/home/nknouf/Documents/Research/Projects/FluidNexus/code/FluidNexus/ui/res/originals/menu_add.png"
    inkscape:export-xdpi="21.290001"
    inkscape:export-ydpi="21.290001">
@@ -61,7 +61,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -84,7 +84,7 @@
        inkscape:export-ydpi="21.290001" />
     <text
        xml:space="preserve"
-       style="font-size:466.73480225px;font-style:normal;font-weight:normal;fill:#b43737;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       style="font-size:466.73480224999997290px;font-style:normal;font-weight:normal;fill:#84302d;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
        x="239.99834"
        y="631.59918"
        id="text3620"
@@ -96,6 +96,6 @@
          id="tspan3622"
          x="239.99834"
          y="631.59918"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#b43737;fill-opacity:1;font-family:Fontin Sans;-inkscape-font-specification:Fontin Sans Bold">x</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#84302d;fill-opacity:1;font-family:Fontin Sans;-inkscape-font-specification:Fontin Sans Bold">x</tspan></text>
   </g>
 </svg>

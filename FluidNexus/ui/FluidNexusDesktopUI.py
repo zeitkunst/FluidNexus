@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'FluidNexus/ui/FluidNexusDesktop.ui'
 #
-# Created: Thu Jun 23 15:20:26 2011
+# Created: Sat Jun 25 16:54:37 2011
 #      by: PyQt4 UI code generator 4.8.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -74,7 +74,25 @@ class Ui_FluidNexus(object):
         self.actionQuit = QtGui.QAction(FluidNexus)
         self.actionQuit.setObjectName(_fromUtf8("actionQuit"))
         self.actionPreferences = QtGui.QAction(FluidNexus)
+        icon2 = QtGui.QIcon()
+        icon2.addPixmap(QtGui.QPixmap(_fromUtf8(":/icons/icons/32x32/menu_preferences.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionPreferences.setIcon(icon2)
         self.actionPreferences.setObjectName(_fromUtf8("actionPreferences"))
+        self.actionViewAll = QtGui.QAction(FluidNexus)
+        icon3 = QtGui.QIcon()
+        icon3.addPixmap(QtGui.QPixmap(_fromUtf8(":/icons/icons/32x32/menu_all.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionViewAll.setIcon(icon3)
+        self.actionViewAll.setObjectName(_fromUtf8("actionViewAll"))
+        self.actionViewOutgoing = QtGui.QAction(FluidNexus)
+        icon4 = QtGui.QIcon()
+        icon4.addPixmap(QtGui.QPixmap(_fromUtf8(":/icons/icons/32x32/menu_outgoing.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionViewOutgoing.setIcon(icon4)
+        self.actionViewOutgoing.setObjectName(_fromUtf8("actionViewOutgoing"))
+        self.actionViewBlacklist = QtGui.QAction(FluidNexus)
+        icon5 = QtGui.QIcon()
+        icon5.addPixmap(QtGui.QPixmap(_fromUtf8(":/icons/icons/32x32/menu_blacklist.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionViewBlacklist.setIcon(icon5)
+        self.actionViewBlacklist.setObjectName(_fromUtf8("actionViewBlacklist"))
         self.menuFile.addAction(self.actionNewMessage)
         self.menuFile.addAction(self.actionPreferences)
         self.menuFile.addSeparator()
@@ -83,6 +101,10 @@ class Ui_FluidNexus(object):
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
         self.FluidNexusToolbar.addAction(self.actionNewMessage)
+        self.FluidNexusToolbar.addSeparator()
+        self.FluidNexusToolbar.addAction(self.actionViewAll)
+        self.FluidNexusToolbar.addAction(self.actionViewOutgoing)
+        self.FluidNexusToolbar.addAction(self.actionViewBlacklist)
 
         self.retranslateUi(FluidNexus)
         QtCore.QMetaObject.connectSlotsByName(FluidNexus)
@@ -99,5 +121,11 @@ class Ui_FluidNexus(object):
         self.actionQuit.setShortcut(QtGui.QApplication.translate("FluidNexus", "Ctrl+Q", None, QtGui.QApplication.UnicodeUTF8))
         self.actionPreferences.setText(QtGui.QApplication.translate("FluidNexus", "&Preferences...", None, QtGui.QApplication.UnicodeUTF8))
         self.actionPreferences.setShortcut(QtGui.QApplication.translate("FluidNexus", "Ctrl+P", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionViewAll.setText(QtGui.QApplication.translate("FluidNexus", "View All", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionViewAll.setToolTip(QtGui.QApplication.translate("FluidNexus", "View all messages", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionViewOutgoing.setText(QtGui.QApplication.translate("FluidNexus", "View Outgoing", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionViewOutgoing.setToolTip(QtGui.QApplication.translate("FluidNexus", "View outgoing messages", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionViewBlacklist.setText(QtGui.QApplication.translate("FluidNexus", "View Blacklist", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionViewBlacklist.setToolTip(QtGui.QApplication.translate("FluidNexus", "View blacklisted messages", None, QtGui.QApplication.UnicodeUTF8))
 
 import FluidNexus_rc

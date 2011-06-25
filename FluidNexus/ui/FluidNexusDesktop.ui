@@ -105,6 +105,10 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionNewMessage"/>
+   <addaction name="separator"/>
+   <addaction name="actionViewAll"/>
+   <addaction name="actionViewOutgoing"/>
+   <addaction name="actionViewBlacklist"/>
   </widget>
   <action name="actionAbout">
    <property name="icon">
@@ -137,11 +141,51 @@
    </property>
   </action>
   <action name="actionPreferences">
+   <property name="icon">
+    <iconset resource="res/FluidNexus.qrc">
+     <normaloff>:/icons/icons/32x32/menu_preferences.png</normaloff>:/icons/icons/32x32/menu_preferences.png</iconset>
+   </property>
    <property name="text">
     <string>&amp;Preferences...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+P</string>
+   </property>
+  </action>
+  <action name="actionViewAll">
+   <property name="icon">
+    <iconset resource="res/FluidNexus.qrc">
+     <normaloff>:/icons/icons/32x32/menu_all.png</normaloff>:/icons/icons/32x32/menu_all.png</iconset>
+   </property>
+   <property name="text">
+    <string>View All</string>
+   </property>
+   <property name="toolTip">
+    <string>View all messages</string>
+   </property>
+  </action>
+  <action name="actionViewOutgoing">
+   <property name="icon">
+    <iconset resource="res/FluidNexus.qrc">
+     <normaloff>:/icons/icons/32x32/menu_outgoing.png</normaloff>:/icons/icons/32x32/menu_outgoing.png</iconset>
+   </property>
+   <property name="text">
+    <string>View Outgoing</string>
+   </property>
+   <property name="toolTip">
+    <string>View outgoing messages</string>
+   </property>
+  </action>
+  <action name="actionViewBlacklist">
+   <property name="icon">
+    <iconset resource="res/FluidNexus.qrc">
+     <normaloff>:/icons/icons/32x32/menu_blacklist.png</normaloff>:/icons/icons/32x32/menu_blacklist.png</iconset>
+   </property>
+   <property name="text">
+    <string>View Blacklist</string>
+   </property>
+   <property name="toolTip">
+    <string>View blacklisted messages</string>
    </property>
   </action>
  </widget>
