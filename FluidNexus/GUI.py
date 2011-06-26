@@ -754,10 +754,13 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         # Not ideal or quick...probably need to refactor
         if (self.viewMode == self.VIEW_ALL):
             items = self.database.all()
+            self.setWindowTitle(self.trUtf8("Fluid Nexus: View All Messages"))
         elif (self.viewMode == self.VIEW_OUTGOING):
             items = self.database.outgoing()
+            self.setWindowTitle(self.trUtf8("Fluid Nexus: View Outgoing Messages"))
         elif (self.viewMode == self.VIEW_BLACKLIST):
             items = self.database.blacklist()
+            self.setWindowTitle(self.trUtf8("Fluid Nexus: View Blacklisted Messages"))
         items.reverse()
 
         for item in items:
