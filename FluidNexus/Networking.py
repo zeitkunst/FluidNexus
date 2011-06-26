@@ -105,6 +105,17 @@ class Networking(object):
         self.ourHashes.remove(hashToReplace)
         self.ourHashes.append(newHash)
 
+    def read(self, cs, size):
+        """Read a certain amount from the given socket."""
+        data = ""
+        while len(data) < size:
+            chunk = cs.recv(size - len(data))
+            if chunk == "":
+                self.cleanup(cs)
+            data = data + chunk
+        return data
+
+
     def readCommand(self, cs):
         """Read a command from the socket.
         
@@ -155,7 +166,8 @@ class Networking(object):
         size = self.sizeStruct.unpack(sizePacked)[0]
         self.logger.debug("Expecting to receive data of size " + str(size))
 
-        data = cs.recv(size)
+        #data = cs.recv(size)
+        data = self.read(cs, size)
         hashes = FluidNexus_pb2.FluidNexusHashes()
         hashes.ParseFromString(data)
 
