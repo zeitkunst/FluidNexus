@@ -108,12 +108,18 @@ class Networking(object):
     def read(self, cs, size):
         """Read a certain amount from the given socket."""
         data = ""
-        while len(data) < size:
-            chunk = cs.recv(size - len(data))
-            if chunk == "":
-                self.cleanup(cs)
-            data = data + chunk
-        return data
+
+        try:
+            while len(data) < size:
+                chunk = cs.recv(size - len(data))
+                if chunk == "":
+                    self.cleanup(cs)
+                data = data + chunk
+            return data
+        except bluetooth.btcommon.BluetoothError, e:
+            self.logger.error("Some sort of bluetooth error: " + str(e))
+            self.cleanup(cs)
+            return ""
 
 
     def readCommand(self, cs):
@@ -124,7 +130,8 @@ class Networking(object):
 
         # First thing we get should be a command
         self.logger.debug("=> Receive command")
-        command = cs.recv(self.commandStruct.size)
+        #command = cs.recv(self.commandStruct.size)
+        command = self.read(cs, self.commandStruct.size)
         self.logger.debug("received %s " % binascii.hexlify(command))
         unpackedCommand = self.commandStruct.unpack(command)
         unpackedCommand = unpackedCommand[0]
@@ -162,7 +169,8 @@ class Networking(object):
         if (command != self.HASHES):
             self.cleanup(cs)
 
-        sizePacked = cs.recv(self.sizeStruct.size)
+        #sizePacked = cs.recv(self.sizeStruct.size)
+        sizePacked = self.read(cs, self.sizeStruct.size)
         size = self.sizeStruct.unpack(sizePacked)[0]
         self.logger.debug("Expecting to receive data of size " + str(size))
 
@@ -228,16 +236,20 @@ class Networking(object):
     def readMessages(self, cs):
         """Read the messages from the client."""
 
-        sizePacked = cs.recv(self.sizeStruct.size)
+        #sizePacked = cs.recv(self.sizeStruct.size)
+        sizePacked = self.read(cs, self.sizeStruct.size)
         size = self.sizeStruct.unpack(sizePacked)[0]
         self.logger.debug("Expecting to receive data of size " + str(size))
-
+        
+        """
         data = ""
         while len(data) < size:
             chunk = cs.recv(size - len(data))
             if chunk == "":
                 self.cleanup(cs)
             data = data + chunk
+        """
+        data = self.read(cs, size)
 
         messages = FluidNexus_pb2.FluidNexusMessages()
         messages.ParseFromString(data)
