@@ -180,7 +180,7 @@ class MessageTextBrowser(QtGui.QTextBrowser):
             <td>%2</td>
         </tr>
         <tr>
-            <td align='right'>%3&nbsp;&nbsp;&nbsp;<a href="fluidnexus://editmessage">Edit</a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage"><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
+        <td align='right'>%3&nbsp;&nbsp;&nbsp;<a href='fluidnexus://editmessage' title='Edit Message'><img src=':/icons/icons/32x32/menu_edit.png' width='32'/></a>&nbsp;&nbsp;&nbsp;<a href='fluidnexus://deletemessage' title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
         </tr>
     </table>
     """
@@ -188,14 +188,17 @@ class MessageTextBrowser(QtGui.QTextBrowser):
     mine_text_attachment = """
     <table width='100%'>
         <tr>
-        <td width='40' rowspan='3'><img src=':/icons/icons/32x32/menu_outgoing.png' width='32' /></td>
+        <td width='40' rowspan='4'><img src=':/icons/icons/32x32/menu_outgoing.png' width='32' /></td>
         <td><h3>%1</h3></td>
         </tr>
         <tr>
             <td>%2</td>
         </tr>
         <tr>
-            <td align='left'><a href='%5'>%4</a>&nbsp;&nbsp;&nbsp;%3&nbsp;&nbsp;&nbsp;<a href="fluidnexus://editmessage">Edit</a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage"><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
+            <td align='right'><strong>Attachment: </strong><a href='%5'>%4</a></td>
+        </tr>
+        <tr>
+            <td align='right'>%3&nbsp;&nbsp;&nbsp;<a href="fluidnexus://editmessage" title='Edit Message'><img src=':/icons/icons/32x32/menu_edit.png' width='32'/></a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage" title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
         </tr>
     </table>
     """
@@ -210,30 +213,69 @@ class MessageTextBrowser(QtGui.QTextBrowser):
             <td>%2</td>
         </tr>
         <tr>
-            <td align='right'>%3&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage"><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
+            <td align='right'>%3&nbsp;&nbsp;&nbsp;<a href="fluidnexus://blacklistmessage" title="Blacklist Message"><img src=":/icons/icons/32x32/menu_blacklist.png" width="32"/></a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage" title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
         </tr>
 
     </table>
     """
 
-    other_text_attachment = """
+    other_text_blacklist = """
     <table width='100%'>
         <tr>
-        <td width='40' rowspan='3'><img src=':/icons/icons/32x32/menu_all.png' width='32' /></td>
+        <td width='40' rowspan='3'><img src=':/icons/icons/32x32/menu_all.png' width='32'  /></td>
             <td><h3>%1</h3></td>
         </tr>
         <tr>
             <td>%2</td>
         </tr>
         <tr>
-            <td align='left'><a href='%5'>%4</a>&nbsp;&nbsp;&nbsp;%3&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage"><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
+            <td align='right'>%3&nbsp;&nbsp;&nbsp;<a href="fluidnexus://unblacklistmessage" title="Unblacklist Message"><img src=":/icons/icons/32x32/menu_all.png" width="32"/></a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage" title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
         </tr>
 
     </table>
     """
 
 
-    def __init__(self, parent = None, mine = False, message_title = "Testing title", message_content = "Testing content", message_type = 0, message_hash = None, message_timestamp = time.time(), attachment_path = None, attachment_original_filename = None, logPath = "FluidNexus.log", level = logging.WARN):
+    other_text_attachment = """
+    <table width='100%'>
+        <tr>
+        <td width='40' rowspan='4'><img src=':/icons/icons/32x32/menu_all.png' width='32' /></td>
+            <td><h3>%1</h3></td>
+        </tr>
+        <tr>
+            <td>%2</td>
+        </tr>
+        <tr>
+            <td align='right'><strong>Attachment: </strong><a href='%5'>%4</a></td>
+        </tr>
+        <tr>
+            <td align='right'>%3&nbsp;&nbsp;&nbsp;<a href="fluidnexus://blacklistmessage" title="Blacklist Message"><img src=":/icons/icons/32x32/menu_blacklist.png" width="32"/></a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage" title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
+        </tr>
+
+    </table>
+    """
+
+    other_text_attachment_blacklist = """
+    <table width='100%'>
+        <tr>
+        <td width='40' rowspan='4'><img src=':/icons/icons/32x32/menu_all.png' width='32' /></td>
+            <td><h3>%1</h3></td>
+        </tr>
+        <tr>
+            <td>%2</td>
+        </tr>
+        <tr>
+            <td align='right'><strong>Attachment: </strong><a href='%5'>%4</a></td>
+        </tr>
+        <tr>
+            <td align='right'>%3&nbsp;&nbsp;&nbsp;<a href="fluidnexus://unblacklistmessage" title="Unblacklist Message"><img src=":/icons/icons/32x32/menu_all.png" width="32"/></a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage" title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
+        </tr>
+
+    </table>
+    """
+
+
+    def __init__(self, parent = None, mine = False, message_title = "Testing title", message_content = "Testing content", message_type = 0, message_hash = None, message_timestamp = time.time(), attachment_path = None, attachment_original_filename = None, logPath = "FluidNexus.log", level = logging.WARN, blacklist = False):
         QtGui.QWidget.__init__(self, parent)
         self.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
 
@@ -249,6 +291,7 @@ class MessageTextBrowser(QtGui.QTextBrowser):
         self.setMessageTimestamp(message_timestamp)
         self.setMessageAttachmentPath(attachment_path)
         self.setMessageAttachmentOriginalFilename(attachment_original_filename)
+        self.blacklist = blacklist
 
         self.connect(self, QtCore.SIGNAL("textChanged()"), self.setHeight)
         self.setTextBrowserHTML()
@@ -265,13 +308,18 @@ class MessageTextBrowser(QtGui.QTextBrowser):
             if (self.mine):
                 s = QtCore.QString(self.mine_text).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()))
             else:
-                s = QtCore.QString(self.other_text).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()))
+                if (self.blacklist):
+                    s = QtCore.QString(self.other_text_blacklist).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()))
+                else:
+                    s = QtCore.QString(self.other_text).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()))
         else:
             if (self.mine):
                 s = QtCore.QString(self.mine_text_attachment).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()), self.getMessageAttachmentOriginalFilename(), "file:///" + self.getMessageAttachmentPath())
             else:
-                print self.getMessageAttachmentPath()
-                s = QtCore.QString(self.other_text_attachment).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()), self.getMessageAttachmentOriginalFilename(), "file:///" + self.getMessageAttachmentPath())
+                if (self.blacklist):
+                    s = QtCore.QString(self.other_text_attachment_blacklist).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()), self.getMessageAttachmentOriginalFilename(), "file:///" + self.getMessageAttachmentPath())
+                else:
+                    s = QtCore.QString(self.other_text_attachment).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()), self.getMessageAttachmentOriginalFilename(), "file:///" + self.getMessageAttachmentPath())
 
         self.setHtml(s)
         # Whether to open links automatically
@@ -335,6 +383,10 @@ class MessageTextBrowser(QtGui.QTextBrowser):
         if (anchor.scheme() == "fluidnexus"):
             if (anchor.host() == "deletemessage"):
                 self.parent.deleteMessage(self.getMessageHash())
+            elif (anchor.host() == "blacklistmessage"):
+                self.parent.blacklistMessage(self.getMessageHash())
+            elif (anchor.host() == "unblacklistmessage"):
+                self.parent.unblacklistMessage(self.getMessageHash())
             elif (anchor.host() == "editmessage"):
                 # TODO
                 # There ought to be a better way of doing this...
@@ -718,9 +770,15 @@ class FluidNexusDesktop(QtGui.QMainWindow):
             attachment_original_filename = item['attachment_original_filename']
 
             if (attachment_path == ""):
-                tb = MessageTextBrowser(parent = self, mine = message_mine, message_title = message_title, message_content = textile.textile(message_content), message_hash = message_hash, message_timestamp = message_timestamp, logPath = self.logPath)
+                if (self.viewMode != self.VIEW_BLACKLIST):
+                    tb = MessageTextBrowser(parent = self, mine = message_mine, message_title = message_title, message_content = textile.textile(message_content), message_hash = message_hash, message_timestamp = message_timestamp, logPath = self.logPath)
+                else:
+                    tb = MessageTextBrowser(parent = self, mine = message_mine, message_title = message_title, message_content = textile.textile(message_content), message_hash = message_hash, message_timestamp = message_timestamp, logPath = self.logPath, blacklist = True)
             else:
-                tb = MessageTextBrowser(parent = self, mine = message_mine, message_title = message_title, message_content = textile.textile(message_content), message_hash = message_hash, message_timestamp = message_timestamp, attachment_path = attachment_path, attachment_original_filename = attachment_original_filename, logPath = self.logPath)
+                if (self.viewMode != self.VIEW_BLACKLIST):
+                    tb = MessageTextBrowser(parent = self, mine = message_mine, message_title = message_title, message_content = textile.textile(message_content), message_hash = message_hash, message_timestamp = message_timestamp, attachment_path = attachment_path, attachment_original_filename = attachment_original_filename, logPath = self.logPath)
+                else:
+                    tb = MessageTextBrowser(parent = self, mine = message_mine, message_title = message_title, message_content = textile.textile(message_content), message_hash = message_hash, message_timestamp = message_timestamp, attachment_path = attachment_path, attachment_original_filename = attachment_original_filename, logPath = self.logPath, blacklist = True)
             tb.setFocusProxy(self)
             self.ui.FluidNexusVBoxLayout.insertWidget(0, tb)
 
@@ -848,6 +906,22 @@ class FluidNexusDesktop(QtGui.QMainWindow):
             self.bluetoothServerThread.removeHash(hashToRemove)
             self.bluetoothClientThread.removeHash(hashToRemove)
 
+    def getTextBrowserWidgetForHash(self, message_hash):
+        """Get a particular text browser widget with the given hash."""
+        numItems = self.ui.FluidNexusVBoxLayout.count()
+
+        foundWidget = None
+        
+        #Find a particular widget with the given hash.  This is a pain to do, and the searching algorithm can probably better, but here it goes.
+        for index in xrange(0, numItems):
+            currentWidget = self.ui.FluidNexusVBoxLayout.itemAt(index).widget()
+            if (currentWidget.getMessageHash() == message_hash):
+                foundWidget = currentWidget
+                break
+
+        return foundWidget
+
+
     def deleteMessage(self, hashToDelete):
         """Delete the selected hash and remove from display."""
 
@@ -858,7 +932,7 @@ class FluidNexusDesktop(QtGui.QMainWindow):
             currentWidget = self.ui.FluidNexusVBoxLayout.itemAt(index).widget()
             if (currentWidget.getMessageHash() == hashToDelete):
                 self.logger.debug("Got message to delete hash: " + hashToDelete)
-                response = self.confirmDialogDelete()
+                response = self.confirmDeleteDialog()
                 if (response == self.YES):
                     self.ui.FluidNexusVBoxLayout.removeWidget(currentWidget)
                     if (currentWidget.getMessageAttachmentPath() is not None):
@@ -867,7 +941,7 @@ class FluidNexusDesktop(QtGui.QMainWindow):
                     self.database.removeByMessageHash(hashToDelete)
                 break
 
-    def confirmDialogDelete(self):
+    def confirmDeleteDialog(self):
         """Create a delete confirmation dialog."""
         self.YES = "Yes"
         self.NO = "No"
@@ -880,6 +954,49 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         message.exec_()
         response = message.clickedButton().text()
         return response
+
+    def blacklistMessage(self, message_hash):
+        """Blacklist the given message with message_hash."""
+
+        foundWidget = self.getTextBrowserWidgetForHash(message_hash)
+
+        if (foundWidget is not None):
+            response = self.confirmBlacklistDialog()
+            if (response == self.YES):
+                self.ui.FluidNexusVBoxLayout.removeWidget(foundWidget)
+                foundWidget.close()
+                self.database.toggleBlacklist(message_hash, 1)
+
+    def confirmBlacklistDialog(self, un = False):
+        """Create a blacklist confirmation dialog."""
+        self.YES = "Yes"
+        self.NO = "No"
+        message = QtGui.QMessageBox(self)
+        if (un):
+            message.setText(self.trUtf8("Do you really want to unblacklist this message?"))
+        else:
+            message.setText(self.trUtf8("Do you really want to blacklist this message?"))
+
+        message.setWindowTitle('FluidNexus')
+        message.setIcon(QtGui.QMessageBox.Question)
+        message.addButton(self.YES, QtGui.QMessageBox.AcceptRole)
+        message.addButton(self.NO, QtGui.QMessageBox.RejectRole)
+        message.exec_()
+        response = message.clickedButton().text()
+        return response
+
+    def unblacklistMessage(self, message_hash):
+        """Unblacklist the given message with message_hash."""
+
+        foundWidget = self.getTextBrowserWidgetForHash(message_hash)
+
+        if (foundWidget is not None):
+            response = self.confirmBlacklistDialog(un = True)
+            if (response == self.YES):
+                self.ui.FluidNexusVBoxLayout.removeWidget(foundWidget)
+                foundWidget.close()
+                self.database.toggleBlacklist(message_hash, 0)
+
 
     def newMessageSaveButtonClicked(self, message_title, message_content, message_filename):
         print type(message_title.toUtf8())

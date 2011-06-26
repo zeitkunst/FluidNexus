@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'FluidNexus/ui/FluidNexusPreferences.ui'
 #
-# Created: Sat Jun 25 17:17:18 2011
+# Created: Sat Jun 25 22:30:05 2011
 #      by: PyQt4 UI code generator 4.8.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -32,6 +32,10 @@ class Ui_FluidNexusPreferences(object):
         self.FluidNexusPreferencesTabWidget.setObjectName(_fromUtf8("FluidNexusPreferencesTabWidget"))
         self.generalTab = QtGui.QWidget()
         self.generalTab.setObjectName(_fromUtf8("generalTab"))
+        self.sendBlacklistedMessagesCheckbox = QtGui.QCheckBox(self.generalTab)
+        self.sendBlacklistedMessagesCheckbox.setEnabled(False)
+        self.sendBlacklistedMessagesCheckbox.setGeometry(QtCore.QRect(10, 10, 221, 21))
+        self.sendBlacklistedMessagesCheckbox.setObjectName(_fromUtf8("sendBlacklistedMessagesCheckbox"))
         self.FluidNexusPreferencesTabWidget.addTab(self.generalTab, _fromUtf8(""))
         self.networkTab = QtGui.QWidget()
         self.networkTab.setObjectName(_fromUtf8("networkTab"))
@@ -115,6 +119,7 @@ class Ui_FluidNexusPreferences(object):
 
     def retranslateUi(self, FluidNexusPreferences):
         FluidNexusPreferences.setWindowTitle(QtGui.QApplication.translate("FluidNexusPreferences", "Fluid Nexus Preferences", None, QtGui.QApplication.UnicodeUTF8))
+        self.sendBlacklistedMessagesCheckbox.setText(QtGui.QApplication.translate("FluidNexusPreferences", "Send blacklisted messages?", None, QtGui.QApplication.UnicodeUTF8))
         self.FluidNexusPreferencesTabWidget.setTabText(self.FluidNexusPreferencesTabWidget.indexOf(self.generalTab), QtGui.QApplication.translate("FluidNexusPreferences", "General", None, QtGui.QApplication.UnicodeUTF8))
         self.bluetoothEnabled.setToolTip(QtGui.QApplication.translate("FluidNexusPreferences", "Whether or not the Bluetooth client/server is enabled", None, QtGui.QApplication.UnicodeUTF8))
         self.bluetoothEnabled.setText(QtGui.QApplication.translate("FluidNexusPreferences", "Bluetooth", None, QtGui.QApplication.UnicodeUTF8))

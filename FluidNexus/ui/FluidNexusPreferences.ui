@@ -52,6 +52,22 @@
     <attribute name="title">
      <string>General</string>
     </attribute>
+    <widget class="QCheckBox" name="sendBlacklistedMessagesCheckbox">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>221</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Send blacklisted messages?</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="networkTab">
     <attribute name="title">

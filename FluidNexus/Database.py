@@ -264,6 +264,13 @@ class FluidNexusDatabase(object):
         self.session.merge(message)
         self.session.commit()
 
+    def toggleBlacklist(self, message_hash, blacklist = True):
+        """Toggle the blacklist status of the given message_hash."""
+        message = self.getMessageByHashORM(message_hash)
+        message.blacklist = blacklist 
+        self.session.merge(message)
+        self.session.commit()
+
     def all(self, limit = None, includeBlacklist = False):
         """Return all of the items in the database,  with optional limit."""
         if (limit is not None):

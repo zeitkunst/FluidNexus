@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'FluidNexus/ui/FluidNexusDesktop.ui'
 #
-# Created: Sat Jun 25 17:17:17 2011
+# Created: Sat Jun 25 22:30:05 2011
 #      by: PyQt4 UI code generator 4.8.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -56,6 +56,8 @@ class Ui_FluidNexus(object):
         self.menuFile.setObjectName(_fromUtf8("menuFile"))
         self.menuHelp = QtGui.QMenu(self.menubar)
         self.menuHelp.setObjectName(_fromUtf8("menuHelp"))
+        self.menu_View = QtGui.QMenu(self.menubar)
+        self.menu_View.setObjectName(_fromUtf8("menu_View"))
         FluidNexus.setMenuBar(self.menubar)
         self.statusbar = QtGui.QStatusBar(FluidNexus)
         self.statusbar.setObjectName(_fromUtf8("statusbar"))
@@ -101,7 +103,11 @@ class Ui_FluidNexus(object):
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.actionQuit)
         self.menuHelp.addAction(self.actionAbout)
+        self.menu_View.addAction(self.actionViewAll)
+        self.menu_View.addAction(self.actionViewOutgoing)
+        self.menu_View.addAction(self.actionViewBlacklist)
         self.menubar.addAction(self.menuFile.menuAction())
+        self.menubar.addAction(self.menu_View.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
         self.FluidNexusToolbar.addAction(self.actionNewMessage)
         self.FluidNexusToolbar.addSeparator()
@@ -116,6 +122,7 @@ class Ui_FluidNexus(object):
         FluidNexus.setWindowTitle(QtGui.QApplication.translate("FluidNexus", "Fluid Nexus", None, QtGui.QApplication.UnicodeUTF8))
         self.menuFile.setTitle(QtGui.QApplication.translate("FluidNexus", "&File", None, QtGui.QApplication.UnicodeUTF8))
         self.menuHelp.setTitle(QtGui.QApplication.translate("FluidNexus", "&Help", None, QtGui.QApplication.UnicodeUTF8))
+        self.menu_View.setTitle(QtGui.QApplication.translate("FluidNexus", "&View", None, QtGui.QApplication.UnicodeUTF8))
         self.FluidNexusToolbar.setWindowTitle(QtGui.QApplication.translate("FluidNexus", "FluidNexusToolbar", None, QtGui.QApplication.UnicodeUTF8))
         self.actionAbout.setText(QtGui.QApplication.translate("FluidNexus", "&About FluidNexus...", None, QtGui.QApplication.UnicodeUTF8))
         self.actionNewMessage.setText(QtGui.QApplication.translate("FluidNexus", "&New Message...", None, QtGui.QApplication.UnicodeUTF8))

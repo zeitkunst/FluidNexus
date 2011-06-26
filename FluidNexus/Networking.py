@@ -62,6 +62,7 @@ class Networking(object):
     hashStruct = struct.Struct('>32s')
     state = STATE_START
 
+    newMessages = []
 
     def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsDir = ".", logPath = "FluidNexus.log", level = logging.DEBUG):
         self.logger = Log.getLogger(logPath = logPath, level = level)
