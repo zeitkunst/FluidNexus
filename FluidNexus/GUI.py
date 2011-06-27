@@ -705,6 +705,7 @@ class FluidNexusDesktop(QtGui.QMainWindow):
 
     def __setupSignals(self):
         """Setup the signals we listen to."""
+        pass
 
     def resizeEvent(self, event):
         if (event.oldSize() != self.ui.centralwidget.size()):
@@ -856,6 +857,9 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         self.deleteTextBrowserWidgets()
         self.setupDisplay()
 
+    def closeEvent(self, event):
+        """Handle the close event from the WM."""
+        self.handleQuit()
 
     def handleQuit(self):
         self.logger.debug("Quiting...")
