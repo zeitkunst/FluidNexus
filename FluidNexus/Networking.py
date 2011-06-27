@@ -116,7 +116,7 @@ class Networking(object):
                     self.cleanup(cs)
                 data = data + chunk
             return data
-        except bluetooth.btcommon.BluetoothError, e:
+        except btcommon.BluetoothError, e:
             self.logger.error("Some sort of bluetooth error: " + str(e))
             self.cleanup(cs)
             return ""
