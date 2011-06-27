@@ -633,7 +633,9 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         if firstRun:
             self.__setupDefaultSettings()
             firstRun = False
+            self.saveGeometrySettings()
         else:
+            self.restoreGeometrySettings()
             self.__setupDatabaseConnection()
 
         # Setup logging
@@ -707,10 +709,19 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         """Setup the signals we listen to."""
         pass
 
+    def saveGeometrySettings(self):
+        self.settings.setValue("app/pos", self.pos())
+        self.settings.setValue("app/size", self.size())
+
+    def restoreGeometrySettings(self):
+        pos = self.settings.value("app/pos", QtCore.QPoint(200, 200)).toPoint()
+        size = self.settings.value("app/size", QtCore.QSize(200, 400)).toSize()
+        self.resize(size)
+        self.move(pos)
+
     def resizeEvent(self, event):
         if (event.oldSize() != self.ui.centralwidget.size()):
             self.ui.FluidNexusScrollArea.resize(self.ui.centralwidget.size())
-
 
     def __setupAppData(self):
         """ Setup the application data directory in the home directory."""
@@ -863,6 +874,7 @@ class FluidNexusDesktop(QtGui.QMainWindow):
 
     def handleQuit(self):
         self.logger.debug("Quiting...")
+        self.saveGeometrySettings()
         self.emit(QtCore.SIGNAL("handleQuit"))
         self.__stopNetworkThreads()
         self.sysTray.hide()
