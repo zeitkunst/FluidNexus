@@ -40,7 +40,7 @@ def start(verbosity = 0, headless = False):
 
 if __name__ == "__main__":
     parser = OptionParser()
-    parser.add_option("-v", "--verbose", dest = "verbosity", action = "count",  help = "How verbose to be.  Use up to 3 v's for full debug.")
+    parser.add_option("-v", "--verbose", dest = "verbosity", action = "count",  help = "How verbose to be.  Use up to 3 v's for full debug logging.")
     # TODO
     # Better short option...
     parser.add_option("-e", "--headless", dest = "headless", action = "store_true",  help = "Whether to run the network services without the GUI")

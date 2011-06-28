@@ -824,8 +824,12 @@ class FluidNexusDesktop(QtGui.QMainWindow):
 
         self.logger.debug("Handing actions: " + str(reason))
         if ((reason == 3) and (self.showing)):
-            self.hide()
-            self.showing = False
+            if (self.isActiveWindow() == False):
+                self.raise_()
+                self.activateWindow()
+            else:
+                self.hide()
+                self.showing = False
         elif ((reason == 3) and (not (self.showing))):
             self.show()
             self.showing = True

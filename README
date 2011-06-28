@@ -20,7 +20,6 @@ Data is sent over bluetooth without any transport layer encryption.  This is som
 
 = TODO =
 
-* Remember geometry and screen location on shutdown
 * Fix TextBrowser size in GUI
 * * Almost there...still off by a bit
 * Shutdown server/client threads properly on GUI exist
