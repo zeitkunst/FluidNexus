@@ -502,9 +502,9 @@ class MessageTextBrowser(QtGui.QTextBrowser):
                 lines = stripped_content.split('\n')
                 stripped_content = '\n'.join([line.strip() for line in lines])
                 if (self.getMessageAttachmentPath() is None):
-                    self.newMessageDialog = FluidNexusNewMessageDialog(parent = self, title = self.getMessageTitle(), content = stripped_content)
+                    self.newMessageDialog = FluidNexusNewMessageDialog(parent = self, title = self.getMessageTitle(), content = stripped_content, windowTitle = self.trUtf8("Edit Message"))
                 else:
-                    self.newMessageDialog = FluidNexusNewMessageDialog(parent = self, title = self.getMessageTitle(), content = stripped_content, attachment_original_path = os.path.realpath(self.getMessageAttachmentPath()))
+                    self.newMessageDialog = FluidNexusNewMessageDialog(parent = self, title = self.getMessageTitle(), content = stripped_content, attachment_original_path = os.path.realpath(self.getMessageAttachmentPath()), windowTitle = self.trUtf8("Edit Message"))
                 self.newMessageDialog.exec_()
         elif (anchor.scheme() == "file"):
             QtGui.QDesktopServices.openUrl(anchor)
@@ -551,7 +551,7 @@ class MessageTextBrowser(QtGui.QTextBrowser):
     #    self.setHeight()
 
 class FluidNexusNewMessageDialog(QtGui.QDialog):
-    def __init__(self, parent=None, title = None, content = None, attachment_original_path = None):
+    def __init__(self, parent=None, title = None, content = None, attachment_original_path = None, windowTitle = "New Message"):
         QtGui.QDialog.__init__(self, parent)
 
         self.parent = parent
@@ -559,11 +559,14 @@ class FluidNexusNewMessageDialog(QtGui.QDialog):
         self.ui = Ui_FluidNexusNewMessage()
         self.ui.setupUi(self)
 
+        self.setWindowTitle(self.trUtf8(windowTitle))
+
         if (title is not None):
             self.ui.newMessageTitle.setText(title)
-
+            self.originalTitle = title
         if (content is not None):
             self.ui.newMessageBody.setPlainText(content)
+            self.originalContent = content
 
         self.connect(self.ui.cancelButton, QtCore.SIGNAL("clicked()"), self.closeDialog)
         self.connect(self, QtCore.SIGNAL("saveButtonClicked"), self.parent.newMessageSaveButtonClicked)
@@ -577,11 +580,35 @@ class FluidNexusNewMessageDialog(QtGui.QDialog):
         else:
             self.filename = None
             self.ui.fileRemoveButton.hide()
+        self.originalFilename = attachment_original_path
 
     def closeDialog(self):
         # TODO
         # Ask for confirmation if the data has changed
-        self.close()
+
+        if ((self.originalTitle != unicode(self.ui.newMessageTitle.text()).encode("utf-8")) or (self.originalContent != unicode(self.ui.newMessageBody.document().toPlainText()).encode("utf-8")) or (self.originalFilename != self.filename)):
+            response = self.confirmSaveDialog()
+            if (response == self.YES):
+                self.saveButtonClicked()
+            else:
+                self.close()
+        else:
+            self.close()
+
+    def confirmSaveDialog(self):
+        """Create a save confirmation dialog."""
+        self.YES = self.trUtf8("Yes")
+        self.NO = self.trUtf8("No")
+        message = QtGui.QMessageBox(self)
+        message.setText(self.trUtf8("Message has changed; do you want to save?"))
+        message.setWindowTitle('FluidNexus')
+        message.setIcon(QtGui.QMessageBox.Warning)
+        message.addButton(self.YES, QtGui.QMessageBox.AcceptRole)
+        message.addButton(self.NO, QtGui.QMessageBox.RejectRole)
+        message.exec_()
+        response = message.clickedButton().text()
+        return response
+
 
     def selectFile(self):
         """Choose a file to include as an attachment."""
@@ -601,7 +628,7 @@ class FluidNexusNewMessageDialog(QtGui.QDialog):
 
     def sameDialog(self):
         """Create a delete confirmation dialog."""
-        self.YES = "OK"
+        self.YES = self.trUtf8("OK")
         message = QtGui.QMessageBox(self)
         message.setText(self.trUtf8("This message already exists in the database.  Please change the title and/or the content."))
         message.setWindowTitle(self.trUtf8('FluidNexus'))
