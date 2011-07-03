@@ -13,12 +13,20 @@ import time
 # External imports
 from bluetooth import *
 
+# TODO
+# Modularize this for different platforms
+import avahi
+import dbus
+
 # My imports
 import FluidNexus_pb2
 from Database import FluidNexusDatabase
 import Log
 
 FluidNexusUUID = "bd547e68-952b-11e0-a6c7-0023148b3104"
+
+# zeroconf service type
+ZEROCONF_SERVICE_TYPE ="_fluidnexus._tcp"
 
 # Command constants
 HELO = 0x0010
@@ -558,27 +566,52 @@ TODO
 class ZeroconfServer(Networking):
     """Class that deals with zeroconf networking using version 3 of the protocol, specifically using protocol buffers."""
 
-    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsDir = ".", logPath = "FluidNexus.log", level = logging.DEBUG, numConnections = 5):
+    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsDir = ".", logPath = "FluidNexus.log", level = logging.DEBUG, numConnections = 5, host = "", port = 17894):
         super(ZeroconfServer, self).__init__(databaseDir = databaseDir, databaseType = databaseType, attachmentsDir = attachmentsDir, logPath = logPath, level = level)
+        self.host = host
+        self.port = port
+        self.name = hashlib.md5(str(time.time())).hexdigest()
+        self.domain = ""
+        self.text = ""
 
         # Do initial setup
         self.setupServerSockets(numConnections = numConnections)
         # TODO
         # conver to avahi zeroconf
-        #self.setupService()
+        self.setupService()
 
     def setupServerSockets(self, numConnections = 5, blocking = 0):
         """Setup the socket for accepting connections."""
         self.serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.serverSocket.bind(("", 17894))
+        self.serverSocket.bind((self.host, self.port))
         self.serverSocket.listen(numConnections)
-        #self.serverSocket.setblocking(blocking)
         self.clientSockets = []
 
     def setupService(self):
-        """Setup the service advertisement."""
-        advertise_service(self.serverSocket, "FluidNexus", service_id = FluidNexusUUID, service_classes = [FluidNexusUUID, SERIAL_PORT_CLASS], profiles = [SERIAL_PORT_PROFILE])
+        """Setup the service for zeroconf."""
 
+        bus = dbus.SystemBus()
+        server = dbus.Interface(
+                         bus.get_object(
+                                 avahi.DBUS_NAME,
+                                 avahi.DBUS_PATH_SERVER),
+                        avahi.DBUS_INTERFACE_SERVER)
+
+        g = dbus.Interface(
+                    bus.get_object(avahi.DBUS_NAME,
+                                   server.EntryGroupNew()),
+                    avahi.DBUS_INTERFACE_ENTRY_GROUP)
+
+        g.AddService(avahi.IF_UNSPEC, avahi.PROTO_UNSPEC,dbus.UInt32(0),
+                     self.name, ZEROCONF_SERVICE_TYPE, self.domain, self.host,
+                     dbus.UInt16(self.port), self.text)
+
+        g.Commit()
+        self.group = g
+
+    def takedownService(self):
+        """Stop the zeroconf service"""
+        self.group.Reset()
 
     def cleanup(self, cs):
         """Do some sort of socket error handling if we ever get a command or data that we don't expect."""
@@ -681,6 +714,7 @@ class ZeroconfServer(Networking):
                 
 
         self.closeDatabase()
+        self.takedownService()
         return self.newMessages
 
 
@@ -692,7 +726,48 @@ class ZeroconfClient(Networking):
         self.host = host
         self.port = port
         self.setState(self.STATE_START)
+        
+        self.setupHandlers()
 
+        self.mainLoop.run()
+
+    def setupHandlers(self):
+        """Setup the handlers for dbus messages on notification of service discovery."""
+        self.loop = DBusGMainLoop()
+        self.bus = dbus.SystemBus(mainloop = loop)
+        self.server = dbus.Interface(self.bus.get_object(avahi.DBUS_NAME, "/"), "org.freedesktop.Avahi.Server")
+        self.sbrowser = dbus.Interface(self.bus.get_object(avahi.DBUS_NAME, self.server.ServiceBrowserNew(avahi.IF_UNSPEC, avahi.PROTO_UNSPEC, ZEROCONF_SERVICE_TYPE, 'local', dbus.UInt32(0))), avahi.DBUS_INTERFACE_SERVICE_BROWSER)
+        self.sbrowser.connect_to_signal("itemNew", self.serviceHandler)
+        self.mainLoop = gobject.MainLoop()
+
+    def serviceHandler(self, interface, protocol, name, stype, domain, flags):
+        """Setup the handler for connecting to services."""
+        self.logger.debug("Found service '%s' type '%s' domain '%s'" % (name, stype, domain))
+        if flags & avahi.LOOKUP_RESULT_LOCAL:
+            pass
+
+        self.server.ResolveService(interface, protocol, name, stype, domain, avahi.PROTO_UNSPEC, dbus.UInt32(0), replay_handler=self.serviceResolved, error_handler = self.serviceResolvedError)
+
+    def serviceResolved(self, *args):
+        """Handle the resolution of the service."""
+        self.logger.debug("Received args: " + str(args))
+        self.host = args[7]
+        self.port = args[8]
+
+        cs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.logger.debug("Connecting to '%s' (%d)" % (self.host, self.port))
+        cs.connect((self.host, self.port))
+
+        self.setState(self.STATE_WRITE_HELO)
+        self.handleServerConnection(cs)
+        cs.close()
+        self.closeDatabase()
+        self.mainLoop.quit()
+        return self.newMessages
+
+
+    def serviceResolvedError(self, *args):
+        self.logger.debug("Service resolution error: " + args[0])
 
     def cleanup(self, cs):
         """Do some sort of socket error handling if we ever get a command or data that we don't expect."""
@@ -775,6 +850,8 @@ class ZeroconfClient(Networking):
         self.getHashesFromDatabase()
         self.hashesToSend = None
         self.newMessages = []
+
+        self.mainLoop.run()
 
         while (self.notDone):
 
