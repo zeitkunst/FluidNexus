@@ -759,29 +759,31 @@ class ZeroconfClient(Networking):
         self.loopType = loopType
         self.setState(self.STATE_START)
         
-        #self.setupHandlers(loopType)
-        self.setupBrowse()
-
     def resolveCallback(self, sdRef, flags, interfaceIndex, errorCode, fullname, hosttarget, port, txtRecord):
         """Our callback for resolved hosts."""
 
         if (errorCode == pybonjour.kDNSServiceErr_NoError):
-            self.logger.debug("Resolved service: " + "\nfullname: " + fullname + "\nhosttarget: " + hosttarget + "\nport: " + str(port))
-            self.resolved.append(True)
-
-            self.openDatabase()
-            self.getHashesFromDatabase()
-            self.hashesToSend = None
-
-            cs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.logger.debug("Connecting to '%s' (%d)" % (hosttarget, port))
-            cs.connect((hosttarget, port))
+            #self.logger.debug("Resolved service: " + "\nfullname: " + fullname + "\nhosttarget: " + hosttarget + "\nport: " + str(port))
+            
+            # Filter out our own zeroconf service
+            # TODO
+            # Will this work in all cases?
+            if (hosttarget.find(socket.gethostname() + ".local.") == -1):
+                self.resolved.append(True)
     
-            self.setState(self.STATE_WRITE_HELO)
-            self.handleServerConnection(cs)
-            cs.close()
-            self.closeDatabase()
-            self.clientNotComplete = False
+                self.openDatabase()
+                self.getHashesFromDatabase()
+                self.hashesToSend = None
+    
+                cs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                self.logger.debug("Connecting to '%s' (%d)" % (hosttarget, port))
+                cs.connect((hosttarget, port))
+        
+                self.setState(self.STATE_WRITE_HELO)
+                self.handleServerConnection(cs)
+                cs.close()
+                self.closeDatabase()
+                self.clientNotComplete = False
 
 
     def browseCallback(self, sdRef, flags, interfaceIndex, errorCode, serviceName, regtype, replyDomain):
@@ -793,7 +795,7 @@ class ZeroconfClient(Networking):
             self.logger.debug("Service removed")
             return
 
-        self.logger.debug("Service added; resolving")
+        #self.logger.debug("Service added; resolving")
 
         self.resolveSDRef = pybonjour.DNSServiceResolve(0, interfaceIndex, serviceName, regtype, replyDomain, self.resolveCallback)
 
@@ -801,7 +803,7 @@ class ZeroconfClient(Networking):
             while not self.resolved:
                 ready = select.select([self.resolveSDRef], [], [], self.timeout)
                 if self.resolveSDRef not in ready[0]:
-                    self.logger.error("Resolve timed out")
+                    #self.logger.error("Resolve timed out")
                     break
                 pybonjour.DNSServiceProcessResult(self.resolveSDRef)
             else:
@@ -826,56 +828,6 @@ class ZeroconfClient(Networking):
         finally:
             self.browseSDRef.close()
             return self.newMessages
-
-    def setupHandlers(self, loopType):
-        """Setup the handlers for dbus messages on notification of service discovery."""
-
-        if (loopType == "glib"):
-            self.loop = DBusGMainLoop(set_as_default = True)
-        elif (loopType == "qt"):
-            self.loop = DBusQtMainLoop(set_as_default = True)
-
-        self.bus = dbus.SystemBus()
-        self.server = dbus.Interface(self.bus.get_object(avahi.DBUS_NAME, "/"), "org.freedesktop.Avahi.Server")
-        self.sbrowser = dbus.Interface(self.bus.get_object(avahi.DBUS_NAME, self.server.ServiceBrowserNew(avahi.IF_UNSPEC, avahi.PROTO_UNSPEC, ZEROCONF_SERVICE_TYPE, 'local', dbus.UInt32(0))), avahi.DBUS_INTERFACE_SERVICE_BROWSER)
-        dbus.set_default_main_loop(self.loop)
-        self.sbrowser.connect_to_signal("ItemNew", self.serviceHandler)
-
-        if (loopType == "glib"):
-            self.mainLoop = gobject.MainLoop()
-        elif (loopType == "qt"):
-            pass
-
-    def serviceHandler(self, interface, protocol, name, stype, domain, flags):
-        """Setup the handler for connecting to services."""
-        self.logger.debug("Found service '%s' type '%s' domain '%s'" % (name, stype, domain))
-        if flags & avahi.LOOKUP_RESULT_LOCAL:
-            pass
-        else:
-            self.server.ResolveService(interface, protocol, name, stype, domain, avahi.PROTO_UNSPEC, dbus.UInt32(0), reply_handler=self.serviceResolved, error_handler = self.serviceResolvedError)
-
-    def serviceResolved(self, *args):
-        """Handle the resolution of the service."""
-        self.logger.debug("Received args: " + str(args))
-        self.host = args[7]
-        self.port = args[8]
-
-        self.openDatabase()
-        self.getHashesFromDatabase()
-        self.hashesToSend = None
-
-        cs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.logger.debug("Connecting to '%s' (%d)" % (self.host, self.port))
-        cs.connect((self.host, self.port))
-
-        self.setState(self.STATE_WRITE_HELO)
-        self.handleServerConnection(cs)
-        cs.close()
-        self.closeDatabase()
-        if (self.loopType == "glib"):
-            self.mainLoop.quit()
-        return self.newMessages
-
 
     def serviceResolvedError(self, *args):
         self.logger.debug("Service resolution error: " + args[0])
@@ -957,10 +909,7 @@ class ZeroconfClient(Networking):
     def run(self):
         """Our run method."""
 
-        if (self.loopType == "glib"):
-            pass
-            #self.mainLoop.run()
-        elif (self.loopType == "qt"):
-            pass
+        # Our method for doing all of the browsing and service resolving
+        self.setupBrowse()
         return self.newMessages
 

@@ -148,7 +148,7 @@ class FluidNexusDatabase(object):
 
         self.__setupSQLAlchemy()
 
-    def __setupSQLAlchemy(self, echo = True):
+    def __setupSQLAlchemy(self, echo = False):
         path = os.path.join(self.databaseDir, self.databaseName)
         self.engine = create_engine('sqlite:///%s' % path, echo=echo)
 

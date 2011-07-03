@@ -35,12 +35,6 @@ def start(verbosity = 0, headless = False):
         from PyQt4 import QtGui
         from FluidNexus.GUI import FluidNexusDesktop
 
-        import dbus
-        from dbus.mainloop.qt import DBusQtMainLoop
-
-        loop = DBusQtMainLoop(set_as_default = True)
-        dbus.set_default_main_loop(loop)
-
         app = QtGui.QApplication(sys.argv)
         fluidNexus = FluidNexusDesktop(level = level)
         fluidNexus.show()
