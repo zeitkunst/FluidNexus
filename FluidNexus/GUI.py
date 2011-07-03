@@ -34,7 +34,8 @@ DEFAULTS = {
     },
     
     "network": {
-        "bluetoothEnabled": 2
+        "bluetooth": 2,
+        "zeroconf": 2
     },
 
     "bluetooth": {
@@ -674,7 +675,7 @@ class FluidNexusPreferencesDialog(QtGui.QDialog):
 
     def __networkPreferencesUpdate(self):
         bluetooth = self.settings.value("network/bluetooth", 2).toInt()[0]
-        zeroconf = self.settings.value("network/bluetooth", 2).toInt()[0]
+        zeroconf = self.settings.value("network/zeroconf", 2).toInt()[0]
 
         if (bluetooth == 2):
             self.ui.bluetoothEnabled.setCheckState(QtCore.Qt.Checked)
@@ -1156,6 +1157,7 @@ class FluidNexusDesktop(QtGui.QMainWindow):
                         os.unlink(currentWidget.getMessageAttachmentPath())
                     currentWidget.close()
                     self.database.removeByMessageHash(hashToDelete)
+                    self.removeHash(hashToDelete)
                 break
 
     def confirmDeleteDialog(self):

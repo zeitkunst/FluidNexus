@@ -220,7 +220,6 @@ class Networking(object):
             m.message_content = data['content']
             m.message_type = FluidNexus_pb2.FluidNexusMessage.TEXT
             if (data["attachment_path"] != ""):
-                self.logger.debug("ATTACHMENT")
                 m.message_attachment_original_filename = data["attachment_original_filename"]
 
                 # TODO
