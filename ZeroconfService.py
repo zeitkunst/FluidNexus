@@ -2,6 +2,7 @@
 import avahi
 import dbus
 import hashlib
+import socket
 import time
 
 __all__ = ["ZeroconfService"]
@@ -44,10 +45,21 @@ class ZeroconfService:
     def unpublish(self):
         self.group.Reset()
 
+def testSocket():
+    ss = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    ss.bind((socket.gethostname(), 65123))
+    ss.listen(1)
+
+    while 1:
+        (cs, ca) = ss.accept()
+        data = cs.recv(1024)
+        print data
 
 def test():
-    service = ZeroconfService(name=hashlib.md5(str(time.time())).hexdigest(), port=65123)
+    port = 65123
+    service = ZeroconfService(name=hashlib.md5(str(time.time())).hexdigest(), port=port)
     service.publish()
+    testSocket()
     raw_input("Press any key to unpublish the service ")
     service.unpublish()
 

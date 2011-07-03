@@ -6,6 +6,7 @@ import hashlib
 import logging
 import os
 import select
+import socket
 import struct
 import time
 
@@ -549,6 +550,250 @@ TODO
                     self.setState(self.STATE_WRITE_HELO)
                     self.handleServerConnection(cs)
                     cs.close()
+                self.notDone = False
+
+        self.closeDatabase()
+        return self.newMessages
+
+class ZeroconfServer(Networking):
+    """Class that deals with zeroconf networking using version 3 of the protocol, specifically using protocol buffers."""
+
+    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsDir = ".", logPath = "FluidNexus.log", level = logging.DEBUG, numConnections = 5):
+        super(ZeroconfServer, self).__init__(databaseDir = databaseDir, databaseType = databaseType, attachmentsDir = attachmentsDir, logPath = logPath, level = level)
+
+        # Do initial setup
+        self.setupServerSockets(numConnections = numConnections)
+        self.setupService()
+
+
+        # Enter into the main loop
+        #self.run()
+
+
+    def setupServerSockets(self, numConnections = 5, blocking = 0):
+        """Setup the socket for accepting connections."""
+        self.serverSocket = BluetoothSocket(RFCOMM)
+        self.serverSocket.bind(("", PORT_ANY))
+        self.serverSocket.listen(numConnections)
+        #self.serverSocket.setblocking(blocking)
+        self.clientSockets = []
+
+    def setupService(self):
+        """Setup the service advertisement."""
+        advertise_service(self.serverSocket, "FluidNexus", service_id = FluidNexusUUID, service_classes = [FluidNexusUUID, SERIAL_PORT_CLASS], profiles = [SERIAL_PORT_PROFILE])
+
+
+    def cleanup(self, cs):
+        """Do some sort of socket error handling if we ever get a command or data that we don't expect."""
+        
+        self.hashesToSend = None
+        cs.close()
+        cs = None
+        self.setState(self.STATE_START)
+
+
+    def handleClientConnection(self, cs):
+        """Handle a connection on the client socket.
+        
+        TODO
+        * Decide if we need to dispatch a new thread to deal with this connection."""
+        notDone = True
+        while (notDone):
+            currentState = self.getState()
+
+            if (currentState == self.STATE_READ_HELO):
+                command = self.readCommand(cs)
+                if (command != self.HELO):
+                    self.cleanup(cs)
+                else:
+                    self.setState(self.STATE_WRITE_HELO)
+            elif (currentState == self.STATE_WRITE_HELO):
+                # TODO
+                # Deal with errors in writing to socket
+                self.writeCommand(cs, self.HELO)
+                self.setState(self.STATE_READ_HASHES)
+            elif (currentState == self.STATE_READ_HASHES):
+                self.readHashes(cs)
+            elif (currentState == self.STATE_WRITE_MESSAGES):
+                self.writeMessages(cs)
+            elif (currentState == self.STATE_READ_SWITCH):
+                command = self.readCommand(cs)
+                if (command != self.SWITCH):
+                    self.cleanup(cs)
+                else:
+                    self.setState(self.STATE_WRITE_HASHES)
+            elif (currentState == self.STATE_WRITE_HASHES):
+                self.writeHashes(cs)
+            elif (currentState == self.STATE_READ_MESSAGES):
+                command = self.readCommand(cs)
+                if (command != self.MESSAGES):
+                    self.cleanup(cs)
+                else:
+                    self.readMessages(cs)
+            elif (currentState == self.STATE_WRITE_SWITCH):
+                self.writeCommand(cs, self.SWITCH)
+                self.setState(self.STATE_READ_DONE)
+            elif (currentState == self.STATE_READ_DONE):
+                command = self.readCommand(cs)
+                if (command != self.DONE):
+                    self.cleanup(cs)
+                else:
+                    self.setState(self.STATE_WRITE_DONE)
+            elif (currentState == self.STATE_WRITE_DONE):
+                self.writeCommand(cs, self.DONE)
+                self.cleanup(cs)
+                notDone = False
+            else:
+                self.logger.debug("No command matches.")
+                self.cleanup(cs)
+                notDone = False
+
+    def run(self):
+        """Run the main loop."""
+        
+        self.openDatabase()
+        self.getHashesFromDatabase()
+        self.hashesToSend = None
+
+        self.notDone = True
+
+        while (self.notDone):
+
+            currentState = self.getState()
+            
+            if (currentState == self.STATE_START):
+                # TODO
+                # * This should be dispatched into another thread, probably, and thus we need a separate self.hashesToSend in the other thread, separate states, etc.  Basically we'd need another class that would encapsulate those states.
+                try:
+                    cs, ci = self.serverSocket.accept()
+                    self.clientSockets.append(cs)
+                    self.setState(self.STATE_WAITING)
+                except btcommon.BluetoothError, e:
+                    pass
+            elif (currentState == self.STATE_WAITING):
+                # See if any sockets are ready to read
+                rr, rw, ie = select.select(self.clientSockets, [], [], 60)
+
+                # If a socket is ready to read, then pass off to method that handles the connection
+                if (rr != []):
+                    for cs in rr:
+                        self.setState(self.STATE_READ_HELO)
+                        self.handleClientConnection(cs)
+                        self.clientSockets.remove(cs)
+                        self.notDone = False
+                
+
+        self.closeDatabase()
+        return self.newMessages
+
+
+class ZeroconfClient(Networking):
+    """Class that deals with zeroconf networking using version 3 of the protocol, specifically using protocol buffers.  """
+
+
+
+
+    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsDir = ".", logPath = "FluidNexus.log", level = logging.DEBUG):
+        super(ZeroconfClient, self).__init__(databaseDir = databaseDir, databaseType = databaseType, attachmentsDir = attachmentsDir, logPath = logPath, level = level, host = "", port = 17894)
+        self.host = host
+        self.port = port
+        self.setState(self.STATE_START)
+
+
+    def cleanup(self, cs):
+        """Do some sort of socket error handling if we ever get a command or data that we don't expect."""
+        
+        self.hashesToSend = None
+        cs.close()
+        cs = None
+        self.setState(self.STATE_START)
+
+    def handleServerConnection(self, cs):
+        """HELO            Write           Read
+        HELO            Read            Write
+        HASHES          Write           Read
+        MESSAGES        Read            Write
+        SWITCH          Write           Read
+        HASHES          Read            Write
+        MESSAGES        Write           Read
+        SWITCH          Read            Write
+        DONE            Write           Read
+        DONE            Read            Write"""
+        
+        notDone = True
+        while (notDone):
+            currentState = self.getState()
+            
+            if (currentState == self.STATE_WRITE_HELO):
+                # TODO
+                # Deal with errors in writing to socket
+                self.writeCommand(cs, self.HELO)
+                self.setState(self.STATE_READ_HELO)
+            elif (currentState == self.STATE_READ_HELO):
+                command = self.readCommand(cs)
+                if (command != self.HELO):
+                    self.cleanup(cs)
+                else:
+                    self.setState(self.STATE_WRITE_HASHES)
+            elif (currentState == self.STATE_WRITE_HASHES):
+                self.writeHashes(cs)
+                self.setState(self.STATE_READ_MESSAGES)
+            elif (currentState == self.STATE_READ_MESSAGES):
+                command = self.readCommand(cs)
+                if (command != self.MESSAGES):
+                    self.cleanup(cs)
+                else:
+                    self.readMessages(cs)
+                    self.setState(self.STATE_WRITE_SWITCH)
+            elif (currentState == self.STATE_WRITE_SWITCH):
+                self.writeCommand(cs, self.SWITCH)
+                self.setState(self.STATE_READ_HASHES)
+            elif (currentState == self.STATE_READ_HASHES):
+                self.readHashes(cs)
+            elif (currentState == self.STATE_WRITE_MESSAGES):
+                self.writeMessages(cs)
+            elif (currentState == self.STATE_READ_SWITCH):
+                command = self.readCommand(cs)
+                if (command != self.SWITCH):
+                    self.cleanup(cs)
+                else:
+                    self.setState(self.STATE_WRITE_DONE)
+            elif (currentState == self.STATE_WRITE_DONE):
+                self.writeCommand(cs, self.DONE)
+                self.setState(self.STATE_READ_DONE)
+            elif (currentState == self.STATE_READ_DONE):
+                command = self.readCommand(cs)
+                if (command != self.DONE):
+                    self.cleanup(cs)
+                else:
+                    self.setState(self.STATE_START)
+                    self.cleanup(cs)
+                    notDone = False
+            else:
+                self.logger.debug("No command matches.")
+                self.cleanup(cs)
+                notDone = False
+
+    def run(self):
+        """Our run method."""
+        self.notDone = True
+        self.openDatabase()
+        self.getHashesFromDatabase()
+        self.hashesToSend = None
+        self.newMessages = []
+
+        while (self.notDone):
+
+            currentState = self.getState()
+           
+            if (currentState == self.STATE_START):
+                cs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                self.logger.debug("Connecting to '%s' (%d)" % (self.host, self.port))
+                cs.connect((self.host, self.port))
+
+                self.setState(self.STATE_WRITE_HELO)
+                self.handleServerConnection(cs)
+                cs.close()
                 self.notDone = False
 
         self.closeDatabase()
