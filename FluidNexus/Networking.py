@@ -761,8 +761,8 @@ class ZeroconfClient(Networking):
         self.logger.debug("Found service '%s' type '%s' domain '%s'" % (name, stype, domain))
         if flags & avahi.LOOKUP_RESULT_LOCAL:
             pass
-
-        self.server.ResolveService(interface, protocol, name, stype, domain, avahi.PROTO_UNSPEC, dbus.UInt32(0), reply_handler=self.serviceResolved, error_handler = self.serviceResolvedError)
+        else:
+            self.server.ResolveService(interface, protocol, name, stype, domain, avahi.PROTO_UNSPEC, dbus.UInt32(0), reply_handler=self.serviceResolved, error_handler = self.serviceResolvedError)
 
     def serviceResolved(self, *args):
         """Handle the resolution of the service."""
@@ -782,7 +782,8 @@ class ZeroconfClient(Networking):
         self.handleServerConnection(cs)
         cs.close()
         self.closeDatabase()
-        self.mainLoop.quit()
+        if (self.loopType == "glib"):
+            self.mainLoop.quit()
         return self.newMessages
 
 
