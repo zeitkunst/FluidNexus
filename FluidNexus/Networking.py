@@ -583,7 +583,7 @@ class ZeroconfServer(Networking):
         #self.setupServerSockets(numConnections = numConnections)
         # TODO
         # conver to avahi zeroconf
-        self.setupService()
+        #self.setupService()
 
     def setupServerSockets(self, numConnections = 5, blocking = 0):
         """Setup the socket for accepting connections."""
@@ -702,6 +702,7 @@ class ZeroconfServer(Networking):
             if (currentState == self.STATE_START):
 
                 self.setupServerSockets(numConnections = self.numConnections)
+                self.setupService()
                 # TODO
                 # * This should be dispatched into another thread, probably, and thus we need a separate self.hashesToSend in the other thread, separate states, etc.  Basically we'd need another class that would encapsulate those states.
                 try:
