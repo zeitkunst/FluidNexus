@@ -17,6 +17,8 @@ from bluetooth import *
 # Modularize this for different platforms
 import avahi
 import dbus
+from dbus.mainloop.glib import DBusGMainLoop
+import gobject
 
 # My imports
 import FluidNexus_pb2
@@ -566,7 +568,7 @@ TODO
 class ZeroconfServer(Networking):
     """Class that deals with zeroconf networking using version 3 of the protocol, specifically using protocol buffers."""
 
-    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsDir = ".", logPath = "FluidNexus.log", level = logging.DEBUG, numConnections = 5, host = "", port = 17894):
+    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsDir = ".", logPath = "FluidNexus.log", level = logging.DEBUG, numConnections = 5, host = "", port = 17897):
         super(ZeroconfServer, self).__init__(databaseDir = databaseDir, databaseType = databaseType, attachmentsDir = attachmentsDir, logPath = logPath, level = level)
         self.host = host
         self.port = port
@@ -583,6 +585,7 @@ class ZeroconfServer(Networking):
     def setupServerSockets(self, numConnections = 5, blocking = 0):
         """Setup the socket for accepting connections."""
         self.serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.serverSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.serverSocket.bind((self.host, self.port))
         self.serverSocket.listen(numConnections)
         self.clientSockets = []
@@ -612,6 +615,8 @@ class ZeroconfServer(Networking):
     def takedownService(self):
         """Stop the zeroconf service"""
         self.group.Reset()
+        self.serverSocket.shutdown(1)
+        self.serverSocket.close()
 
     def cleanup(self, cs):
         """Do some sort of socket error handling if we ever get a command or data that we don't expect."""
@@ -729,16 +734,15 @@ class ZeroconfClient(Networking):
         
         self.setupHandlers()
 
-        self.mainLoop.run()
-
     def setupHandlers(self):
         """Setup the handlers for dbus messages on notification of service discovery."""
         self.loop = DBusGMainLoop()
-        self.bus = dbus.SystemBus(mainloop = loop)
+        self.bus = dbus.SystemBus(mainloop = self.loop)
         self.server = dbus.Interface(self.bus.get_object(avahi.DBUS_NAME, "/"), "org.freedesktop.Avahi.Server")
         self.sbrowser = dbus.Interface(self.bus.get_object(avahi.DBUS_NAME, self.server.ServiceBrowserNew(avahi.IF_UNSPEC, avahi.PROTO_UNSPEC, ZEROCONF_SERVICE_TYPE, 'local', dbus.UInt32(0))), avahi.DBUS_INTERFACE_SERVICE_BROWSER)
-        self.sbrowser.connect_to_signal("itemNew", self.serviceHandler)
+        self.sbrowser.connect_to_signal("ItemNew", self.serviceHandler)
         self.mainLoop = gobject.MainLoop()
+        #gobject.MainLoop().run()
 
     def serviceHandler(self, interface, protocol, name, stype, domain, flags):
         """Setup the handler for connecting to services."""
@@ -746,13 +750,17 @@ class ZeroconfClient(Networking):
         if flags & avahi.LOOKUP_RESULT_LOCAL:
             pass
 
-        self.server.ResolveService(interface, protocol, name, stype, domain, avahi.PROTO_UNSPEC, dbus.UInt32(0), replay_handler=self.serviceResolved, error_handler = self.serviceResolvedError)
+        self.server.ResolveService(interface, protocol, name, stype, domain, avahi.PROTO_UNSPEC, dbus.UInt32(0), reply_handler=self.serviceResolved, error_handler = self.serviceResolvedError)
 
     def serviceResolved(self, *args):
         """Handle the resolution of the service."""
         self.logger.debug("Received args: " + str(args))
         self.host = args[7]
         self.port = args[8]
+
+        self.openDatabase()
+        self.getHashesFromDatabase()
+        self.hashesToSend = None
 
         cs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.logger.debug("Connecting to '%s' (%d)" % (self.host, self.port))
@@ -845,28 +853,7 @@ class ZeroconfClient(Networking):
 
     def run(self):
         """Our run method."""
-        self.notDone = True
-        self.openDatabase()
-        self.getHashesFromDatabase()
-        self.hashesToSend = None
-        self.newMessages = []
 
         self.mainLoop.run()
-
-        while (self.notDone):
-
-            currentState = self.getState()
-           
-            if (currentState == self.STATE_START):
-                cs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                self.logger.debug("Connecting to '%s' (%d)" % (self.host, self.port))
-                cs.connect((self.host, self.port))
-
-                self.setState(self.STATE_WRITE_HELO)
-                self.handleServerConnection(cs)
-                cs.close()
-                self.notDone = False
-
-        self.closeDatabase()
         return self.newMessages
 
