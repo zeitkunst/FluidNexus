@@ -758,7 +758,11 @@ class ZeroconfClient(Networking):
         self.port = port
         self.loopType = loopType
         self.setState(self.STATE_START)
-        
+
+        self.openDatabase()
+        self.getHashesFromDatabase()
+        self.closeDatabase()
+
     def resolveCallback(self, sdRef, flags, interfaceIndex, errorCode, fullname, hosttarget, port, txtRecord):
         """Our callback for resolved hosts."""
 

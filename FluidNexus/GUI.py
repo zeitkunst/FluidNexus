@@ -24,9 +24,7 @@ from Networking import BluetoothServerVer3, BluetoothClientVer3, ZeroconfClient,
 import Log
 
 # TODO
-# * Interface is not automatically updated in insert of new TextBrowser in gnome on Lucid...why is that?
 # * Also, on Lucid gnome get a "QThread: Destoryed while thread is still running" error when doing File...Quit
-# * Deal with sqlite thread stuff...why can't I call a thread's method to close the database connection opened in that thread?  And do I even need to close the connection on thread quit?
 # * Decide whether or not textile is the best way to format our info in these TextBrowsers
 # 
 DEFAULTS = {
@@ -91,12 +89,9 @@ class ServiceThread(QtCore.QThread):
         self.connect(self, QtCore.SIGNAL("terminated()"), self.handleTerminated)
 
     def setupService(self):
-        """Override in child classes to do the setup for the service as necessary.
+        """Override in child classes to do the setup for the service as necessary."""
 
-        TODO
-
-        Raise error if not implemented."""
-        pass
+        raise NotImplementedError
 
     def handleStarted(self):
         self.logger.debug(self.threadName + " started")
@@ -125,12 +120,9 @@ class ServiceThread(QtCore.QThread):
         self.service.replaceHash(hashToReplace, newHash)
 
     def run(self):
-        """Override in client classes.
+        """Override in client classes."""
 
-        TODO
-
-        Raise error."""
-        pass
+        raise NotImplementedError
 
 class ZeroconfClientQt(ServiceThread):
 
@@ -485,6 +477,11 @@ class MessageTextBrowser(QtGui.QTextBrowser):
         self.setMinimumHeight(height)
         self.setMaximumHeight(height)
 
+    def getDatabase(self):
+        """Return the database object."""
+        return self.parent.database
+
+
     def mousePressEvent(self, e):
         pass
 
@@ -535,12 +532,6 @@ class MessageTextBrowser(QtGui.QTextBrowser):
                 attachment_original_filename = os.path.basename(message_filename)
                 #attachment_path = os.path.join(self.parent.attachmentsDir, new_message_hash) + extension
                 attachment_path = message_filename
-
-                #os.unlink(os.path.join(self.parent.attachmentsDir, self.getMessageHash()))
-
-                # TODO
-                # This will break on windows and needs to be fixed
-                #os.symlink(message_filename, attachment_path)
 
                 message_timestamp = time.time()
                 self.parent.database.updateByMessageHash(message_hash = self.getMessageHash(), new_message_hash = new_message_hash, new_content = message_content, new_title = message_title, new_timestamp = message_timestamp, new_attachment_path = attachment_path, new_attachment_original_filename = attachment_original_filename)
@@ -608,9 +599,26 @@ class FluidNexusNewMessageDialog(QtGui.QDialog):
         self.ui.fileSelectedLabel.setText("")
         self.ui.fileRemoveButton.hide()
 
+    def sameDialog(self):
+        """Create a delete confirmation dialog."""
+        self.YES = "OK"
+        message = QtGui.QMessageBox(self)
+        message.setText(self.trUtf8("This message already exists in the database.  Please change the title and/or the content."))
+        message.setWindowTitle(self.trUtf8('FluidNexus'))
+        message.setIcon(QtGui.QMessageBox.Critical)
+        message.addButton(self.YES, QtGui.QMessageBox.AcceptRole)
+        message.exec_()
+        response = message.clickedButton().text()
+        return response
+
     def saveButtonClicked(self):
-        self.emit(QtCore.SIGNAL("saveButtonClicked"), self.ui.newMessageTitle.text(), self.ui.newMessageBody.document().toPlainText(), self.filename)
-        self.close()
+        message_hash = hashlib.sha256(unicode(self.ui.newMessageTitle.text()).encode("utf-8") + unicode(self.ui.newMessageBody.document().toPlainText()).encode("utf-8")).hexdigest()
+        
+        if (self.parent.getDatabase().checkForMessageByHash(message_hash)):
+            self.sameDialog()
+        else:
+            self.emit(QtCore.SIGNAL("saveButtonClicked"), self.ui.newMessageTitle.text(), self.ui.newMessageBody.document().toPlainText(), self.filename)
+            self.close()
 
 class FluidNexusPreferencesDialog(QtGui.QDialog):
     bluetoothScanFrequencies = [5, 10, 30, 60, 120, 300, 600, 1200, 1800, 3600]
@@ -981,6 +989,10 @@ class FluidNexusDesktop(QtGui.QMainWindow):
             self.show()
             self.showing = True
 
+    def getDatabase(self):
+        """Return the database object."""
+        return self.database
+
     def deleteTextBrowserWidgets(self):
         """Delete all of the text browser widgets in preparation for repopulating.
 
@@ -1177,10 +1189,6 @@ class FluidNexusDesktop(QtGui.QMainWindow):
 
 
     def newMessageSaveButtonClicked(self, message_title, message_content, message_filename):
-        print type(message_title.toUtf8())
-        print message_title.toUtf8()
-        print type(message_title.toUtf8())
-        print unicode(message_title)
 
         message_hash = unicode(hashlib.sha256(unicode(message_title).encode("utf-8") + unicode(message_content).encode("utf-8")).hexdigest())
 
@@ -1198,12 +1206,7 @@ class FluidNexusDesktop(QtGui.QMainWindow):
             message_filename = unicode(message_filename)
             fullPath, extension = os.path.splitext(message_filename)
             attachment_original_filename = os.path.basename(message_filename)
-            #attachment_path = os.path.join(self.attachmentsDir, message_hash) + extension
             attachment_path = message_filename
-
-            # TODO
-            # This will break on windows and needs to be fixed
-            #os.symlink(message_filename, attachment_path)
 
             # Add the hash
             self.addHash(message_hash)

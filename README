@@ -6,7 +6,18 @@ fluidnexus@fluidnexus.net
 
 This software is ALPHA QUALITY and should only be used at your own risk.  More detailed instructions about theory, motivation, installation, and use can be found on the website.
 
-The software has been testing on Ubuntu Maverick with python 2.6.6 and requires the following python modules: pyqt4, python-qt4-dbus, sqlalchemy, textile, pybluez, protobuf (version 2.3.0 or higher).  Ideally the software will work unmodified for bluetooth on Windows with the requisite libraries, but that has not been extensively tested.  Zeroconf will require some changes.  Mac OS X will require the use of a different bluetooth library such as lightblue; zeroconf is another question altogether.
+The software has been testing on Ubuntu Maverick with python 2.6.6 and requires the following python modules: pyqt4, pybonjour, sqlalchemy, textile, pybluez, protobuf (version 2.3.0 or higher).
+
+Specific network modality notes:
+
+Bluetooth:
+* Should run without modification on Windows if pybluez is installed, but this hasn't been tested
+* Will not run on OS X due to lack of pybluez; the networking code will have to be ported to lightblue
+
+Zeroconf:
+* Should run without modification on Windows if pybonjour is installed, along with the Bonjour library from Apple; this has not been tested
+* Should run without modification on OS X if pybonjour is installed; this has not been tested
+* Linux will require the installation of a avahi-bonjour compatability library; on ubuntu this is libavahi-compat-libdnssd1.
 
 To run, type "./FluidNexus.py"; for help, type "./FluidNexus.py --help".
 
@@ -18,13 +29,13 @@ Data is stored unencrypted in a local sqlite database.  It is best that you take
 
 Data is sent over bluetooth without any transport layer encryption.  This is something we plan on implementing in the future.
 
+Data is sent over link-local wifi using zeroconf for service discovery without any transport layer encryption.  This is something we plan on implementing in the future.
+
 = TODO =
 
-* Move current zeroconf implementation to pybonjour (requires installation of avahi compat library: libavahi-compat-libdnssd1)
 * Fix TextBrowser size in GUI
 * * Almost there...still off by a bit
 * Shutdown server/client threads properly on GUI exist
 * Start server/client threads in headless version; shutdown properly by catching interrupts
-* Implement zeroconf
 * Implement ad-hoc wifi
 * Implement SSL/TLS over the network modalities
