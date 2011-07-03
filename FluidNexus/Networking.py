@@ -17,8 +17,10 @@ from bluetooth import *
 # Modularize this for different platforms
 import avahi
 import dbus
+from dbus.mainloop.qt import DBusQtMainLoop
 from dbus.mainloop.glib import DBusGMainLoop
 import gobject
+from PyQt4 import QtCore
 
 # My imports
 import FluidNexus_pb2
@@ -726,23 +728,33 @@ class ZeroconfServer(Networking):
 class ZeroconfClient(Networking):
     """Class that deals with zeroconf networking using version 3 of the protocol, specifically using protocol buffers.  """
 
-    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsDir = ".", logPath = "FluidNexus.log", level = logging.DEBUG, host = "", port = 17894):
+    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsDir = ".", logPath = "FluidNexus.log", level = logging.DEBUG, host = "", port = 9999, loopType = "glib"):
         super(ZeroconfClient, self).__init__(databaseDir = databaseDir, databaseType = databaseType, attachmentsDir = attachmentsDir, logPath = logPath, level = level)
         self.host = host
         self.port = port
+        self.loopType = loopType
         self.setState(self.STATE_START)
         
-        self.setupHandlers()
+        self.setupHandlers(loopType)
 
-    def setupHandlers(self):
+    def setupHandlers(self, loopType):
         """Setup the handlers for dbus messages on notification of service discovery."""
-        self.loop = DBusGMainLoop()
-        self.bus = dbus.SystemBus(mainloop = self.loop)
+
+        if (loopType == "glib"):
+            self.loop = DBusGMainLoop(set_as_default = True)
+        elif (loopType == "qt"):
+            self.loop = DBusQtMainLoop(set_as_default = True)
+
+        self.bus = dbus.SystemBus()
         self.server = dbus.Interface(self.bus.get_object(avahi.DBUS_NAME, "/"), "org.freedesktop.Avahi.Server")
         self.sbrowser = dbus.Interface(self.bus.get_object(avahi.DBUS_NAME, self.server.ServiceBrowserNew(avahi.IF_UNSPEC, avahi.PROTO_UNSPEC, ZEROCONF_SERVICE_TYPE, 'local', dbus.UInt32(0))), avahi.DBUS_INTERFACE_SERVICE_BROWSER)
+        dbus.set_default_main_loop(self.loop)
         self.sbrowser.connect_to_signal("ItemNew", self.serviceHandler)
-        self.mainLoop = gobject.MainLoop()
-        #gobject.MainLoop().run()
+
+        if (loopType == "glib"):
+            self.mainLoop = gobject.MainLoop()
+        elif (loopType == "qt"):
+            pass
 
     def serviceHandler(self, interface, protocol, name, stype, domain, flags):
         """Setup the handler for connecting to services."""
@@ -854,6 +866,9 @@ class ZeroconfClient(Networking):
     def run(self):
         """Our run method."""
 
-        self.mainLoop.run()
+        if (self.loopType == "glib"):
+            self.mainLoop.run()
+        elif (self.loopType == "qt"):
+            pass
         return self.newMessages
 

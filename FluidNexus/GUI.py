@@ -20,7 +20,7 @@ from ui.FluidNexusNewMessageUI import Ui_FluidNexusNewMessage
 from ui.FluidNexusAboutUI import Ui_FluidNexusAbout
 from ui.FluidNexusPreferencesUI import Ui_FluidNexusPreferences
 from Database import FluidNexusDatabase
-from Networking import BluetoothServerVer3, BluetoothClientVer3
+from Networking import BluetoothServerVer3, BluetoothClientVer3, ZeroconfClient, ZeroconfServer
 import Log
 
 # TODO
@@ -41,7 +41,12 @@ DEFAULTS = {
 
     "bluetooth": {
         "scanFrequency": 300
+    },
+
+    "zeroconf": {
+        "scanFrequency": 300
     }
+
 
 }
 
@@ -62,6 +67,111 @@ class TreeIter(QtGui.QTreeWidgetItemIterator):
             return value
         else:
             raise StopIteration
+
+class ServiceThread(QtCore.QThread):
+    def __init__(self, databaseDir = None, databaseType = None, attachmentsDir = None, logPath = "FluidNexus.log", parent = None, level = logging.WARN, scanFrequency = 300, threadName = "ServiceThread"):
+        QtCore.QThread.__init__(self, parent)
+
+        self.databaseDir = databaseDir
+        self.databaseType = databaseType
+        self.attachmentsDir = attachmentsDir
+        self.parent = parent
+        self.threadName = threadName
+        self.logPath = logPath
+        self.level = level
+        self.logger = Log.getLogger(logPath = logPath, level = level)
+
+        self.scanFrequency = scanFrequency
+
+        self.setupService()
+
+        self.connect(self, QtCore.SIGNAL("newMessages"), self.parent.newMessages)
+        self.connect(self, QtCore.SIGNAL("started()"), self.handleStarted)
+        self.connect(self, QtCore.SIGNAL("finished()"), self.handleFinished)
+        self.connect(self, QtCore.SIGNAL("terminated()"), self.handleTerminated)
+
+    def setupService(self):
+        """Override in child classes to do the setup for the service as necessary.
+
+        TODO
+
+        Raise error if not implemented."""
+        pass
+
+    def handleStarted(self):
+        self.logger.debug(self.threadName + " started")
+
+    def handleFinished(self):
+        self.logger.debug(self.threadName + " finished")
+
+    def handleTerminated(self):
+        self.logger.debug(self.threadName + " terminated")
+
+    def handleBluetoothScanFrequencyChanged(self, value):
+        self.scanFrequency = value.toInt()[0]
+
+    def cleanup(self):
+        """Cleanup after ourselves."""
+        self.service.cleanup()
+
+    def addHash(self, message_hash):
+        self.service.addHash(message_hash)
+
+    def removeHash(self, hashToRemove):
+        self.service.removeHash(hashToRemove)
+
+    def replaceHash(self, hashToReplace, newHash):
+        self.service.replaceHash(hashToReplace, newHash)
+
+    def run(self):
+        """Override in client classes.
+
+        TODO
+
+        Raise error."""
+        pass
+
+class ZeroconfClientQt(ServiceThread):
+
+    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsDir = ".", logPath = "FluidNexus.log", level = logging.WARN, scanFrequency = 300, parent = None, threadName = "ZeroconfClientThread", loopType = "qt"):
+        self.loopType = loopType
+        super(ZeroconfClientQt, self).__init__(databaseDir = databaseDir, databaseType = databaseType, attachmentsDir = attachmentsDir, logPath = logPath, level = level, parent = parent, scanFrequency = scanFrequency, threadName = threadName)
+
+    def setupService(self):
+        """Setup our zeroconf service."""
+
+        self.service = ZeroconfClient(databaseDir = self.databaseDir, databaseType = self.databaseType, attachmentsDir = self.attachmentsDir, logPath = self.logPath, loopType = self.loopType)
+
+        self.connect(self.parent, QtCore.SIGNAL("zeroconfScanFrequencyChanged(QVariant)"), self.handleZeroconfScanFrequencyChanged)
+
+    def handleZeroconfScanFrequencyChanged(self, value):
+        self.scanFrequency = value.toInt()[0]
+
+    def run(self):
+        newMessages = self.service.run()
+
+        if (newMessages != []):
+            self.emit(QtCore.SIGNAL("newMessages"), newMessages)
+
+        self.logger.debug("Sleeping for %d seconds" % self.scanFrequency)
+        self.sleep(self.scanFrequency)
+
+class ZeroconfServerQt(ServiceThread):
+
+    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsDir = ".", logPath = "FluidNexus.log", level = logging.WARN, parent = None, threadName = "ZeroconfServerThread"):
+        super(ZeroconfServerQt, self).__init__(databaseDir = databaseDir, databaseType = databaseType, attachmentsDir = attachmentsDir, logPath = logPath, level = level, parent = parent, threadName = threadName)
+
+    def setupService(self):
+        """Setup our zeroconf service."""
+
+        self.service = ZeroconfServer(databaseDir = self.databaseDir, databaseType = self.databaseType, attachmentsDir = self.attachmentsDir, logPath = self.logPath)
+
+    def run(self):
+        newMessages = self.service.run()
+
+        if (newMessages != []):
+            self.emit(QtCore.SIGNAL("newMessages"), newMessages)
+
 
 class FluidNexusServerQt(QtCore.QThread):
     def __init__(self, dataDir = None, databaseType = None, attachmentsDir = None, logPath = "FluidNexus.log", parent = None, level = logging.WARN):
@@ -503,6 +613,7 @@ class FluidNexusNewMessageDialog(QtGui.QDialog):
 
 class FluidNexusPreferencesDialog(QtGui.QDialog):
     bluetoothScanFrequencies = [5, 10, 30, 60, 120, 300, 600, 1200, 1800, 3600]
+    zeroconfScanFrequencies = bluetoothScanFrequencies
     
     GENERAL_TAB = 0
     NETWORK_TAB = 1
@@ -527,32 +638,47 @@ class FluidNexusPreferencesDialog(QtGui.QDialog):
 
     def __networkPreferencesUpdate(self):
         bluetooth = self.settings.value("network/bluetooth", 2).toInt()[0]
+        zeroconf = self.settings.value("network/bluetooth", 2).toInt()[0]
 
         if (bluetooth == 2):
             self.ui.bluetoothEnabled.setCheckState(QtCore.Qt.Checked)
+            self.ui.FluidNexusPreferencesTabWidget.setTabEnabled(self.BLUETOOTH_TAB, True)
         else:
             self.ui.bluetoothEnabled.setCheckState(QtCore.Qt.Unchecked)
+            self.ui.FluidNexusPreferencesTabWidget.setTabEnabled(self.BLUETOOTH_TAB, False)
+
+        if (zeroconf == 2):
+            self.ui.zeroconfEnabled.setCheckState(QtCore.Qt.Checked)
+            self.ui.FluidNexusPreferencesTabWidget.setTabEnabled(self.ZEROCONF_TAB, True)
+        else:
+            self.ui.zeroconfEnabled.setCheckState(QtCore.Qt.Unchecked)
+            self.ui.FluidNexusPreferencesTabWidget.setTabEnabled(self.ZEROCONF_TAB, False)
+
 
     def __bluetoothPreferencesUpdate(self):
         bluetoothScanFrequency = self.settings.value("bluetooth/scanFrequency", 300).toInt()[0]
         index = self.bluetoothScanFrequencies.index(bluetoothScanFrequency)
         self.ui.bluetoothScanFrequency.setCurrentIndex(index)
 
+    def __zeroconfPreferencesUpdate(self):
+        zeroconfScanFrequency = self.settings.value("zeroconf/scanFrequency", 300).toInt()[0]
+        index = self.zeroconfScanFrequencies.index(zeroconfScanFrequency)
+        self.ui.zeroconfScanFrequency.setCurrentIndex(index)
+
+
     def __updatePreferencesDialog(self):
         """Update the preferences dialog based on our settings."""
         
-        self.ui.FluidNexusPreferencesTabWidget.setTabEnabled(self.ZEROCONF_TAB, False)
         self.ui.FluidNexusPreferencesTabWidget.setTabEnabled(self.ADHOC_TAB, False)
         self.__networkPreferencesUpdate()
         self.__bluetoothPreferencesUpdate()
+        self.__zeroconfPreferencesUpdate()
         self.preferencesToChange = {}
 
     def reject(self):
-        self.logger.debug("Rejecting")
         QtGui.QDialog.reject(self)
 
     def accept(self):
-        self.logger.debug("Accepting")
 
         for key in self.preferencesToChange.keys():
             self.settings.setValue(key, self.preferencesToChange[key])
@@ -565,12 +691,28 @@ class FluidNexusPreferencesDialog(QtGui.QDialog):
         else:
             self.ui.FluidNexusPreferencesTabWidget.setTabEnabled(self.BLUETOOTH_TAB, False)
 
+    def zeroconfChanged(self, value):
+        self.preferencesToChange["network/zeroconf"] = value
+        if (value == 2):
+            self.ui.FluidNexusPreferencesTabWidget.setTabEnabled(self.ZEROCONF_TAB, True)
+        else:
+            self.ui.FluidNexusPreferencesTabWidget.setTabEnabled(self.ZEROCONF_TAB, False)
+
+
     def bluetoothScanFrequencyChanged(self, index):
         # TODO
         # It would be nice to get the disambiguation paramter, but that's not likely...
         # Remember that if we change the number of options in the UI, we have to change the number of options here as well
         self.preferencesToChange["bluetooth/scanFrequency"] = self.bluetoothScanFrequencies[index]
         self.parent.emit(QtCore.SIGNAL("bluetoothScanFrequencyChanged(QVariant)"), self.bluetoothScanFrequencies[index])
+
+    def zeroconfScanFrequencyChanged(self, index):
+        # TODO
+        # It would be nice to get the disambiguation paramter, but that's not likely...
+        # Remember that if we change the number of options in the UI, we have to change the number of options here as well
+        self.preferencesToChange["zeroconf/scanFrequency"] = self.zeroconfScanFrequencies[index]
+        self.parent.emit(QtCore.SIGNAL("zeroconfScanFrequencyChanged(QVariant)"), self.zeroconfScanFrequencies[index])
+
 
 
     def closeDialog(self):
@@ -674,6 +816,13 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         else:
             self.bluetoothEnabled = False
 
+        zeroconf = self.settings.value("network/zeroconf", 2).toInt()[0]
+        if (zeroconf == 2): 
+            self.zeroconfEnabled = True
+        else:
+            self.zeroconfEnabled = False
+
+
         # Start the network threads
         self.__startNetworkThreads()
 
@@ -742,11 +891,23 @@ class FluidNexusDesktop(QtGui.QMainWindow):
             self.bluetoothClientThread = FluidNexusClientQt(parent = self, dataDir = self.dataDir, databaseType = "pysqlite2", attachmentsDir = self.attachmentsDir, logPath = self.logPath, level = self.logLevel, scanFrequency = scanFrequency)
             self.bluetoothClientThread.start()
 
+        if (self.zeroconfEnabled):
+            self.zeroconfServerThread = ZeroconfServerQt(parent = self, databaseDir = self.dataDir, databaseType = "pysqlite2", attachmentsDir = self.attachmentsDir, logPath = self.logPath, level = self.logLevel)
+            self.zeroconfServerThread.start()
+            
+            scanFrequency = self.settings.value("zeroconf/scanFrequency", 300).toInt()[0]
+            self.zeroconfClientThread = ZeroconfClientQt(parent = self, databaseDir = self.dataDir, databaseType = "pysqlite2", attachmentsDir = self.attachmentsDir, logPath = self.logPath, level = self.logLevel, scanFrequency = scanFrequency, loopType = "qt")
+            self.zeroconfClientThread.start()
+
 
     def __stopNetworkThreads(self):
         if (self.bluetoothEnabled):
             self.bluetoothServerThread.quit()
             self.bluetoothClientThread.quit()
+
+        if (self.zeroconfEnabled):
+            self.zeroconfServerThread.quit()
+            self.zeroconfClientThread.quit()
 
     def setupDisplay(self):
         """Setup our display with a bunch of text browsers."""
@@ -905,13 +1066,22 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         if (self.bluetoothEnabled):
             self.bluetoothServerThread.replaceHash(hashToReplace, newHash)
             self.bluetoothClientThread.replaceHash(hashToReplace, newHash)
-    
+
+        if (self.zeroconfEnabled):
+            self.zeroconfServerThread.replaceHash(hashToReplace, newHash)
+            self.zeroconfClientThread.replaceHash(hashToReplace, newHash)
+   
     def removeHash(self, hashToRemove):
         """Remove a hash from our threads."""
 
         if (self.bluetoothEnabled):
             self.bluetoothServerThread.removeHash(hashToRemove)
             self.bluetoothClientThread.removeHash(hashToRemove)
+
+        if (self.zeroconfEnabled):
+            self.zeroconfServerThread.removeHash(hashToRemove)
+            self.zeroconfClientThread.removeHash(hashToRemove)
+
 
     def getTextBrowserWidgetForHash(self, message_hash):
         """Get a particular text browser widget with the given hash."""

@@ -97,9 +97,9 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QCheckBox" name="zeroconfCheckbox">
+       <widget class="QCheckBox" name="zeroconfEnabled">
         <property name="enabled">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
         <property name="text">
          <string>Zeroconf</string>
@@ -107,7 +107,7 @@
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="QCheckBox" name="adhocCheckbox">
+       <widget class="QCheckBox" name="adhocEnabled">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -260,6 +260,88 @@
     <attribute name="title">
      <string>Zeroconf</string>
     </attribute>
+    <widget class="QWidget" name="formLayoutWidget_3">
+     <property name="geometry">
+      <rect>
+       <x>9</x>
+       <y>9</y>
+       <width>391</width>
+       <height>241</height>
+      </rect>
+     </property>
+     <layout class="QFormLayout" name="formLayout_2">
+      <item row="0" column="0">
+       <widget class="QLabel" name="zeroconfScanFrequencyLabel">
+        <property name="text">
+         <string>Scan Frequency:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="zeroconfScanFrequency">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip">
+         <string>How often to scan for nearby devices.  Lower values will severely impact battery life.</string>
+        </property>
+        <item>
+         <property name="text">
+          <string comment="5">5 seconds</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string comment="10">10 seconds</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string comment="30">30 seconds</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string comment="60">1 minute</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string comment="120">2 minutes</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string comment="300">5 minutes</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string comment="600">10 minutes</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string comment="1200">20 minutes</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string comment="1800">30 minutes</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string comment="3600">1 hour</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </widget>
    <widget class="QWidget" name="adhocWifiTab">
     <attribute name="title">
@@ -336,9 +418,43 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>zeroconfEnabled</sender>
+   <signal>stateChanged(int)</signal>
+   <receiver>FluidNexusPreferences</receiver>
+   <slot>zeroconfChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>100</x>
+     <y>86</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>160</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>zeroconfScanFrequency</sender>
+   <signal>activated(int)</signal>
+   <receiver>FluidNexusPreferences</receiver>
+   <slot>zeroconfScanFrequencyChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>183</x>
+     <y>64</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>450</x>
+     <y>125</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>bluetoothScanFrequencyChanged(int)</slot>
   <slot>bluetoothChanged(int)</slot>
+  <slot>zeroconfChanged(int)</slot>
+  <slot>zeroconfScanFrequencyChanged(int)</slot>
  </slots>
 </ui>
