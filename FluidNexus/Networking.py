@@ -577,9 +577,10 @@ class ZeroconfServer(Networking):
         self.name = hashlib.md5(str(time.time())).hexdigest()
         self.domain = ""
         self.text = ""
+        self.numConnections = numConnections
 
         # Do initial setup
-        self.setupServerSockets(numConnections = numConnections)
+        #self.setupServerSockets(numConnections = numConnections)
         # TODO
         # conver to avahi zeroconf
         self.setupService()
@@ -699,6 +700,8 @@ class ZeroconfServer(Networking):
             currentState = self.getState()
             
             if (currentState == self.STATE_START):
+
+                self.setupServerSockets(numConnections = self.numConnections)
                 # TODO
                 # * This should be dispatched into another thread, probably, and thus we need a separate self.hashesToSend in the other thread, separate states, etc.  Basically we'd need another class that would encapsulate those states.
                 try:

@@ -103,6 +103,7 @@ class ServiceThread(QtCore.QThread):
 
     def handleFinished(self):
         self.logger.debug(self.threadName + " finished")
+        self.start()
 
     def handleTerminated(self):
         self.logger.debug(self.threadName + " terminated")
@@ -1226,11 +1227,6 @@ class FluidNexusDesktop(QtGui.QMainWindow):
             self.bluetoothServerThread.addHash(message_hash)
             self.bluetoothClientThread.addHash(message_hash)
 
-def start():
-    app = QtGui.QApplication(sys.argv)
-    fluidNexus = FluidNexusDesktop()
-    fluidNexus.show()
-    sys.exit(app.exec_())
-
-if __name__ == "__main__":
-    start()
+        if (self.zeroconfEnabled):
+            self.zeroconfServerThread.addHash(message_hash)
+            self.zeroconfClientThread.addHash(message_hash)
