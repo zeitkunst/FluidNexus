@@ -563,17 +563,14 @@ class ZeroconfServer(Networking):
 
         # Do initial setup
         self.setupServerSockets(numConnections = numConnections)
-        self.setupService()
-
-
-        # Enter into the main loop
-        #self.run()
-
+        # TODO
+        # conver to avahi zeroconf
+        #self.setupService()
 
     def setupServerSockets(self, numConnections = 5, blocking = 0):
         """Setup the socket for accepting connections."""
-        self.serverSocket = BluetoothSocket(RFCOMM)
-        self.serverSocket.bind(("", PORT_ANY))
+        self.serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.serverSocket.bind(("", 17894))
         self.serverSocket.listen(numConnections)
         #self.serverSocket.setblocking(blocking)
         self.clientSockets = []
@@ -690,11 +687,8 @@ class ZeroconfServer(Networking):
 class ZeroconfClient(Networking):
     """Class that deals with zeroconf networking using version 3 of the protocol, specifically using protocol buffers.  """
 
-
-
-
-    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsDir = ".", logPath = "FluidNexus.log", level = logging.DEBUG):
-        super(ZeroconfClient, self).__init__(databaseDir = databaseDir, databaseType = databaseType, attachmentsDir = attachmentsDir, logPath = logPath, level = level, host = "", port = 17894)
+    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsDir = ".", logPath = "FluidNexus.log", level = logging.DEBUG, host = "", port = 17894):
+        super(ZeroconfClient, self).__init__(databaseDir = databaseDir, databaseType = databaseType, attachmentsDir = attachmentsDir, logPath = logPath, level = level)
         self.host = host
         self.port = port
         self.setState(self.STATE_START)
