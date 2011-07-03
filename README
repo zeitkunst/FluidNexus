@@ -6,7 +6,7 @@ fluidnexus@fluidnexus.net
 
 This software is ALPHA QUALITY and should only be used at your own risk.  More detailed instructions about theory, motivation, installation, and use can be found on the website.
 
-The software has been testing on Ubuntu Maverick with python 2.6.6 and requires the following python modules: pyqt, sqlalchemy, textile, pybluez, protobuf (version 2.3.0 or higher).  Ideally the software will work unmodified on Windows with the requisite libraries, but that has not been extensively tested.  Mac OS X will require the use of a different bluetooth library such as lightblue.
+The software has been testing on Ubuntu Maverick with python 2.6.6 and requires the following python modules: pyqt4, python-qt4-dbus, sqlalchemy, textile, pybluez, protobuf (version 2.3.0 or higher).  Ideally the software will work unmodified for bluetooth on Windows with the requisite libraries, but that has not been extensively tested.  Zeroconf will require some changes.  Mac OS X will require the use of a different bluetooth library such as lightblue; zeroconf is another question altogether.
 
 To run, type "./FluidNexus.py"; for help, type "./FluidNexus.py --help".
 
@@ -20,7 +20,7 @@ Data is sent over bluetooth without any transport layer encryption.  This is som
 
 = TODO =
 
-* Remember geometry and screen location on shutdown
+* Move current zeroconf implementation to pybonjour (requires installation of avahi compat library: libavahi-compat-libdnssd1)
 * Fix TextBrowser size in GUI
 * * Almost there...still off by a bit
 * Shutdown server/client threads properly on GUI exist

@@ -15,6 +15,7 @@ from bluetooth import *
 
 # TODO
 # Modularize this for different platforms
+import pybonjour
 import avahi
 import dbus
 from dbus.mainloop.qt import DBusQtMainLoop
@@ -26,6 +27,13 @@ from PyQt4 import QtCore
 import FluidNexus_pb2
 from Database import FluidNexusDatabase
 import Log
+
+class ZeroconfClientCompleteException(Exception): 
+    def __init__(self):
+        pass
+
+    def __str__(self):
+        return "ZeroconfClientCompleteException"
 
 FluidNexusUUID = "bd547e68-952b-11e0-a6c7-0023148b3104"
 
@@ -593,9 +601,16 @@ class ZeroconfServer(Networking):
         self.serverSocket.listen(numConnections)
         self.clientSockets = []
 
+    def serviceCallback(self, sdRef, falgs, errorCode, name, regtype, domain):
+        """Callback for when we have setup a service."""
+        if (errorCode == pybonjour.kDNSServiceErr_NoError):
+            self.logger.debug("Registered service:\nname: " + name + "\nregtype: " + regtype + "\ndomain: " + domain)
+
     def setupService(self):
         """Setup the service for zeroconf."""
+        self.sdRef = pybonjour.DNSServiceRegister(name = self.name, regtype = ZEROCONF_SERVICE_TYPE, port = self.port, callBack = self.serviceCallback)
 
+        """
         bus = dbus.SystemBus()
         server = dbus.Interface(
                          bus.get_object(
@@ -614,10 +629,12 @@ class ZeroconfServer(Networking):
 
         g.Commit()
         self.group = g
+        """
 
     def takedownService(self):
         """Stop the zeroconf service"""
-        self.group.Reset()
+        #self.group.Reset()
+        self.sdRef.close()
         self.serverSocket.shutdown(1)
         self.serverSocket.close()
 
@@ -732,6 +749,9 @@ class ZeroconfServer(Networking):
 class ZeroconfClient(Networking):
     """Class that deals with zeroconf networking using version 3 of the protocol, specifically using protocol buffers.  """
 
+    timeout = 5
+    resolved = []
+
     def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsDir = ".", logPath = "FluidNexus.log", level = logging.DEBUG, host = "", port = 9999, loopType = "glib"):
         super(ZeroconfClient, self).__init__(databaseDir = databaseDir, databaseType = databaseType, attachmentsDir = attachmentsDir, logPath = logPath, level = level)
         self.host = host
@@ -739,7 +759,73 @@ class ZeroconfClient(Networking):
         self.loopType = loopType
         self.setState(self.STATE_START)
         
-        self.setupHandlers(loopType)
+        #self.setupHandlers(loopType)
+        self.setupBrowse()
+
+    def resolveCallback(self, sdRef, flags, interfaceIndex, errorCode, fullname, hosttarget, port, txtRecord):
+        """Our callback for resolved hosts."""
+
+        if (errorCode == pybonjour.kDNSServiceErr_NoError):
+            self.logger.debug("Resolved service: " + "\nfullname: " + fullname + "\nhosttarget: " + hosttarget + "\nport: " + str(port))
+            self.resolved.append(True)
+
+            self.openDatabase()
+            self.getHashesFromDatabase()
+            self.hashesToSend = None
+
+            cs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.logger.debug("Connecting to '%s' (%d)" % (hosttarget, port))
+            cs.connect((hosttarget, port))
+    
+            self.setState(self.STATE_WRITE_HELO)
+            self.handleServerConnection(cs)
+            cs.close()
+            self.closeDatabase()
+            self.clientNotComplete = False
+
+
+    def browseCallback(self, sdRef, flags, interfaceIndex, errorCode, serviceName, regtype, replyDomain):
+        """Our callback for browsing services."""
+        if (errorCode != pybonjour.kDNSServiceErr_NoError):
+            return
+
+        if (not (flags & pybonjour.kDNSServiceFlagsAdd)):
+            self.logger.debug("Service removed")
+            return
+
+        self.logger.debug("Service added; resolving")
+
+        self.resolveSDRef = pybonjour.DNSServiceResolve(0, interfaceIndex, serviceName, regtype, replyDomain, self.resolveCallback)
+
+        try:
+            while not self.resolved:
+                ready = select.select([self.resolveSDRef], [], [], self.timeout)
+                if self.resolveSDRef not in ready[0]:
+                    self.logger.error("Resolve timed out")
+                    break
+                pybonjour.DNSServiceProcessResult(self.resolveSDRef)
+            else:
+                self.resolved.pop()
+        finally:
+            self.resolveSDRef.close()
+        
+
+    def setupBrowse(self):
+        """Setup our service browsing."""
+        self.browseSDRef = pybonjour.DNSServiceBrowse(regtype = ZEROCONF_SERVICE_TYPE, callBack = self.browseCallback)
+
+        self.clientNotComplete = True
+        try:
+            try:
+                while self.clientNotComplete:
+                    ready = select.select([self.browseSDRef], [], [])
+                    if self.browseSDRef in ready[0]:
+                        pybonjour.DNSServiceProcessResult(self.browseSDRef)
+            except KeyboardInterrupt:
+                pass
+        finally:
+            self.browseSDRef.close()
+            return self.newMessages
 
     def setupHandlers(self, loopType):
         """Setup the handlers for dbus messages on notification of service discovery."""
@@ -872,7 +958,8 @@ class ZeroconfClient(Networking):
         """Our run method."""
 
         if (self.loopType == "glib"):
-            self.mainLoop.run()
+            pass
+            #self.mainLoop.run()
         elif (self.loopType == "qt"):
             pass
         return self.newMessages
