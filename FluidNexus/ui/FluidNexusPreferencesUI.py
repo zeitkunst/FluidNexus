@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'FluidNexus/ui/FluidNexusPreferences.ui'
 #
-# Created: Sun Jul  3 13:19:43 2011
+# Created: Sun Jul 10 03:21:19 2011
 #      by: PyQt4 UI code generator 4.8.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -17,18 +17,18 @@ except AttributeError:
 class Ui_FluidNexusPreferences(object):
     def setupUi(self, FluidNexusPreferences):
         FluidNexusPreferences.setObjectName(_fromUtf8("FluidNexusPreferences"))
-        FluidNexusPreferences.resize(452, 357)
+        FluidNexusPreferences.resize(501, 350)
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(_fromUtf8(":/icons/icons/fluid_nexus_icon.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         FluidNexusPreferences.setWindowIcon(icon)
         self.buttonBox = QtGui.QDialogButtonBox(FluidNexusPreferences)
-        self.buttonBox.setGeometry(QtCore.QRect(90, 310, 341, 32))
+        self.buttonBox.setGeometry(QtCore.QRect(150, 310, 341, 32))
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
         self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Save)
         self.buttonBox.setObjectName(_fromUtf8("buttonBox"))
         self.FluidNexusPreferencesTabWidget = QtGui.QTabWidget(FluidNexusPreferences)
         self.FluidNexusPreferencesTabWidget.setEnabled(True)
-        self.FluidNexusPreferencesTabWidget.setGeometry(QtCore.QRect(10, 10, 421, 291))
+        self.FluidNexusPreferencesTabWidget.setGeometry(QtCore.QRect(10, 10, 481, 291))
         self.FluidNexusPreferencesTabWidget.setObjectName(_fromUtf8("FluidNexusPreferencesTabWidget"))
         self.generalTab = QtGui.QWidget()
         self.generalTab.setObjectName(_fromUtf8("generalTab"))
@@ -134,6 +134,9 @@ class Ui_FluidNexusPreferences(object):
         self.adhocWifiTab = QtGui.QWidget()
         self.adhocWifiTab.setObjectName(_fromUtf8("adhocWifiTab"))
         self.FluidNexusPreferencesTabWidget.addTab(self.adhocWifiTab, _fromUtf8(""))
+        self.tab = QtGui.QWidget()
+        self.tab.setObjectName(_fromUtf8("tab"))
+        self.FluidNexusPreferencesTabWidget.addTab(self.tab, _fromUtf8(""))
 
         self.retranslateUi(FluidNexusPreferences)
         self.FluidNexusPreferencesTabWidget.setCurrentIndex(0)
@@ -182,5 +185,6 @@ class Ui_FluidNexusPreferences(object):
         self.zeroconfScanFrequency.setItemText(9, QtGui.QApplication.translate("FluidNexusPreferences", "1 hour", None, QtGui.QApplication.UnicodeUTF8))
         self.FluidNexusPreferencesTabWidget.setTabText(self.FluidNexusPreferencesTabWidget.indexOf(self.zeroconfTab), QtGui.QApplication.translate("FluidNexusPreferences", "Zeroconf", None, QtGui.QApplication.UnicodeUTF8))
         self.FluidNexusPreferencesTabWidget.setTabText(self.FluidNexusPreferencesTabWidget.indexOf(self.adhocWifiTab), QtGui.QApplication.translate("FluidNexusPreferences", "Ad-hoc Wifi", None, QtGui.QApplication.UnicodeUTF8))
+        self.FluidNexusPreferencesTabWidget.setTabText(self.FluidNexusPreferencesTabWidget.indexOf(self.tab), QtGui.QApplication.translate("FluidNexusPreferences", "Nexus", None, QtGui.QApplication.UnicodeUTF8))
 
 import FluidNexus_rc

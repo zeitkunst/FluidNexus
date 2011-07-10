@@ -4,8 +4,6 @@ option java_package = "net.fluidnexus.FluidNexus";
 option java_outer_classname = "Protos";
 option optimize_for = LITE_RUNTIME;
 
-//"create table FluidNexusData (_id integer primary key autoincrement,    source varchar(32), time bigint, type integer, title varchar(40), data long     varchar, hash varchar(32), cellID varchar(20), mine bit);";
-
 message FluidNexusHashes {
     repeated string message_hash = 1;
 }
@@ -17,7 +15,10 @@ message FluidNexusMessage {
     optional string message_hash = 4;
     optional string message_source = 5;
     optional bool message_mine = 6;
+    optional bool message_public = 16;
+    optional int32 message_ttl = 17;
 
+    // TODO
     // Do we want to do it this way, or use mime-types?
     enum MessageType {
         TEXT = 0;

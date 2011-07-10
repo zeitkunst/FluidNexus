@@ -562,6 +562,9 @@ class FluidNexusNewMessageDialog(QtGui.QDialog):
 
         self.setWindowTitle(self.trUtf8(windowTitle))
 
+        self.originalTitle = ""
+        self.originalContent = ""
+
         if (title is not None):
             self.ui.newMessageTitle.setText(title)
             self.originalTitle = title
@@ -657,6 +660,7 @@ class FluidNexusPreferencesDialog(QtGui.QDialog):
     BLUETOOTH_TAB = 2
     ZEROCONF_TAB = 3
     ADHOC_TAB = 4
+    NEXUS_TAB = 5
 
     def __init__(self, parent=None, logPath = "FluidNexus.log", level = logging.ERROR, settings = None):
         QtGui.QDialog.__init__(self, parent)
@@ -707,6 +711,7 @@ class FluidNexusPreferencesDialog(QtGui.QDialog):
         """Update the preferences dialog based on our settings."""
         
         self.ui.FluidNexusPreferencesTabWidget.setTabEnabled(self.ADHOC_TAB, False)
+        self.ui.FluidNexusPreferencesTabWidget.setTabEnabled(self.NEXUS_TAB, False)
         self.__networkPreferencesUpdate()
         self.__bluetoothPreferencesUpdate()
         self.__zeroconfPreferencesUpdate()
