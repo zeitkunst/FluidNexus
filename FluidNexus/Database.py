@@ -112,6 +112,8 @@ class Messages(Base):
     attachment_original_filename = Column('attachment_original_filename', String, default = "")
     mine = Column('mine', Boolean, default = 0)
     blacklist = Column('blacklist', Boolean, default = 0)
+    public = Column('public', Boolean, default = 0)
+    ttl = Column('ttl', Integer, default = 0)
 
     def __repr__(self):
         return "<Messages('%d', '%s', '%s', '%s', '%f', '%s', '%s', '%s', '%s')>" % (self.message_type, self.title, self.content, self.message_hash, self.time, self.attachment_path, self.attachment_mimetype, self.mine, self.blacklist)
@@ -148,7 +150,7 @@ class FluidNexusDatabase(object):
 
         self.__setupSQLAlchemy()
 
-    def __setupSQLAlchemy(self, echo = False):
+    def __setupSQLAlchemy(self, echo = True):
         path = os.path.join(self.databaseDir, self.databaseName)
         self.engine = create_engine('sqlite:///%s' % path, echo=echo)
 

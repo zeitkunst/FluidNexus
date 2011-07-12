@@ -9,9 +9,12 @@ import re
 import stat
 import sys
 import time
+import urllib2
 
 # External library imports
 from PyQt4 import QtCore, QtGui
+import simplejson
+import oauth2
 import textile
 
 # My library imports
@@ -19,6 +22,7 @@ from ui.FluidNexusDesktopUI import Ui_FluidNexus
 from ui.FluidNexusNewMessageUI import Ui_FluidNexusNewMessage
 from ui.FluidNexusAboutUI import Ui_FluidNexusAbout
 from ui.FluidNexusPreferencesUI import Ui_FluidNexusPreferences
+from ui.FluidNexusRequestAuthorizationUI import Ui_RequestAuthorizationDialog
 from Database import FluidNexusDatabase
 from Networking import BluetoothServerVer3, BluetoothClientVer3, ZeroconfClient, ZeroconfServer
 import Log
@@ -48,6 +52,23 @@ DEFAULTS = {
 
 
 }
+
+# build our oauth request token request
+REQUEST_TOKEN_URL = "http://localhost:6543/api/01/request_token"
+def build_request_token_request(url, key, secret, method='POST'):
+    params = {                                            
+        'oauth_version': "1.0",
+        'oauth_nonce': oauth2.generate_nonce(),
+        'oauth_timestamp': int(time.time()),
+        'oauth_signature_method': 'HMAC-SHA1',
+        'oauth_callback': 'fluidnexus://access_token/',
+    }
+    consumer = oauth2.Consumer(key=key, secret=secret)
+    params['oauth_consumer_key'] = consumer.key
+    req = oauth2.Request(method=method, url=url, parameters=params)
+    signature_method = oauth2.SignatureMethod_HMAC_SHA1()
+    req.sign_request(signature_method, consumer, None)
+    return req
 
 # Strangely, the QTreeWidgetItemIterator doesn't provide a python iterable
 # So we have to create our own...or base our code on:
@@ -138,6 +159,14 @@ class ZeroconfClientQt(ServiceThread):
 
         self.connect(self.parent, QtCore.SIGNAL("zeroconfScanFrequencyChanged(QVariant)"), self.handleZeroconfScanFrequencyChanged)
 
+    def testZeroconf(self):
+        enabled = self.service.testZeroconf()
+
+        if (not enabled):
+            self.parent.disableZeroconf()
+        
+        return enabled
+
     def handleZeroconfScanFrequencyChanged(self, value):
         self.scanFrequency = value.toInt()[0]
 
@@ -185,6 +214,14 @@ class FluidNexusServerQt(QtCore.QThread):
         self.connect(self, QtCore.SIGNAL("finished()"), self.handleFinished)
         self.connect(self, QtCore.SIGNAL("terminated()"), self.handleTerminated)
 
+    def testBluetooth(self):
+        enabled = self.btServer.testBluetooth()
+
+        if (not enabled):
+            self.parent.disableBluetooth()
+        
+        return enabled
+
     def handleStarted(self):
         self.logger.debug("BluetoothServerThread started")
 
@@ -230,11 +267,20 @@ class FluidNexusClientQt(QtCore.QThread):
 
         self.btClient = BluetoothClientVer3(databaseDir = dataDir, databaseType = databaseType, attachmentsDir = attachmentsDir, logPath = logPath)
 
+
         self.connect(self, QtCore.SIGNAL("newMessages"), self.parent.newMessages)
         self.connect(self, QtCore.SIGNAL("started()"), self.handleStarted)
         self.connect(self, QtCore.SIGNAL("finished()"), self.handleFinished)
         self.connect(self, QtCore.SIGNAL("terminated()"), self.handleTerminated)
         self.connect(self.parent, QtCore.SIGNAL("bluetoothScanFrequencyChanged(QVariant)"), self.handleBluetoothScanFrequencyChanged)
+
+    def testBluetooth(self):
+        enabled = self.btClient.testBluetooth()
+
+        if (not enabled):
+            self.parent.disableBluetooth()
+
+        return enabled
 
     def handleStarted(self):
         self.logger.debug("BluetoothClientThread started")
@@ -706,15 +752,18 @@ class FluidNexusPreferencesDialog(QtGui.QDialog):
         index = self.zeroconfScanFrequencies.index(zeroconfScanFrequency)
         self.ui.zeroconfScanFrequency.setCurrentIndex(index)
 
+    def __nexusPreferencesUpdate(self):
+        self.ui.keyInput.setText(self.settings.value("nexus/key", "").toString())
+        self.ui.secretInput.setText(self.settings.value("nexus/secret", "").toString())
 
     def __updatePreferencesDialog(self):
         """Update the preferences dialog based on our settings."""
         
         self.ui.FluidNexusPreferencesTabWidget.setTabEnabled(self.ADHOC_TAB, False)
-        self.ui.FluidNexusPreferencesTabWidget.setTabEnabled(self.NEXUS_TAB, False)
         self.__networkPreferencesUpdate()
         self.__bluetoothPreferencesUpdate()
         self.__zeroconfPreferencesUpdate()
+        self.__nexusPreferencesUpdate()
         self.preferencesToChange = {}
 
     def reject(self):
@@ -755,7 +804,20 @@ class FluidNexusPreferencesDialog(QtGui.QDialog):
         self.preferencesToChange["zeroconf/scanFrequency"] = self.zeroconfScanFrequencies[index]
         self.parent.emit(QtCore.SIGNAL("zeroconfScanFrequencyChanged(QVariant)"), self.zeroconfScanFrequencies[index])
 
+    def nexusKeyFinished(self):
+        self.preferencesToChange["nexus/key"] = self.ui.keyInput.text()
 
+    def nexusSecretFinished(self):
+        self.preferencesToChange["nexus/secret"] = self.ui.secretInput.text()
+
+    def onRequestAuthorization(self):
+        request = build_request_token_request(REQUEST_TOKEN_URL, unicode(self.ui.keyInput.text()), unicode(self.ui.secretInput.text()))
+        u = urllib2.urlopen(REQUEST_TOKEN_URL, data = request.to_postdata())
+        result = u.read()
+        u.close()
+        url = simplejson.loads(unicode(result))
+
+        QtGui.QDesktopServices.openUrl(QtCore.QUrl(url["result"]))
 
     def closeDialog(self):
         # TODO
@@ -927,19 +989,30 @@ class FluidNexusDesktop(QtGui.QMainWindow):
 
         if (self.bluetoothEnabled):
             self.bluetoothServerThread = FluidNexusServerQt(parent = self, dataDir = self.dataDir, databaseType = "pysqlite2", attachmentsDir = self.attachmentsDir, logPath = self.logPath, level = self.logLevel)
-            self.bluetoothServerThread.start()
+
+            # TODO
+            # Any faster way to determine whether or not it's enabled?
+            enabled = self.bluetoothServerThread.testBluetooth()
+
+            if (enabled):
+                self.bluetoothServerThread.start()
             
-            scanFrequency = self.settings.value("bluetooth/scanFrequency", 300).toInt()[0]
-            self.bluetoothClientThread = FluidNexusClientQt(parent = self, dataDir = self.dataDir, databaseType = "pysqlite2", attachmentsDir = self.attachmentsDir, logPath = self.logPath, level = self.logLevel, scanFrequency = scanFrequency)
-            self.bluetoothClientThread.start()
+                scanFrequency = self.settings.value("bluetooth/scanFrequency", 300).toInt()[0]
+                self.bluetoothClientThread = FluidNexusClientQt(parent = self, dataDir = self.dataDir, databaseType = "pysqlite2", attachmentsDir = self.attachmentsDir, logPath = self.logPath, level = self.logLevel, scanFrequency = scanFrequency)
+    
+                self.bluetoothClientThread.start()
 
         if (self.zeroconfEnabled):
-            self.zeroconfServerThread = ZeroconfServerQt(parent = self, databaseDir = self.dataDir, databaseType = "pysqlite2", attachmentsDir = self.attachmentsDir, logPath = self.logPath, level = self.logLevel)
-            self.zeroconfServerThread.start()
-            
             scanFrequency = self.settings.value("zeroconf/scanFrequency", 300).toInt()[0]
             self.zeroconfClientThread = ZeroconfClientQt(parent = self, databaseDir = self.dataDir, databaseType = "pysqlite2", attachmentsDir = self.attachmentsDir, logPath = self.logPath, level = self.logLevel, scanFrequency = scanFrequency, loopType = "qt")
-            self.zeroconfClientThread.start()
+            enabled = self.zeroconfClientThread.testZeroconf()
+
+            if (enabled):
+                self.zeroconfClientThread.start()
+    
+                self.zeroconfServerThread = ZeroconfServerQt(parent = self, databaseDir = self.dataDir, databaseType = "pysqlite2", attachmentsDir = self.attachmentsDir, logPath = self.logPath, level = self.logLevel)
+                self.zeroconfServerThread.start()
+            
 
 
     def __stopNetworkThreads(self):
@@ -1105,6 +1178,22 @@ class FluidNexusDesktop(QtGui.QMainWindow):
             self.ui.FluidNexusVBoxLayout.insertWidget(0, tb)
 
         self.statusBar().showMessage(self.trUtf8("New messages received."))
+
+    def disableBluetooth(self):
+        self.bluetoothEnabled = False
+        self.settings.setValue("network/bluetooth", 0)
+        # TODO
+        # add dialog that bluetooth was not enabled
+        self.logger.error("Bluetooth not enabled; shutting off bluetooth service")
+        self.statusBar().showMessage(self.trUtf8("Bluetooth not enabled; shutting off bluetooth service."))
+
+    def disableZeroconf(self):
+        self.zeroconfEnabled = False
+        self.settings.setValue("network/zeroconf", 0)
+        #TODO
+        # add dialog that zeroconf was not enabled
+        self.logger.error("Zeroconf not enabled; shutting off zeroconf service")
+        self.statusBar().showMessage(self.trUtf8("Zeroconf not enabled; shutting off zeroconf service."))
 
     def replaceHash(self, hashToReplace, newHash):
         """Replace a hash in our threads."""

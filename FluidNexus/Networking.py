@@ -16,12 +16,6 @@ from bluetooth import *
 # TODO
 # Modularize this for different platforms
 import pybonjour
-import avahi
-import dbus
-from dbus.mainloop.qt import DBusQtMainLoop
-from dbus.mainloop.glib import DBusGMainLoop
-import gobject
-from PyQt4 import QtCore
 
 # My imports
 import FluidNexus_pb2
@@ -315,10 +309,13 @@ TODO
         self.setupServerSockets(numConnections = numConnections)
         self.setupService()
 
-
-        # Enter into the main loop
-        #self.run()
-
+    def testBluetooth(self):
+        """Test the bluetooth connection."""
+        try:
+            nearbyDevices = discover_devices(duration = 1)
+            return True
+        except BluetoothError, e:
+            return False
 
     def setupServerSockets(self, numConnections = 5, blocking = 0):
         """Setup the socket for accepting connections."""
@@ -448,6 +445,14 @@ TODO
     def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsDir = ".", logPath = "FluidNexus.log", level = logging.DEBUG, numConnections = 5):
         super(BluetoothClientVer3, self).__init__(databaseDir = databaseDir, databaseType = databaseType, attachmentsDir = attachmentsDir, logPath = logPath, level = level)
         self.setState(self.STATE_START)
+
+    def testBluetooth(self):
+        """Test the bluetooth connection."""
+        try:
+            nearbyDevices = discover_devices(duration = 1)
+            return True
+        except BluetoothError, e:
+            return False
 
     def doDeviceDiscovery(self):
         """Do our device discovery."""
@@ -813,7 +818,16 @@ class ZeroconfClient(Networking):
                 self.resolved.pop()
         finally:
             self.resolveSDRef.close()
-        
+       
+    def testZeroconf(self):
+        try:
+            browse = pybonjour.DNSServiceBrowse(regtype = ZEROCONF_SERVICE_TYPE)
+            browse.close()
+            return True
+        except pybonjour.BonjourError, e:
+            if (e[0] == -65537):
+                return False
+
 
     def setupBrowse(self):
         """Setup our service browsing."""

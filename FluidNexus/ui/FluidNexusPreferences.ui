@@ -46,7 +46,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>5</number>
    </property>
    <widget class="QWidget" name="generalTab">
     <attribute name="title">
@@ -352,6 +352,95 @@
     <attribute name="title">
      <string>Nexus</string>
     </attribute>
+    <widget class="QWidget" name="formLayoutWidget_4">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>451</width>
+       <height>241</height>
+      </rect>
+     </property>
+     <layout class="QFormLayout" name="formLayout_3">
+      <item row="0" column="0">
+       <widget class="QLabel" name="keyLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Key:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="keyInput"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="secretLabel">
+        <property name="text">
+         <string>Secret:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="secretInput"/>
+      </item>
+      <item row="2" column="1">
+       <widget class="QPushButton" name="generateRequestTokenButton">
+        <property name="text">
+         <string>Request Authorization</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLabel" name="noteLabel">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>The values below should not need to be changed. </string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="tokenLabel">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Token: </string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QLineEdit" name="tokenInput">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="tokenSecretLabel">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Token Secret: </string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="QLineEdit" name="tokenSecretInput">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </widget>
   </widget>
  </widget>
@@ -455,11 +544,62 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>keyInput</sender>
+   <signal>editingFinished()</signal>
+   <receiver>FluidNexusPreferences</receiver>
+   <slot>nexusKeyFinished()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>299</x>
+     <y>64</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>78</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>secretInput</sender>
+   <signal>editingFinished()</signal>
+   <receiver>FluidNexusPreferences</receiver>
+   <slot>nexusSecretFinished()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>347</x>
+     <y>92</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>498</x>
+     <y>188</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>generateRequestTokenButton</sender>
+   <signal>clicked()</signal>
+   <receiver>FluidNexusPreferences</receiver>
+   <slot>onRequestAuthorization()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>229</x>
+     <y>127</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>98</x>
+     <y>321</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>bluetoothScanFrequencyChanged(int)</slot>
   <slot>bluetoothChanged(int)</slot>
   <slot>zeroconfChanged(int)</slot>
   <slot>zeroconfScanFrequencyChanged(int)</slot>
+  <slot>nexusKeyFinished()</slot>
+  <slot>nexusSecretFinished()</slot>
+  <slot>onRequestAuthorization()</slot>
  </slots>
 </ui>
