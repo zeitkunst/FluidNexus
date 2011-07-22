@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'FluidNexus/ui/FluidNexusNewMessage.ui'
 #
-# Created: Mon Jul 11 14:37:43 2011
+# Created: Fri Jul 22 03:30:38 2011
 #      by: PyQt4 UI code generator 4.8.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -80,9 +80,9 @@ class Ui_FluidNexusNewMessage(object):
         self.saveButton.setObjectName(_fromUtf8("saveButton"))
         self.horizontalLayout_3.addWidget(self.saveButton)
         self.formLayout.setLayout(4, QtGui.QFormLayout.FieldRole, self.horizontalLayout_3)
-        self.publicCheckBox = QtGui.QCheckBox(FluidNexusNewMessage)
-        self.publicCheckBox.setObjectName(_fromUtf8("publicCheckBox"))
-        self.formLayout.setWidget(3, QtGui.QFormLayout.FieldRole, self.publicCheckBox)
+        self.nexusCheckBox = QtGui.QCheckBox(FluidNexusNewMessage)
+        self.nexusCheckBox.setObjectName(_fromUtf8("nexusCheckBox"))
+        self.formLayout.setWidget(3, QtGui.QFormLayout.FieldRole, self.nexusCheckBox)
         self.horizontalLayout.addLayout(self.formLayout)
         self.titleLabel.setBuddy(self.newMessageTitle)
         self.messageLabel.setBuddy(self.newMessageBody)
@@ -100,6 +100,6 @@ class Ui_FluidNexusNewMessage(object):
         self.fileRemoveButton.setText(QtGui.QApplication.translate("FluidNexusNewMessage", "Remove File", None, QtGui.QApplication.UnicodeUTF8))
         self.cancelButton.setText(QtGui.QApplication.translate("FluidNexusNewMessage", "Cancel", None, QtGui.QApplication.UnicodeUTF8))
         self.saveButton.setText(QtGui.QApplication.translate("FluidNexusNewMessage", "Save", None, QtGui.QApplication.UnicodeUTF8))
-        self.publicCheckBox.setText(QtGui.QApplication.translate("FluidNexusNewMessage", "Public (post to Nexus?)", None, QtGui.QApplication.UnicodeUTF8))
+        self.nexusCheckBox.setText(QtGui.QApplication.translate("FluidNexusNewMessage", "Public (post to Nexus?)", None, QtGui.QApplication.UnicodeUTF8))
 
 import FluidNexus_rc

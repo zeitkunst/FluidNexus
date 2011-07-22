@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'FluidNexus/ui/FluidNexusPreferences.ui'
 #
-# Created: Mon Jul 11 14:37:44 2011
+# Created: Fri Jul 22 03:30:39 2011
 #      by: PyQt4 UI code generator 4.8.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -36,6 +36,14 @@ class Ui_FluidNexusPreferences(object):
         self.sendBlacklistedMessagesCheckbox.setEnabled(False)
         self.sendBlacklistedMessagesCheckbox.setGeometry(QtCore.QRect(10, 10, 221, 21))
         self.sendBlacklistedMessagesCheckbox.setObjectName(_fromUtf8("sendBlacklistedMessagesCheckbox"))
+        self.ttlSpinBox = QtGui.QSpinBox(self.generalTab)
+        self.ttlSpinBox.setGeometry(QtCore.QRect(10, 40, 56, 26))
+        self.ttlSpinBox.setProperty(_fromUtf8("value"), 30)
+        self.ttlSpinBox.setObjectName(_fromUtf8("ttlSpinBox"))
+        self.ttlLabel = QtGui.QLabel(self.generalTab)
+        self.ttlLabel.setGeometry(QtCore.QRect(70, 40, 81, 31))
+        self.ttlLabel.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
+        self.ttlLabel.setObjectName(_fromUtf8("ttlLabel"))
         self.FluidNexusPreferencesTabWidget.addTab(self.generalTab, _fromUtf8(""))
         self.networkTab = QtGui.QWidget()
         self.networkTab.setObjectName(_fromUtf8("networkTab"))
@@ -150,12 +158,14 @@ class Ui_FluidNexusPreferences(object):
         self.keyLabel.setObjectName(_fromUtf8("keyLabel"))
         self.formLayout_3.setWidget(0, QtGui.QFormLayout.LabelRole, self.keyLabel)
         self.keyInput = QtGui.QLineEdit(self.formLayoutWidget_4)
+        self.keyInput.setMaxLength(20)
         self.keyInput.setObjectName(_fromUtf8("keyInput"))
         self.formLayout_3.setWidget(0, QtGui.QFormLayout.FieldRole, self.keyInput)
         self.secretLabel = QtGui.QLabel(self.formLayoutWidget_4)
         self.secretLabel.setObjectName(_fromUtf8("secretLabel"))
         self.formLayout_3.setWidget(1, QtGui.QFormLayout.LabelRole, self.secretLabel)
         self.secretInput = QtGui.QLineEdit(self.formLayoutWidget_4)
+        self.secretInput.setMaxLength(20)
         self.secretInput.setObjectName(_fromUtf8("secretInput"))
         self.formLayout_3.setWidget(1, QtGui.QFormLayout.FieldRole, self.secretInput)
         self.generateRequestTokenButton = QtGui.QPushButton(self.formLayoutWidget_4)
@@ -184,7 +194,7 @@ class Ui_FluidNexusPreferences(object):
         self.FluidNexusPreferencesTabWidget.addTab(self.tab, _fromUtf8(""))
 
         self.retranslateUi(FluidNexusPreferences)
-        self.FluidNexusPreferencesTabWidget.setCurrentIndex(5)
+        self.FluidNexusPreferencesTabWidget.setCurrentIndex(0)
         QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("accepted()")), FluidNexusPreferences.accept)
         QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("rejected()")), FluidNexusPreferences.reject)
         QtCore.QObject.connect(self.bluetoothScanFrequency, QtCore.SIGNAL(_fromUtf8("activated(int)")), FluidNexusPreferences.bluetoothScanFrequencyChanged)
@@ -194,11 +204,14 @@ class Ui_FluidNexusPreferences(object):
         QtCore.QObject.connect(self.keyInput, QtCore.SIGNAL(_fromUtf8("editingFinished()")), FluidNexusPreferences.nexusKeyFinished)
         QtCore.QObject.connect(self.secretInput, QtCore.SIGNAL(_fromUtf8("editingFinished()")), FluidNexusPreferences.nexusSecretFinished)
         QtCore.QObject.connect(self.generateRequestTokenButton, QtCore.SIGNAL(_fromUtf8("clicked()")), FluidNexusPreferences.onRequestAuthorization)
+        QtCore.QObject.connect(self.ttlSpinBox, QtCore.SIGNAL(_fromUtf8("editingFinished()")), FluidNexusPreferences.ttlFinished)
         QtCore.QMetaObject.connectSlotsByName(FluidNexusPreferences)
 
     def retranslateUi(self, FluidNexusPreferences):
         FluidNexusPreferences.setWindowTitle(QtGui.QApplication.translate("FluidNexusPreferences", "Fluid Nexus Preferences", None, QtGui.QApplication.UnicodeUTF8))
         self.sendBlacklistedMessagesCheckbox.setText(QtGui.QApplication.translate("FluidNexusPreferences", "Send blacklisted messages?", None, QtGui.QApplication.UnicodeUTF8))
+        self.ttlSpinBox.setToolTip(QtGui.QApplication.translate("FluidNexusPreferences", "Default Time to Live (TTL), or the maximum number of \"hops\" allowed for a public message to attempt to be posted to the Nexus.", None, QtGui.QApplication.UnicodeUTF8))
+        self.ttlLabel.setText(QtGui.QApplication.translate("FluidNexusPreferences", "Default TTL", None, QtGui.QApplication.UnicodeUTF8))
         self.FluidNexusPreferencesTabWidget.setTabText(self.FluidNexusPreferencesTabWidget.indexOf(self.generalTab), QtGui.QApplication.translate("FluidNexusPreferences", "General", None, QtGui.QApplication.UnicodeUTF8))
         self.bluetoothEnabled.setToolTip(QtGui.QApplication.translate("FluidNexusPreferences", "Whether or not the Bluetooth client/server is enabled", None, QtGui.QApplication.UnicodeUTF8))
         self.bluetoothEnabled.setText(QtGui.QApplication.translate("FluidNexusPreferences", "Bluetooth", None, QtGui.QApplication.UnicodeUTF8))

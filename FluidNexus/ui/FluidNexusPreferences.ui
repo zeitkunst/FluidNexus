@@ -46,7 +46,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>5</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="generalTab">
     <attribute name="title">
@@ -66,6 +66,38 @@
      </property>
      <property name="text">
       <string>Send blacklisted messages?</string>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="ttlSpinBox">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>40</y>
+       <width>56</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Default Time to Live (TTL), or the maximum number of &quot;hops&quot; allowed for a public message to attempt to be posted to the Nexus.</string>
+     </property>
+     <property name="value">
+      <number>30</number>
+     </property>
+    </widget>
+    <widget class="QLabel" name="ttlLabel">
+     <property name="geometry">
+      <rect>
+       <x>70</x>
+       <y>40</y>
+       <width>81</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Default TTL</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
      </property>
     </widget>
    </widget>
@@ -376,7 +408,11 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QLineEdit" name="keyInput"/>
+       <widget class="QLineEdit" name="keyInput">
+        <property name="maxLength">
+         <number>20</number>
+        </property>
+       </widget>
       </item>
       <item row="1" column="0">
        <widget class="QLabel" name="secretLabel">
@@ -386,7 +422,11 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QLineEdit" name="secretInput"/>
+       <widget class="QLineEdit" name="secretInput">
+        <property name="maxLength">
+         <number>20</number>
+        </property>
+       </widget>
       </item>
       <item row="2" column="1">
        <widget class="QPushButton" name="generateRequestTokenButton">
@@ -592,6 +632,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>ttlSpinBox</sender>
+   <signal>editingFinished()</signal>
+   <receiver>FluidNexusPreferences</receiver>
+   <slot>ttlFinished()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>56</x>
+     <y>84</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>8</x>
+     <y>297</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>bluetoothScanFrequencyChanged(int)</slot>
@@ -601,5 +657,6 @@
   <slot>nexusKeyFinished()</slot>
   <slot>nexusSecretFinished()</slot>
   <slot>onRequestAuthorization()</slot>
+  <slot>ttlFinished()</slot>
  </slots>
 </ui>

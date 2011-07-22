@@ -108,15 +108,17 @@ class Messages(Base):
     content = Column('content', String, nullable = False)
     message_hash = Column('hash', String(length = 64), nullable = False, unique = True)
     time = Column('time', Float, default = float(0.0))
+    received_time = Column('received_time', Float, default = float(0.0))
     attachment_path = Column('attachment_path', String, default = "")
     attachment_original_filename = Column('attachment_original_filename', String, default = "")
     mine = Column('mine', Boolean, default = 0)
     blacklist = Column('blacklist', Boolean, default = 0)
     public = Column('public', Boolean, default = 0)
     ttl = Column('ttl', Integer, default = 0)
+    uploaded = Column('uploaded', Boolean, default = 0)
 
     def __repr__(self):
-        return "<Messages('%d', '%s', '%s', '%s', '%f', '%s', '%s', '%s', '%s')>" % (self.message_type, self.title, self.content, self.message_hash, self.time, self.attachment_path, self.attachment_mimetype, self.mine, self.blacklist)
+        return "<Messages('%d', '%s', '%s', '%s', '%f', '%f', '%s', '%s', '%s', '%s')>" % (self.message_type, self.title, self.content, self.message_hash, self.time, self.received_time, self.attachment_path, self.attachment_mimetype, self.mine, self.blacklist)
 
 class Blacklist(Base):
     __tablename__ = 'blacklist'
@@ -167,31 +169,31 @@ class FluidNexusDatabase(object):
         content = u'Run against Bush in progress (just went through times sq).  media march starts at 7, 52nd and broadway'
         now = time.time()
         message_hash = hashlib.sha256(title + content).hexdigest()
-        self.session.add(Messages(title = title, content = content, time = now, message_hash = message_hash))
+        self.session.add(Messages(title = title, content = content, time = now, received_time = now, message_hash = message_hash))
 
         title = u'Federal agents'
         content = u'Video dispatch. Federal agents trailing activists at 6th Ave and 9th St. Situation tense.'
         message_hash = hashlib.sha256(title + content).hexdigest()
         now = time.time()
-        self.session.add(Messages(title = title, content = content, time = now, message_hash = message_hash))
+        self.session.add(Messages(title = title, content = content, time = now, received_time = now, message_hash = message_hash))
 
         title = u'Mobilize to dine'
         content = u'CT delegation @ Maison (7th Ave. & 53rd).  Outdoor dining area.  Try to get people there.'
         message_hash = hashlib.sha256(title + content).hexdigest()
         now = time.time()
-        self.session.add(Messages(title = title, content = content, time = now, message_hash = message_hash))
+        self.session.add(Messages(title = title, content = content, time = now, received_time = now, message_hash = message_hash))
         self.session.commit()
 
     def hashes(self):
         """Get a list of hashes from the database, ordered by time desc."""
 
         hashes = []
-        for message_hash in self.session.query(Messages.message_hash).order_by(desc(Messages.time)):
+        for message_hash in self.session.query(Messages.message_hash).order_by(desc(Messages.received_time)):
             hashes.append(message_hash[0])
 
         return hashes
 
-    def addMine(self, message_type = 0, title = "", content = "", attachment_path = None, attachment_original_filename = None):
+    def addMine(self, message_type = 0, title = "", content = "", attachment_path = None, attachment_original_filename = None, public = False, ttl = 30):
         """Add one of our own messages to the database."""
         message_hash = hashlib.sha256(title.encode("utf-8") + content.encode("utf-8")).hexdigest()
 
@@ -199,23 +201,23 @@ class FluidNexusDatabase(object):
         # Ensure new message is not already in the database
         now = time.time()
         if (attachment_path is not None):
-            message = Messages(message_type = message_type, title = title, content = content, message_hash = message_hash, time = now, attachment_path = attachment_path, attachment_original_filename = attachment_original_filename, mine = True)
+            message = Messages(message_type = message_type, title = title, content = content, message_hash = message_hash, time = now, received_time = now, attachment_path = attachment_path, attachment_original_filename = attachment_original_filename, mine = True, public = public, ttl = ttl)
         else:
-            message = Messages(message_type = message_type, title = title, content = content, message_hash = message_hash, time = now, mine = True)
+            message = Messages(message_type = message_type, title = title, content = content, message_hash = message_hash, time = now, received_time = now, mine = True, public = public, ttl = ttl)
 
         self.session.add(message)
         self.session.commit()
 
-    def addReceived(self, message_type = 0, title = "", content = "", timestamp = time.time(), attachment_path = None, attachment_original_filename = None):
+    def addReceived(self, message_type = 0, title = "", content = "", timestamp = time.time(), received_timestamp = time.time(), attachment_path = None, attachment_original_filename = None):
         """Add one of our own messages to the database."""
         message_hash = hashlib.sha256(title.encode("utf-8") + content.encode("utf-8")).hexdigest()
 
         # TODO
         # Ensure new message is not already in the database
         if (attachment_path is not None):
-            message = Messages(message_type = message_type, title = title, content = content, message_hash = message_hash, time = timestamp, attachment_path = attachment_path, attachment_original_filename = attachment_original_filename, mine = False)
+            message = Messages(message_type = message_type, title = title, content = content, message_hash = message_hash, time = timestamp, received_time = received_timestamp, attachment_path = attachment_path, attachment_original_filename = attachment_original_filename, mine = False)
         else:
-            message = Messages(message_type = message_type, title = title, content = content, message_hash = message_hash, time = timestamp, mine = False)
+            message = Messages(message_type = message_type, title = title, content = content, message_hash = message_hash, time = timestamp, received_time = received_timestamp, mine = False)
 
         self.session.add(message)
         self.session.commit()
@@ -259,7 +261,7 @@ class FluidNexusDatabase(object):
         self.session.query(Messages).filter(Messages.message_hash == message_hash).delete()
         self.session.commit()
 
-    def updateByMessageHash(self, message_hash = "", new_message_hash = "", new_title = "", new_content = "", new_timestamp = 0.0, new_attachment_path = "", new_attachment_original_filename = ""):
+    def updateByMessageHash(self, message_hash = "", new_message_hash = "", new_title = "", new_content = "", new_timestamp = 0.0, new_attachment_path = "", new_attachment_original_filename = "", new_public = False, new_ttl = 30):
         """Update an item by a message hash with a new hash."""
 
         # TODO
@@ -269,8 +271,11 @@ class FluidNexusDatabase(object):
         message.title = new_title
         message.content = new_content
         message.timestamp = new_timestamp
+        message.received_timestamp = new_timestamp
         message.attachment_path = new_attachment_path
         message.attachment_original_filename = new_attachment_original_filename
+        message.public = new_public
+        message.ttl = new_ttl
 
         self.session.merge(message)
         self.session.commit()
@@ -286,14 +291,14 @@ class FluidNexusDatabase(object):
         """Return all of the items in the database,  with optional limit."""
         if (limit is not None):
             if (includeBlacklist):
-                rows = self.session.query(Messages).order_by(desc(Messages.time)).all()[0:limit]
+                rows = self.session.query(Messages).order_by(desc(Messages.received_time)).all()[0:limit]
             else:
-                rows = self.session.query(Messages).filter(Messages.blacklist == False).order_by(desc(Messages.time)).all()[0:limit]
+                rows = self.session.query(Messages).filter(Messages.blacklist == False).order_by(desc(Messages.received_time)).all()[0:limit]
         else:
             if (includeBlacklist):
-                rows = self.session.query(Messages).order_by(desc(Messages.time)).all()
+                rows = self.session.query(Messages).order_by(desc(Messages.received_time)).all()
             else:
-                rows = self.session.query(Messages).filter(Messages.blacklist == False).order_by(desc(Messages.time)).all()
+                rows = self.session.query(Messages).filter(Messages.blacklist == False).order_by(desc(Messages.received_time)).all()
 
         results = []
         for row in rows:
@@ -304,9 +309,9 @@ class FluidNexusDatabase(object):
     def outgoing(self, limit = None):
         """Return outgoing items in the database,  with optional limit."""
         if (limit is not None):
-            rows = self.session.query(Messages).filter(Messages.mine == True).order_by(desc(Messages.time)).all()[0:limit]
+            rows = self.session.query(Messages).filter(Messages.mine == True).order_by(desc(Messages.received_time)).all()[0:limit]
         else:
-            rows = self.session.query(Messages).filter(Messages.mine == True).order_by(desc(Messages.time)).all()
+            rows = self.session.query(Messages).filter(Messages.mine == True).order_by(desc(Messages.received_time)).all()
 
         results = []
         for row in rows:
@@ -317,9 +322,9 @@ class FluidNexusDatabase(object):
     def blacklist(self, limit = None):
         """Return blacklisted items in the database,  with optional limit."""
         if (limit is not None):
-            rows = self.session.query(Messages).filter(Messages.blacklist == True).order_by(desc(Messages.time)).all()[0:limit]
+            rows = self.session.query(Messages).filter(Messages.blacklist == True).order_by(desc(Messages.received_time)).all()[0:limit]
         else:
-            rows = self.session.query(Messages).filter(Messages.blacklist == True).order_by(desc(Messages.time)).all()
+            rows = self.session.query(Messages).filter(Messages.blacklist == True).order_by(desc(Messages.received_time)).all()
 
         results = []
         for row in rows:

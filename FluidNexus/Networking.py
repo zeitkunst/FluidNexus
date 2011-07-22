@@ -210,6 +210,7 @@ class Networking(object):
             m = messages.message.add()
             data = self.database.getMessageByHash(currentHash)
             m.message_timestamp = data['time']
+            m.message_received_timestamp = data['received_time']
             m.message_title = data['title']
             m.message_content = data['content']
             m.message_type = FluidNexus_pb2.FluidNexusMessage.TEXT
@@ -282,11 +283,11 @@ class Networking(object):
                     attachmentFP = open(message_attachment_path, "wb")
                     attachmentFP.write(message.message_attachment)
                     attachmentFP.close()
-                    self.database.addReceived(timestamp = message.message_timestamp, title = message.message_title, content = message.message_content, attachment_path = message_attachment_path, attachment_original_filename = message.message_attachment_original_filename)
-                    newMessage = {"message_hash": message_hash, "message_timestamp": message.message_timestamp, "message_title": message.message_title, "message_content": message.message_content, "message_attachment_path": message_attachment_path, "message_attachment_original_filename": message.message_attachment_original_filename}
+                    self.database.addReceived(timestamp = message.message_timestamp, received_timestamp = message.message_received_timestamp, title = message.message_title, content = message.message_content, attachment_path = message_attachment_path, attachment_original_filename = message.message_attachment_original_filename)
+                    newMessage = {"message_hash": message_hash, "message_timestamp": message.message_timestamp, "message_received_timestamp": message.message_received_timestamp, "message_title": message.message_title, "message_content": message.message_content, "message_attachment_path": message_attachment_path, "message_attachment_original_filename": message.message_attachment_original_filename}
                 else:
-                    self.database.addReceived(timestamp = message.message_timestamp, title = message.message_title, content = message.message_content)
-                    newMessage = {"message_hash": message_hash, "message_timestamp": message.message_timestamp, "message_title": message.message_title, "message_content": message.message_content, "message_attachment_path": "", "message_attachment_original_filename": ""}
+                    self.database.addReceived(timestamp = message.message_timestamp, received_timestamp = message.message_received_timestamp, title = message.message_title, content = message.message_content)
+                    newMessage = {"message_hash": message_hash, "message_timestamp": message.message_timestamp, "message_received_timestamp": message.message_received_timestamp, "message_title": message.message_title, "message_content": message.message_content, "message_attachment_path": "", "message_attachment_original_filename": ""}
                 self.newMessages.append(newMessage)
 
         self.getHashesFromDatabase()

@@ -12,6 +12,7 @@ message FluidNexusMessage {
     optional string message_title = 1;
     optional string message_content = 2;
     optional float message_timestamp = 3;
+    optional float message_received_timestamp = 10;
     optional string message_hash = 4;
     optional string message_source = 5;
     optional bool message_mine = 6;
