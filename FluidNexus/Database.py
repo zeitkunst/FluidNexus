@@ -208,16 +208,16 @@ class FluidNexusDatabase(object):
         self.session.add(message)
         self.session.commit()
 
-    def addReceived(self, message_type = 0, title = "", content = "", timestamp = time.time(), received_timestamp = time.time(), attachment_path = None, attachment_original_filename = None):
+    def addReceived(self, message_type = 0, title = "", content = "", timestamp = time.time(), received_timestamp = time.time(), attachment_path = None, attachment_original_filename = None, public = False, ttl = 30):
         """Add one of our own messages to the database."""
         message_hash = hashlib.sha256(title.encode("utf-8") + content.encode("utf-8")).hexdigest()
 
         # TODO
         # Ensure new message is not already in the database
         if (attachment_path is not None):
-            message = Messages(message_type = message_type, title = title, content = content, message_hash = message_hash, time = timestamp, received_time = received_timestamp, attachment_path = attachment_path, attachment_original_filename = attachment_original_filename, mine = False)
+            message = Messages(message_type = message_type, title = title, content = content, message_hash = message_hash, time = timestamp, received_time = received_timestamp, attachment_path = attachment_path, attachment_original_filename = attachment_original_filename, mine = False, public = public, ttl = ttl)
         else:
-            message = Messages(message_type = message_type, title = title, content = content, message_hash = message_hash, time = timestamp, received_time = received_timestamp, mine = False)
+            message = Messages(message_type = message_type, title = title, content = content, message_hash = message_hash, time = timestamp, received_time = received_timestamp, mine = False, public = public, ttl = ttl)
 
         self.session.add(message)
         self.session.commit()

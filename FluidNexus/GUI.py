@@ -564,6 +564,8 @@ class MessageTextBrowser(QtGui.QTextBrowser):
         self.adjustSize()        
         self.setHeight()
 
+        # TODO
+        # This causes recursion errors, even if the size is what we want
         #self.connect(self, QtCore.SIGNAL("resizeEvent(QResizeEvent)"), self.resizeEvent)
 
 

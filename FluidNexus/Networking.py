@@ -283,10 +283,10 @@ class Networking(object):
                     attachmentFP = open(message_attachment_path, "wb")
                     attachmentFP.write(message.message_attachment)
                     attachmentFP.close()
-                    self.database.addReceived(timestamp = message.message_timestamp, received_timestamp = message.message_received_timestamp, title = message.message_title, content = message.message_content, attachment_path = message_attachment_path, attachment_original_filename = message.message_attachment_original_filename)
+                    self.database.addReceived(timestamp = message.message_timestamp, received_timestamp = message.message_received_timestamp, title = message.message_title, content = message.message_content, attachment_path = message_attachment_path, attachment_original_filename = message.message_attachment_original_filename, public = message.message_public, ttl = message.message_ttl)
                     newMessage = {"message_hash": message_hash, "message_timestamp": message.message_timestamp, "message_received_timestamp": message.message_received_timestamp, "message_title": message.message_title, "message_content": message.message_content, "message_attachment_path": message_attachment_path, "message_attachment_original_filename": message.message_attachment_original_filename, "message_public": message.message_public, "message_ttl": message.message_ttl}
                 else:
-                    self.database.addReceived(timestamp = message.message_timestamp, received_timestamp = message.message_received_timestamp, title = message.message_title, content = message.message_content)
+                    self.database.addReceived(timestamp = message.message_timestamp, received_timestamp = message.message_received_timestamp, title = message.message_title, content = message.message_content, public = public, ttl = ttl)
                     newMessage = {"message_hash": message_hash, "message_timestamp": message.message_timestamp, "message_received_timestamp": message.message_received_timestamp, "message_title": message.message_title, "message_content": message.message_content, "message_attachment_path": "", "message_attachment_original_filename": "", "message_public": message.message_public, "message_ttl": message.message_ttl}
                 self.newMessages.append(newMessage)
 
