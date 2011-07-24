@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 # Standard library imports
+import base64
 import binascii
 import hashlib
 import logging
@@ -284,7 +285,7 @@ class Networking(object):
 
         #self.logger.debug("Received messages: " + str(messages))
 
-        # Go through the received messages and add any that were sent
+        # Go through the received messages and add any that were received
         fields = messages.ListFields()
         self.newMessages = []
         if (fields != []):
@@ -301,14 +302,14 @@ class Networking(object):
                     if (message.message_public and (message.message_ttl != 0)):
                         message.message_ttl = message.message_ttl - 1
 
-                    self.database.addReceived(timestamp = message.message_timestamp, received_timestamp = message.message_received_timestamp, title = message.message_title, content = message.message_content, attachment_path = message_attachment_path, attachment_original_filename = message.message_attachment_original_filename, public = message.message_public, ttl = message.message_ttl)
+                    self.database.addReceived(timestamp = message.message_timestamp, received_timestamp = time.time(), title = message.message_title, content = message.message_content, attachment_path = message_attachment_path, attachment_original_filename = message.message_attachment_original_filename, public = message.message_public, ttl = message.message_ttl)
                     newMessage = {"message_hash": message_hash, "message_timestamp": message.message_timestamp, "message_received_timestamp": message.message_received_timestamp, "message_title": message.message_title, "message_content": message.message_content, "message_attachment_path": message_attachment_path, "message_attachment_original_filename": message.message_attachment_original_filename, "message_public": message.message_public, "message_ttl": message.message_ttl}
                 else:
                     # Decrement TTL
                     if (message.message_public and (message.message_ttl != 0)):
                         message.message_ttl = message.message_ttl - 1
 
-                    self.database.addReceived(timestamp = message.message_timestamp, received_timestamp = message.message_received_timestamp, title = message.message_title, content = message.message_content, public = message.message_public, ttl = message.message_ttl)
+                    self.database.addReceived(timestamp = message.message_timestamp, received_timestamp = time.time(), title = message.message_title, content = message.message_content, public = message.message_public, ttl = message.message_ttl)
                     newMessage = {"message_hash": message_hash, "message_timestamp": message.message_timestamp, "message_received_timestamp": message.message_received_timestamp, "message_title": message.message_title, "message_content": message.message_content, "message_attachment_path": "", "message_attachment_original_filename": "", "message_public": message.message_public, "message_ttl": message.message_ttl}
                 self.newMessages.append(newMessage)
 
@@ -369,7 +370,17 @@ class NexusNetworking(Networking):
                         self.logger.warn("Cannot upload to the nexus without an access token; please enter a valid token in the preferences.")
                         return False
 
-                    messageJSON = {"message_title": message["title"], "message_content": message["content"], "message_hash": message["message_hash"], "message_time": message["time"], "message_type": message["message_type"]}
+                    if (message["attachment_original_filename"] == ""):
+                        messageJSON = {"message_title": message["title"], "message_content": message["content"], "message_hash": message["message_hash"], "message_time": message["time"], "message_type": message["message_type"]}
+                    else:
+                        # TODO
+                        # Error handling :-)
+                        attachmentDataFP = open(os.path.realpath(message["attachment_path"]), 'rb')
+                        attachmentData = attachmentDataFP.read()
+                        attachmentDataFP.close()
+                        attachmentDataBase64 = base64.b64encode(attachmentData)
+                        messageJSON = {"message_title": message["title"], "message_content": message["content"], "message_hash": message["message_hash"], "message_time": message["time"], "message_type": message["message_type"], "message_attachment_original_filename": message["attachment_original_filename"], "message_attachment": attachmentDataBase64}
+
                     data = {"message": json.dumps(messageJSON)}
                     request = self.build_request(NEXUS_ENDPOINT, data)
                     try:
@@ -384,6 +395,7 @@ class NexusNetworking(Networking):
                     result = json.loads(result)
                     self.logger.debug(result)
                     self.database.setUploaded(message["message_hash"])
+
 
 
 class BluetoothServerVer3(Networking):

@@ -3,6 +3,7 @@
 # Standard library imports
 import hashlib
 import logging
+import mimetypes
 import os
 import pickle
 import re
@@ -1473,7 +1474,9 @@ class FluidNexusDesktop(QtGui.QMainWindow):
                 if (response == self.YES):
                     self.ui.FluidNexusVBoxLayout.removeWidget(currentWidget)
                     if (currentWidget.getMessageAttachmentPath() is not None):
-                        os.unlink(currentWidget.getMessageAttachmentPath())
+                        # Only delete non-mine attachments
+                        if (not currentWidget.mine):
+                            os.unlink(currentWidget.getMessageAttachmentPath())
                     currentWidget.close()
                     self.database.removeByMessageHash(hashToDelete)
                     self.removeHash(hashToDelete)
@@ -1564,8 +1567,21 @@ class FluidNexusDesktop(QtGui.QMainWindow):
             # Convert QString to unicode
             message_content = unicode(message_content)
 
+            # Guess type
+            mimeType = mimetypes.guess_type(attachment_original_filename)
+            
+            print mimeType
+            if ("image" in mimeType[0]):
+                message_type = 1
+            elif ("audio" in mimeType[0]):
+                message_type = 2
+            elif ("video" in mimeType[0]):
+                message_type = 3
+            else:
+                message_type = 0
+
             # Add to database
-            self.database.addMine(title = unicode(message_title), content = unicode(message_content), attachment_path = attachment_path, attachment_original_filename = attachment_original_filename, public = public, ttl = ttl)
+            self.database.addMine(message_type = message_type, title = unicode(message_title), content = unicode(message_content), attachment_path = attachment_path, attachment_original_filename = attachment_original_filename, public = public, ttl = ttl)
 
             # Update display
             tb = MessageTextBrowser(parent = self, mine = 1, message_title = message_title, message_content = textile.textile(message_content), message_hash = message_hash, message_timestamp = time.time(), attachment_path = attachment_path, attachment_original_filename = attachment_original_filename, message_public = public, logPath = self.logPath)
