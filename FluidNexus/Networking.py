@@ -358,6 +358,12 @@ class NexusNetworking(Networking):
                     self.database.setUploaded(message["message_hash"])
                 else:
                     self.logger.debug("NO MESSAGE WITH HASH %s FOUND" % message["message_hash"])
+
+                    # Check that the token is not ""
+                    if (self.token == ""):
+                        self.logger.warn("Cannot upload to the nexus without an access token; please enter a valid token in the preferences.")
+                        return False
+
                     messageJSON = {"message_title": message["title"], "message_content": message["content"], "message_hash": message["message_hash"], "message_time": message["time"], "message_type": message["message_type"]}
                     data = {"message": json.dumps(messageJSON)}
                     request = self.build_request(NEXUS_ENDPOINT, data)
