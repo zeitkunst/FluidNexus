@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="744.09448819"
+   height="1052.3622047"
+   id="svg4232"
+   version="1.1"
+   inkscape:version="0.48.1 r9760"
+   sodipodi:docname="menu_public.svg">
+  <defs
+     id="defs4234">
+    <marker
+       inkscape:stockid="Arrow2Lend"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="Arrow2Lend"
+       style="overflow:visible;">
+      <path
+         id="path4157"
+         style="font-size:12.0;fill-rule:evenodd;stroke-width:0.62500000;stroke-linejoin:round;"
+         d="M 8.7185878,4.0337352 L -2.2072895,0.016013256 L 8.7185884,-4.0017078 C 6.9730900,-1.6296469 6.9831476,1.6157441 8.7185878,4.0337352 z "
+         transform="scale(1.1) rotate(180) translate(1,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="Arrow1Mend"
+       style="overflow:visible;">
+      <path
+         id="path5521"
+         d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1.0pt;marker-start:none;"
+         transform="scale(0.4) rotate(180) translate(10,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mstart"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="Arrow1Mstart"
+       style="overflow:visible">
+      <path
+         id="path5518"
+         d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1.0pt;marker-start:none"
+         transform="scale(0.4) translate(10,0)" />
+    </marker>
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 526.18109 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       id="perspective4240" />
+    <inkscape:perspective
+       id="perspective4224"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.35"
+     inkscape:cx="511.53239"
+     inkscape:cy="520"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1449"
+     inkscape:window-height="698"
+     inkscape:window-x="14"
+     inkscape:window-y="24"
+     inkscape:window-maximized="0" />
+  <metadata
+     id="metadata4237">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       transform="matrix(0.64686989,0.76260039,-0.76260039,0.64686989,856.33063,-234.41158)"
+       id="g3098-0"
+       inkscape:export-filename="/home/nknouf/Documents/Research/Projects/FluidNexus/code/FluidNexus/FluidNexus/ui/res/icons/32x32/menu_public.png"
+       inkscape:export-xdpi="2.7"
+       inkscape:export-ydpi="2.7">
+      <path
+         inkscape:export-ydpi="5.3200002"
+         inkscape:export-xdpi="5.3200002"
+         inkscape:export-filename="/home/nknouf/Documents/Research/Projects/FluidNexus/code/FluidNexus/FluidNexus/ui/res/icons/32x32/menu_all.png"
+         transform="matrix(15.602794,0,0,15.260627,-49.960876,199.42241)"
+         d="m 43.550163,18.353283 c 0,3.521913 -7.76441,6.376988 -17.342296,6.376988 -9.577886,0 -17.3422969,-2.855075 -17.3422969,-6.376988 0,-3.521913 7.7644109,-6.376988 17.3422969,-6.376988 9.577886,0 17.342296,2.855075 17.342296,6.376988 z"
+         sodipodi:ry="6.3769879"
+         sodipodi:rx="17.342297"
+         sodipodi:cy="18.353283"
+         sodipodi:cx="26.207867"
+         id="path2846-9"
+         style="fill:#8c8c8c;fill-opacity:1;fill-rule:evenodd;stroke:none"
+         sodipodi:type="arc" />
+      <path
+         inkscape:export-ydpi="5.3200002"
+         inkscape:export-xdpi="5.3200002"
+         inkscape:export-filename="/home/nknouf/Documents/Research/Projects/FluidNexus/code/FluidNexus/FluidNexus/ui/res/icons/32x32/menu_all.png"
+         transform="matrix(1.1728395,0,0,1.1728395,1325.7099,-300.69046)"
+         d="m -708.57142,665.2193 c 0,63.90724 -51.80705,115.71429 -115.71429,115.71429 -63.90723,0 -115.71428,-51.80705 -115.71428,-115.71429 0,-63.90724 51.80705,-115.71429 115.71428,-115.71429 63.90724,0 115.71429,51.80705 115.71429,115.71429 z"
+         sodipodi:ry="115.71429"
+         sodipodi:rx="115.71429"
+         sodipodi:cy="665.2193"
+         sodipodi:cx="-824.28571"
+         id="path5482-8"
+         style="fill:#84302d;fill-opacity:1;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none"
+         sodipodi:type="arc" />
+    </g>
+    <path
+       style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#84302d;stroke-width:0.86805552px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 174.28571,240.5134 c -74.824019,0 -138.039599,32.98667 -158.624999,78.28125 -93.93029,6.73153 -167.093801,60.21836 -167.093801,125.21875 1e-4,69.55781 83.800161,125.96875 187.156301,125.96875 19.07336,0 37.47559,-1.96228 54.8125,-5.53125 29.180849,20.77312 69.374719,33.625 113.749999,33.625 87.43902,0 158.63598,-49.82484 161.34375,-112.03125 39.08189,-13.76782 65.8125,-41.60681 65.8125,-73.6875 0,-39.3022 -40.13069,-72.18046 -93.9375,-80.6875 C 323.91982,279.89514 256.02503,240.5134 174.28571,240.5134 z"
+       id="path3938"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/nknouf/Documents/Research/Projects/FluidNexus/code/FluidNexus/FluidNexus/ui/res/icons/32x32/menu_public.png"
+       inkscape:export-xdpi="2.7"
+       inkscape:export-ydpi="2.7" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:10;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#Arrow2Lend)"
+       d="m 514.28571,100.93361 c 0,0 -8.57143,-31.42857 -140,-34.285713 -131.42857,-2.857143 -240,151.428573 -240,151.428573"
+       id="path4769"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="csc"
+       inkscape:export-filename="/home/nknouf/Documents/Research/Projects/FluidNexus/code/FluidNexus/FluidNexus/ui/res/icons/32x32/menu_public.png"
+       inkscape:export-xdpi="2.7"
+       inkscape:export-ydpi="2.7" />
+  </g>
+</svg>

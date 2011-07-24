@@ -323,6 +323,8 @@ class FluidNexusClientQt(QtCore.QThread):
 class MessageTextBrowser(QtGui.QTextBrowser):
     """Wrapper around the text browser that adds some useful stuff for us."""
 
+    # TODO
+    # Need to figure out a way to streamline this...
     mine_text = """
     <table width='100%'>
         <tr>
@@ -337,6 +339,22 @@ class MessageTextBrowser(QtGui.QTextBrowser):
         </tr>
     </table>
     """
+
+    mine_text_public = """
+    <table width='100%'>
+        <tr>
+        <td width='40' rowspan='3'><img src=':/icons/icons/32x32/menu_public.png' width='32'/></td>
+        <td><h3>%1</h3></td>
+        </tr>
+        <tr>
+            <td>%2</td>
+        </tr>
+        <tr>
+        <td align='right'>%3&nbsp;&nbsp;&nbsp;<a href='fluidnexus://editmessage' title='Edit Message'><img src=':/icons/icons/32x32/menu_edit.png' width='32'/></a>&nbsp;&nbsp;&nbsp;<a href='fluidnexus://deletemessage' title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
+        </tr>
+    </table>
+    """
+
 
     mine_text_attachment = """
     <table width='100%'>
@@ -356,6 +374,25 @@ class MessageTextBrowser(QtGui.QTextBrowser):
     </table>
     """
 
+    mine_text_attachment_public = """
+    <table width='100%'>
+        <tr>
+        <td width='40' rowspan='4'><img src=':/icons/icons/32x32/menu_public.png' width='32' /></td>
+        <td><h3>%1</h3></td>
+        </tr>
+        <tr>
+            <td>%2</td>
+        </tr>
+        <tr>
+            <td align='right'><img src=':/icons/icons/32x32/attachment_icon.png'/>&nbsp;&nbsp;<a href='%5'>%4</a></td>
+        </tr>
+        <tr>
+            <td align='right'>%3&nbsp;&nbsp;&nbsp;<a href="fluidnexus://editmessage" title='Edit Message'><img src=':/icons/icons/32x32/menu_edit.png' width='32'/></a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage" title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
+        </tr>
+    </table>
+    """
+
+
     other_text = """
     <table width='100%'>
         <tr>
@@ -372,6 +409,23 @@ class MessageTextBrowser(QtGui.QTextBrowser):
     </table>
     """
 
+    other_text_public = """
+    <table width='100%'>
+        <tr>
+        <td width='40' rowspan='3'><img src=':/icons/icons/32x32/menu_public_other.png' width='32'  /></td>
+            <td><h3>%1</h3></td>
+        </tr>
+        <tr>
+            <td>%2</td>
+        </tr>
+        <tr>
+            <td align='right'>%3&nbsp;&nbsp;&nbsp;<a href="fluidnexus://blacklistmessage" title="Blacklist Message"><img src=":/icons/icons/32x32/menu_blacklist.png" width="32"/></a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage" title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
+        </tr>
+
+    </table>
+    """
+
+
     other_text_blacklist = """
     <table width='100%'>
         <tr>
@@ -387,6 +441,23 @@ class MessageTextBrowser(QtGui.QTextBrowser):
 
     </table>
     """
+
+    other_text_blacklist_public = """
+    <table width='100%'>
+        <tr>
+        <td width='40' rowspan='3'><img src=':/icons/icons/32x32/menu_public_other.png' width='32'  /></td>
+            <td><h3>%1</h3></td>
+        </tr>
+        <tr>
+            <td>%2</td>
+        </tr>
+        <tr>
+            <td align='right'>%3&nbsp;&nbsp;&nbsp;<a href="fluidnexus://unblacklistmessage" title="Unblacklist Message"><img src=":/icons/icons/32x32/menu_all.png" width="32"/></a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage" title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
+        </tr>
+
+    </table>
+    """
+
 
 
     other_text_attachment = """
@@ -408,6 +479,26 @@ class MessageTextBrowser(QtGui.QTextBrowser):
     </table>
     """
 
+    other_text_attachment_public = """
+    <table width='100%'>
+        <tr>
+        <td width='40' rowspan='4'><img src=':/icons/icons/32x32/menu_public_other.png' width='32' /></td>
+            <td><h3>%1</h3></td>
+        </tr>
+        <tr>
+            <td>%2</td>
+        </tr>
+        <tr>
+        <td align='right'><img src=':/icons/icons/32x32/attachment_icon.png'/>&nbsp;&nbsp;<a href='%5'>%4</a></td>
+        </tr>
+        <tr>
+            <td align='right'>%3&nbsp;&nbsp;&nbsp;<a href="fluidnexus://blacklistmessage" title="Blacklist Message"><img src=":/icons/icons/32x32/menu_blacklist.png" width="32"/></a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage" title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
+        </tr>
+
+    </table>
+    """
+
+
     other_text_attachment_blacklist = """
     <table width='100%'>
         <tr>
@@ -426,6 +517,26 @@ class MessageTextBrowser(QtGui.QTextBrowser):
 
     </table>
     """
+
+    other_text_attachment_blacklist_public = """
+    <table width='100%'>
+        <tr>
+        <td width='40' rowspan='4'><img src=':/icons/icons/32x32/menu_public_other.png' width='32' /></td>
+            <td><h3>%1</h3></td>
+        </tr>
+        <tr>
+            <td>%2</td>
+        </tr>
+        <tr>
+            <td align='right'><img src=':/icons/icons/32x32/attachment_icon.png'/>&nbsp;&nbsp;<a href='%5'>%4</a></td>
+        </tr>
+        <tr>
+            <td align='right'>%3&nbsp;&nbsp;&nbsp;<a href="fluidnexus://unblacklistmessage" title="Unblacklist Message"><img src=":/icons/icons/32x32/menu_all.png" width="32"/></a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage" title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
+        </tr>
+
+    </table>
+    """
+
 
 
     def __init__(self, parent = None, mine = False, message_title = "Testing title", message_content = "Testing content", message_type = 0, message_hash = None, message_timestamp = time.time(), message_received_timestamp = time.time(), attachment_path = None, attachment_original_filename = None, message_public = False, logPath = "FluidNexus.log", level = logging.WARN, blacklist = False):
@@ -461,20 +572,38 @@ class MessageTextBrowser(QtGui.QTextBrowser):
 
         if (self.getMessageAttachmentPath() is None):
             if (self.mine):
-                s = QtCore.QString(self.mine_text).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()))
-            else:
-                if (self.blacklist):
-                    s = QtCore.QString(self.other_text_blacklist).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()))
+                if (self.getMessagePublic()):
+                    s = QtCore.QString(self.mine_text_public).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()))
                 else:
-                    s = QtCore.QString(self.other_text).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()))
+                    s = QtCore.QString(self.mine_text).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()))
+            else:
+                if (self.getMessagePublic()):
+                    if (self.blacklist):
+                        s = QtCore.QString(self.other_text_blacklist_public).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()))
+                    else:
+                        s = QtCore.QString(self.other_text_public).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()))
+                else:
+                    if (self.blacklist):
+                        s = QtCore.QString(self.other_text_blacklist).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()))
+                    else:
+                        s = QtCore.QString(self.other_text).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()))
         else:
             if (self.mine):
-                s = QtCore.QString(self.mine_text_attachment).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()), self.getMessageAttachmentOriginalFilename(), "file:///" + self.getMessageAttachmentPath())
-            else:
-                if (self.blacklist):
-                    s = QtCore.QString(self.other_text_attachment_blacklist).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()), self.getMessageAttachmentOriginalFilename(), "file:///" + self.getMessageAttachmentPath())
+                if (self.getMessagePublic()):
+                    s = QtCore.QString(self.mine_text_attachment_public).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()), self.getMessageAttachmentOriginalFilename(), "file:///" + self.getMessageAttachmentPath())
                 else:
-                    s = QtCore.QString(self.other_text_attachment).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()), self.getMessageAttachmentOriginalFilename(), "file:///" + self.getMessageAttachmentPath())
+                    s = QtCore.QString(self.mine_text_attachment).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()), self.getMessageAttachmentOriginalFilename(), "file:///" + self.getMessageAttachmentPath())
+            else:
+                if (self.getMessagePublic()):
+                    if (self.blacklist):
+                        s = QtCore.QString(self.other_text_attachment_blacklist_public).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()), self.getMessageAttachmentOriginalFilename(), "file:///" + self.getMessageAttachmentPath())
+                    else:
+                        s = QtCore.QString(self.other_text_attachment_public).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()), self.getMessageAttachmentOriginalFilename(), "file:///" + self.getMessageAttachmentPath())
+                else:
+                    if (self.blacklist):
+                        s = QtCore.QString(self.other_text_attachment_blacklist).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()), self.getMessageAttachmentOriginalFilename(), "file:///" + self.getMessageAttachmentPath())
+                    else:
+                        s = QtCore.QString(self.other_text_attachment).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()), self.getMessageAttachmentOriginalFilename(), "file:///" + self.getMessageAttachmentPath())
 
         self.setHtml(s)
         # Whether to open links automatically
