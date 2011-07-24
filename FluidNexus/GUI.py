@@ -1014,8 +1014,9 @@ class FluidNexusDesktop(QtGui.QMainWindow):
 
     # Global values for the view modes
     VIEW_ALL = 0
-    VIEW_OUTGOING = 1
-    VIEW_BLACKLIST = 2
+    VIEW_PUBLIC = 1
+    VIEW_OUTGOING = 2
+    VIEW_BLACKLIST = 3
 
     viewMode = VIEW_ALL
 
@@ -1192,6 +1193,9 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         if (self.viewMode == self.VIEW_ALL):
             items = self.database.all()
             self.setWindowTitle(self.trUtf8("Fluid Nexus: View All Messages"))
+        elif (self.viewMode == self.VIEW_PUBLIC):
+            items = self.database.public()
+            self.setWindowTitle(self.trUtf8("Fluid Nexus: View Public Messages"))
         elif (self.viewMode == self.VIEW_OUTGOING):
             items = self.database.outgoing()
             self.setWindowTitle(self.trUtf8("Fluid Nexus: View Outgoing Messages"))
@@ -1231,6 +1235,7 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         self.connect(self.ui.actionPreferences, QtCore.SIGNAL('triggered()'), self.handlePreferences)
 
         self.connect(self.ui.actionViewAll, QtCore.SIGNAL('triggered()'), self.handleViewAll)
+        self.connect(self.ui.actionViewPublic, QtCore.SIGNAL('triggered()'), self.handleViewPublic)
         self.connect(self.ui.actionViewOutgoing, QtCore.SIGNAL('triggered()'), self.handleViewOutgoing)
         self.connect(self.ui.actionViewBlacklist, QtCore.SIGNAL('triggered()'), self.handleViewBlacklist)
 
@@ -1286,6 +1291,12 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         self.deleteTextBrowserWidgets()
         self.setupDisplay()
 
+    def handleViewPublic(self):
+        self.changeToolbarCheckedState(self.viewMode, self.VIEW_PUBLIC)
+        self.viewMode = self.VIEW_PUBLIC
+        self.deleteTextBrowserWidgets()
+        self.setupDisplay()
+
     def handleViewOutgoing(self):
         self.changeToolbarCheckedState(self.viewMode, self.VIEW_OUTGOING)
         self.viewMode = self.VIEW_OUTGOING
@@ -1314,7 +1325,7 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         """Change the checked state of the toolbar buttons from the old to the new."""
         # TODO
         # Perhaps a better way of doing this rather than hard-coding it?
-        actions = ["actionViewAll", "actionViewOutgoing", "actionViewBlacklist"]
+        actions = ["actionViewAll", "actionViewPublic", "actionViewOutgoing", "actionViewBlacklist"]
         oldAction = getattr(self.ui, actions[old])
         newAction = getattr(self.ui, actions[new])
         oldAction.setChecked(False)
