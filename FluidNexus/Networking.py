@@ -9,9 +9,12 @@ import select
 import socket
 import struct
 import time
+import urllib2
 
 # External imports
 from bluetooth import *
+import oauth2
+import simplejson as json
 
 # TODO
 # Modularize this for different platforms
@@ -42,10 +45,15 @@ SWITCH = 0x0040
 SWITCH_DONE = 0x0041
 DONE_DONE = 0x00F0
 
+# Nexus constants
+NEXUS_ENDPOINT = "http://localhost:6543/api/01/nexus/message/update.json"
+NEXUS_HASH_ENDPOINT = "http://localhost:6543/api/01/nexus/hashes/%s.json"
+
 # TODO
 # * Deal with settings/config better
 # * Better error checking, deal with socket timeouts, socket closing, etc
 # * * Basically need to wrap all "recv" with a "read" that takes in socket, amount to read, and captures error of "bluetooth.btcommon.BluetoothError: (104, 'Connection reset by peer')"
+
 
 class Networking(object):
     """Base class for all other networking activity.  Other networking modalities need to subclass from this class."""
@@ -306,6 +314,60 @@ class Networking(object):
 
         self.getHashesFromDatabase()
         self.setState(self.STATE_WRITE_SWITCH)
+
+class NexusNetworking(Networking):
+    """Class for dealing with uploading public messages to the nexus."""
+
+    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsDir = ".", logPath = "FluidNexus.log", level = logging.DEBUG, key = "", secret = "", token = "", token_secret = ""):
+
+        super(NexusNetworking, self).__init__(databaseDir = databaseDir, databaseType = databaseType, attachmentsDir = attachmentsDir, logPath = logPath, level = level)
+
+        self.key = key
+        self.secret = secret
+        self.token = token
+        self.token_secret = token_secret
+
+    def build_request(self, url, message, method="POST"):
+        # TODO
+        # do we need to add in oauth_callback to be in compliance?
+        consumer = oauth2.Consumer(key = self.key, secret = self.secret)
+        params = {}
+        params.update(message)
+        token = oauth2.Token(self.token, self.token_secret)
+        req = oauth2.Request.from_consumer_and_token(consumer, token = token, http_method=method, http_url=url, parameters=params)
+        signature_method = oauth2.SignatureMethod_HMAC_SHA1()
+        req.sign_request(signature_method, consumer, token)
+        return req
+
+    def run(self):
+        self.openDatabase()
+        publicMessages = self.database.public()
+
+        # TODO
+        # Check that we can access internet
+
+        for message in publicMessages:
+            if (not message["uploaded"]):
+                u = urllib2.urlopen(NEXUS_HASH_ENDPOINT % message["message_hash"])
+                result = u.read()
+                u.close()
+                result = json.loads(result)
+                
+                # If the result is true, then the message has already been uploaded by someone else and we should save this result
+                if (result["result"]):
+                    self.database.setUploaded(message["message_hash"])
+                else:
+                    self.logger.debug("NO MESSAGE WITH HASH %s FOUND" % message["message_hash"])
+                    messageJSON = {"message_title": message["title"], "message_content": message["content"], "message_hash": message["message_hash"], "message_time": message["time"], "message_type": message["message_type"]}
+                    data = {"message": json.dumps(messageJSON)}
+                    request = self.build_request(NEXUS_ENDPOINT, data)
+                    u = urllib2.urlopen(NEXUS_ENDPOINT, data = request.to_postdata())
+                    result = u.read()
+                    u.close()
+
+                    result = json.loads(result)
+                    self.logger.debug(result)
+                    self.database.setUploaded(message["message_hash"])
 
 
 class BluetoothServerVer3(Networking):

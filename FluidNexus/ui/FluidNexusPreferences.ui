@@ -438,17 +438,17 @@
       <item row="3" column="1">
        <widget class="QLabel" name="noteLabel">
         <property name="enabled">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
         <property name="text">
-         <string>The values below should not need to be changed. </string>
+         <string>Enter the values below after authorization</string>
         </property>
        </widget>
       </item>
       <item row="4" column="0">
        <widget class="QLabel" name="tokenLabel">
         <property name="enabled">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
         <property name="text">
          <string>Token: </string>
@@ -458,14 +458,14 @@
       <item row="4" column="1">
        <widget class="QLineEdit" name="tokenInput">
         <property name="enabled">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
       </item>
       <item row="5" column="0">
        <widget class="QLabel" name="tokenSecretLabel">
         <property name="enabled">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
         <property name="text">
          <string>Token Secret: </string>
@@ -475,7 +475,7 @@
       <item row="5" column="1">
        <widget class="QLineEdit" name="tokenSecretInput">
         <property name="enabled">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -648,6 +648,38 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>tokenInput</sender>
+   <signal>editingFinished()</signal>
+   <receiver>FluidNexusPreferences</receiver>
+   <slot>tokenFinished()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>155</x>
+     <y>177</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>0</x>
+     <y>228</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tokenSecretInput</sender>
+   <signal>editingFinished()</signal>
+   <receiver>FluidNexusPreferences</receiver>
+   <slot>tokenSecretFinished()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>145</x>
+     <y>215</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>2</x>
+     <y>273</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>bluetoothScanFrequencyChanged(int)</slot>
@@ -658,5 +690,7 @@
   <slot>nexusSecretFinished()</slot>
   <slot>onRequestAuthorization()</slot>
   <slot>ttlFinished()</slot>
+  <slot>tokenFinished()</slot>
+  <slot>tokenSecretFinished()</slot>
  </slots>
 </ui>

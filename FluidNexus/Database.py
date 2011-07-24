@@ -233,6 +233,21 @@ class FluidNexusDatabase(object):
             self.logger.error("Multiple results found for hash %s; this should never happen!" % message_hash)
             return False
 
+    def setUploaded(self, message_hash):
+        try:
+            result = self.session.query(Messages).filter(Messages.message_hash == message_hash).one()
+            result.uploaded = True
+            self.session.add(result)
+            self.session.commit()
+            return True
+        except NoResultFound, e:
+            self.logger.error("No result found for hash %s; this should never happen!" % message_hash)
+            return False
+        except MultipleResultsFound, e:
+            self.logger.error("Multiple results found for hash %s; this should never happen!" % message_hash)
+            return False
+
+
     def getMessageByHash(self, message_hash):
         """Get a message for a given hash."""
         try:

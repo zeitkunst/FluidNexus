@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'FluidNexus/ui/FluidNexusPreferences.ui'
 #
-# Created: Sun Jul 24 12:47:20 2011
+# Created: Sun Jul 24 13:24:20 2011
 #      by: PyQt4 UI code generator 4.8.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -172,23 +172,23 @@ class Ui_FluidNexusPreferences(object):
         self.generateRequestTokenButton.setObjectName(_fromUtf8("generateRequestTokenButton"))
         self.formLayout_3.setWidget(2, QtGui.QFormLayout.FieldRole, self.generateRequestTokenButton)
         self.noteLabel = QtGui.QLabel(self.formLayoutWidget_4)
-        self.noteLabel.setEnabled(False)
+        self.noteLabel.setEnabled(True)
         self.noteLabel.setObjectName(_fromUtf8("noteLabel"))
         self.formLayout_3.setWidget(3, QtGui.QFormLayout.FieldRole, self.noteLabel)
         self.tokenLabel = QtGui.QLabel(self.formLayoutWidget_4)
-        self.tokenLabel.setEnabled(False)
+        self.tokenLabel.setEnabled(True)
         self.tokenLabel.setObjectName(_fromUtf8("tokenLabel"))
         self.formLayout_3.setWidget(4, QtGui.QFormLayout.LabelRole, self.tokenLabel)
         self.tokenInput = QtGui.QLineEdit(self.formLayoutWidget_4)
-        self.tokenInput.setEnabled(False)
+        self.tokenInput.setEnabled(True)
         self.tokenInput.setObjectName(_fromUtf8("tokenInput"))
         self.formLayout_3.setWidget(4, QtGui.QFormLayout.FieldRole, self.tokenInput)
         self.tokenSecretLabel = QtGui.QLabel(self.formLayoutWidget_4)
-        self.tokenSecretLabel.setEnabled(False)
+        self.tokenSecretLabel.setEnabled(True)
         self.tokenSecretLabel.setObjectName(_fromUtf8("tokenSecretLabel"))
         self.formLayout_3.setWidget(5, QtGui.QFormLayout.LabelRole, self.tokenSecretLabel)
         self.tokenSecretInput = QtGui.QLineEdit(self.formLayoutWidget_4)
-        self.tokenSecretInput.setEnabled(False)
+        self.tokenSecretInput.setEnabled(True)
         self.tokenSecretInput.setObjectName(_fromUtf8("tokenSecretInput"))
         self.formLayout_3.setWidget(5, QtGui.QFormLayout.FieldRole, self.tokenSecretInput)
         self.FluidNexusPreferencesTabWidget.addTab(self.tab, _fromUtf8(""))
@@ -205,6 +205,8 @@ class Ui_FluidNexusPreferences(object):
         QtCore.QObject.connect(self.secretInput, QtCore.SIGNAL(_fromUtf8("editingFinished()")), FluidNexusPreferences.nexusSecretFinished)
         QtCore.QObject.connect(self.generateRequestTokenButton, QtCore.SIGNAL(_fromUtf8("clicked()")), FluidNexusPreferences.onRequestAuthorization)
         QtCore.QObject.connect(self.ttlSpinBox, QtCore.SIGNAL(_fromUtf8("editingFinished()")), FluidNexusPreferences.ttlFinished)
+        QtCore.QObject.connect(self.tokenInput, QtCore.SIGNAL(_fromUtf8("editingFinished()")), FluidNexusPreferences.tokenFinished)
+        QtCore.QObject.connect(self.tokenSecretInput, QtCore.SIGNAL(_fromUtf8("editingFinished()")), FluidNexusPreferences.tokenSecretFinished)
         QtCore.QMetaObject.connectSlotsByName(FluidNexusPreferences)
 
     def retranslateUi(self, FluidNexusPreferences):
@@ -249,7 +251,7 @@ class Ui_FluidNexusPreferences(object):
         self.keyLabel.setText(QtGui.QApplication.translate("FluidNexusPreferences", "Key:", None, QtGui.QApplication.UnicodeUTF8))
         self.secretLabel.setText(QtGui.QApplication.translate("FluidNexusPreferences", "Secret:", None, QtGui.QApplication.UnicodeUTF8))
         self.generateRequestTokenButton.setText(QtGui.QApplication.translate("FluidNexusPreferences", "Request Authorization", None, QtGui.QApplication.UnicodeUTF8))
-        self.noteLabel.setText(QtGui.QApplication.translate("FluidNexusPreferences", "The values below should not need to be changed. ", None, QtGui.QApplication.UnicodeUTF8))
+        self.noteLabel.setText(QtGui.QApplication.translate("FluidNexusPreferences", "Enter the values below after authorization", None, QtGui.QApplication.UnicodeUTF8))
         self.tokenLabel.setText(QtGui.QApplication.translate("FluidNexusPreferences", "Token: ", None, QtGui.QApplication.UnicodeUTF8))
         self.tokenSecretLabel.setText(QtGui.QApplication.translate("FluidNexusPreferences", "Token Secret: ", None, QtGui.QApplication.UnicodeUTF8))
         self.FluidNexusPreferencesTabWidget.setTabText(self.FluidNexusPreferencesTabWidget.indexOf(self.tab), QtGui.QApplication.translate("FluidNexusPreferences", "Nexus", None, QtGui.QApplication.UnicodeUTF8))

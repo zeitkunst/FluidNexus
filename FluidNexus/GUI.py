@@ -23,7 +23,7 @@ from ui.FluidNexusNewMessageUI import Ui_FluidNexusNewMessage
 from ui.FluidNexusAboutUI import Ui_FluidNexusAbout
 from ui.FluidNexusPreferencesUI import Ui_FluidNexusPreferences
 from Database import FluidNexusDatabase
-from Networking import BluetoothServerVer3, BluetoothClientVer3, ZeroconfClient, ZeroconfServer
+from Networking import BluetoothServerVer3, BluetoothClientVer3, ZeroconfClient, ZeroconfServer, NexusNetworking
 import Log
 
 # TODO
@@ -57,14 +57,17 @@ DEFAULTS = {
 }
 
 # build our oauth request token request
-REQUEST_TOKEN_URL = "http://localhost:6543/api/01/request_token"
+URL_BASE = "http://localhost:6543/api/01/"
+OAUTH_CALLBACK_URL = URL_BASE + "access_token"
+REQUEST_TOKEN_URL = URL_BASE + "request_token"
+
 def build_request_token_request(url, key, secret, method='POST'):
     params = {                                            
         'oauth_version': "1.0",
         'oauth_nonce': oauth2.generate_nonce(),
         'oauth_timestamp': int(time.time()),
         'oauth_signature_method': 'HMAC-SHA1',
-        'oauth_callback': 'fluidnexus://access_token/',
+        'oauth_callback': OAUTH_CALLBACK_URL,
     }
     consumer = oauth2.Consumer(key=key, secret=secret)
     params['oauth_consumer_key'] = consumer.key
@@ -148,6 +151,38 @@ class ServiceThread(QtCore.QThread):
         """Override in client classes."""
 
         raise NotImplementedError
+
+class NexusNetworkingQt(ServiceThread):
+
+    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsDir = ".", logPath = "FluidNexus.log", level = logging.WARN, scanFrequency = 300, parent = None, threadName = "NexusNetworkingThread", key = "", secret = "", token = "", token_secret = ""):
+        self.key = unicode(key)
+        self.secret = unicode(secret)
+        self.token = unicode(token)
+        self.token_secret = unicode(token_secret)
+
+        super(NexusNetworkingQt, self).__init__(databaseDir = databaseDir, databaseType = databaseType, attachmentsDir = attachmentsDir, logPath = logPath, level = level, parent = parent, scanFrequency = scanFrequency, threadName = threadName)
+
+    def testZeroconf(self):
+        enabled = self.service.testZeroconf()
+
+        if (not enabled):
+            self.parent.disableZeroconf()
+        
+        return enabled
+
+    def setupService(self):
+        """Setup our nexus service."""
+
+        self.service = NexusNetworking(databaseDir = self.databaseDir, databaseType = self.databaseType, attachmentsDir = self.attachmentsDir, logPath = self.logPath, key = self.key, secret = self.secret, token = self.token, token_secret = self.token_secret)
+
+    def run(self):
+        self.service.run()
+
+        # TODO
+        # Make this frequency configurable
+        self.logger.debug("NexusNetworkingThread sleeping for %d seconds" % self.scanFrequency)
+        self.sleep(self.scanFrequency)
+
 
 class ZeroconfClientQt(ServiceThread):
 
@@ -911,6 +946,9 @@ class FluidNexusPreferencesDialog(QtGui.QDialog):
     def __nexusPreferencesUpdate(self):
         self.ui.keyInput.setText(self.settings.value("nexus/key", "").toString())
         self.ui.secretInput.setText(self.settings.value("nexus/secret", "").toString())
+        self.ui.tokenInput.setText(self.settings.value("nexus/token", "").toString())
+        self.ui.tokenSecretInput.setText(self.settings.value("nexus/tokenSecret", "").toString())
+
 
     def __updatePreferencesDialog(self):
         """Update the preferences dialog based on our settings."""
@@ -969,6 +1007,13 @@ class FluidNexusPreferencesDialog(QtGui.QDialog):
 
     def nexusSecretFinished(self):
         self.preferencesToChange["nexus/secret"] = self.ui.secretInput.text()
+
+    def tokenFinished(self):
+        self.preferencesToChange["nexus/token"] = self.ui.tokenInput.text()
+
+    def tokenSecretFinished(self):
+        self.preferencesToChange["nexus/tokenSecret"] = self.ui.tokenSecretInput.text()
+
 
     def onRequestAuthorization(self):
         request = build_request_token_request(REQUEST_TOKEN_URL, unicode(self.ui.keyInput.text()), unicode(self.ui.secretInput.text()))
@@ -1174,7 +1219,15 @@ class FluidNexusDesktop(QtGui.QMainWindow):
                 self.zeroconfServerThread = ZeroconfServerQt(parent = self, databaseDir = self.dataDir, databaseType = "pysqlite2", attachmentsDir = self.attachmentsDir, logPath = self.logPath, level = self.logLevel)
                 self.zeroconfServerThread.start()
             
+        # TODO
+        # enable configuration of nexus sending
 
+        key = self.settings.value("nexus/key", "").toString()
+        secret = self.settings.value("nexus/secret", "").toString()
+        token = self.settings.value("nexus/token", "").toString()
+        token_secret = self.settings.value("nexus/tokenSecret", "").toString()
+        self.nexusThread = NexusNetworkingQt(parent = self, databaseDir = self.dataDir, databaseType = "pysqlite2", attachmentsDir = self.attachmentsDir, logPath = self.logPath, level = self.logLevel, key = key, secret = secret, token = token, token_secret = token_secret)
+        self.nexusThread.start()
 
     def __stopNetworkThreads(self):
         if (self.bluetoothEnabled):
