@@ -22,7 +22,6 @@ from ui.FluidNexusDesktopUI import Ui_FluidNexus
 from ui.FluidNexusNewMessageUI import Ui_FluidNexusNewMessage
 from ui.FluidNexusAboutUI import Ui_FluidNexusAbout
 from ui.FluidNexusPreferencesUI import Ui_FluidNexusPreferences
-from ui.FluidNexusRequestAuthorizationUI import Ui_RequestAuthorizationDialog
 from Database import FluidNexusDatabase
 from Networking import BluetoothServerVer3, BluetoothClientVer3, ZeroconfClient, ZeroconfServer
 import Log
