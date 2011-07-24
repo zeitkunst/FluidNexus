@@ -351,7 +351,7 @@ class NexusNetworking(Networking):
                 try:
                     u = urllib2.urlopen(NEXUS_HASH_ENDPOINT % message["message_hash"])
                 except urllib2.URLError, e:
-                    self.logger.error("Some sort of urllib2 error: " + e)
+                    self.logger.error("Some sort of urllib2 error: " + str(e))
                     return False
 
                 result = u.read()
@@ -375,7 +375,7 @@ class NexusNetworking(Networking):
                     try:
                         u = urllib2.urlopen(NEXUS_ENDPOINT, data = request.to_postdata())
                     except urllib2.URLError, e:
-                        self.logger.error("Some sort of urllib2 error: " + e)
+                        self.logger.error("Some sort of urllib2 error: " + str(e))
                         return False
 
                     result = u.read()
