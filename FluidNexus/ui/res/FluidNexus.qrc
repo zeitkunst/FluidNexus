@@ -1,8 +1,7 @@
 <RCC>
   <qresource prefix="icons">
-    <file>originals/menu_add.svg</file>
-    <file>originals/menu_public_other.svg</file>
     <file>icons/32x32/attachment_icon.png</file>
+    <file>icons/32x32/menu_public_other.png</file>
     <file>icons/32x32/menu_all.png</file>
     <file>icons/32x32/menu_outgoing.png</file>
     <file>icons/32x32/menu_blacklist.png</file>
