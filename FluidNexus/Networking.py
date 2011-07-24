@@ -348,7 +348,12 @@ class NexusNetworking(Networking):
 
         for message in publicMessages:
             if (not message["uploaded"]):
-                u = urllib2.urlopen(NEXUS_HASH_ENDPOINT % message["message_hash"])
+                try:
+                    u = urllib2.urlopen(NEXUS_HASH_ENDPOINT % message["message_hash"])
+                except urllib2.URLError, e:
+                    self.logger.error("Some sort of urllib2 error: " + e)
+                    return False
+
                 result = u.read()
                 u.close()
                 result = json.loads(result)
@@ -367,7 +372,12 @@ class NexusNetworking(Networking):
                     messageJSON = {"message_title": message["title"], "message_content": message["content"], "message_hash": message["message_hash"], "message_time": message["time"], "message_type": message["message_type"]}
                     data = {"message": json.dumps(messageJSON)}
                     request = self.build_request(NEXUS_ENDPOINT, data)
-                    u = urllib2.urlopen(NEXUS_ENDPOINT, data = request.to_postdata())
+                    try:
+                        u = urllib2.urlopen(NEXUS_ENDPOINT, data = request.to_postdata())
+                    except urllib2.URLError, e:
+                        self.logger.error("Some sort of urllib2 error: " + e)
+                        return False
+
                     result = u.read()
                     u.close()
 
