@@ -214,6 +214,11 @@ class Networking(object):
             m.message_title = data['title']
             m.message_content = data['content']
             m.message_type = FluidNexus_pb2.FluidNexusMessage.TEXT
+            m.message_public = data["public"]
+
+            if (data["public"]):
+                m.message_ttl = data["ttl"]
+
             if (data["attachment_path"] != ""):
                 m.message_attachment_original_filename = data["attachment_original_filename"]
 
@@ -283,9 +288,18 @@ class Networking(object):
                     attachmentFP = open(message_attachment_path, "wb")
                     attachmentFP.write(message.message_attachment)
                     attachmentFP.close()
+                    
+                    # Decrement TTL
+                    if (message.message_public and (message.message_ttl != 0)):
+                        message.message_ttl = message.message_ttl - 1
+
                     self.database.addReceived(timestamp = message.message_timestamp, received_timestamp = message.message_received_timestamp, title = message.message_title, content = message.message_content, attachment_path = message_attachment_path, attachment_original_filename = message.message_attachment_original_filename, public = message.message_public, ttl = message.message_ttl)
                     newMessage = {"message_hash": message_hash, "message_timestamp": message.message_timestamp, "message_received_timestamp": message.message_received_timestamp, "message_title": message.message_title, "message_content": message.message_content, "message_attachment_path": message_attachment_path, "message_attachment_original_filename": message.message_attachment_original_filename, "message_public": message.message_public, "message_ttl": message.message_ttl}
                 else:
+                    # Decrement TTL
+                    if (message.message_public and (message.message_ttl != 0)):
+                        message.message_ttl = message.message_ttl - 1
+
                     self.database.addReceived(timestamp = message.message_timestamp, received_timestamp = message.message_received_timestamp, title = message.message_title, content = message.message_content, public = message.message_public, ttl = message.message_ttl)
                     newMessage = {"message_hash": message_hash, "message_timestamp": message.message_timestamp, "message_received_timestamp": message.message_received_timestamp, "message_title": message.message_title, "message_content": message.message_content, "message_attachment_path": "", "message_attachment_original_filename": "", "message_public": message.message_public, "message_ttl": message.message_ttl}
                 self.newMessages.append(newMessage)

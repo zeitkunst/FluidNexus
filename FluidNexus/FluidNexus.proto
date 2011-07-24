@@ -17,7 +17,7 @@ message FluidNexusMessage {
     optional string message_source = 5;
     optional bool message_mine = 6;
     optional bool message_public = 16;
-    optional int32 message_ttl = 17;
+    optional int32 message_ttl = 17 [default = 0];
 
     // TODO
     // Do we want to do it this way, or use mime-types?
