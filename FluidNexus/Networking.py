@@ -3,8 +3,10 @@
 # Standard library imports
 import base64
 import binascii
+import cookielib
 import hashlib
 import logging
+import MultipartPostHandlerUnicode
 import os
 import select
 import socket
@@ -378,17 +380,19 @@ class NexusNetworking(Networking):
                     if (self.token == ""):
                         self.logger.warn("Cannot upload to the nexus without an access token; please enter a valid token in the preferences.")
                         return False
-
+                    
+                    uploadData = {}
                     if (message["attachment_original_filename"] == ""):
                         messageJSON = {"message_title": message["title"], "message_content": message["content"], "message_hash": message["message_hash"], "message_time": message["time"], "message_type": message["message_type"]}
                     else:
                         # TODO
                         # Error handling :-)
                         attachmentDataFP = open(os.path.realpath(message["attachment_path"]), 'rb')
-                        attachmentData = attachmentDataFP.read()
-                        attachmentDataFP.close()
-                        attachmentDataBase64 = base64.b64encode(attachmentData)
-                        messageJSON = {"message_title": message["title"], "message_content": message["content"], "message_hash": message["message_hash"], "message_time": message["time"], "message_type": message["message_type"], "message_attachment_original_filename": message["attachment_original_filename"], "message_attachment": attachmentDataBase64}
+                        #attachmentData = attachmentDataFP.read()
+                        #attachmentDataFP.close()
+                        #attachmentDataBase64 = base64.b64encode(attachmentData)
+                        messageJSON = {"message_title": message["title"], "message_content": message["content"], "message_hash": message["message_hash"], "message_time": message["time"], "message_type": message["message_type"], "message_attachment_original_filename": message["attachment_original_filename"]}
+                        uploadData["message_attachment"] = attachmentDataFP
 
                     request = self.build_request(NEXUS_NONCE_ENDPOINT)
                     try:
@@ -404,10 +408,17 @@ class NexusNetworking(Networking):
                         # Now take our nonce and add it to the message
                         messageJSON["message_nonce"] = nonce
                         messageJSON["message_key"] = self.key
-                        data = {"message": json.dumps(messageJSON)}
-                        u = urllib2.urlopen(NEXUS_MESSAGE_ENDPOINT, data = urllib.urlencode(data))
-                        result = u.read()
-                        u.close()
+                        uploadData["message"] = json.dumps(messageJSON)
+
+                        cookies = cookielib.CookieJar()
+                        opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookies), MultipartPostHandlerUnicode.MultipartPostHandler)
+                        response = opener.open(NEXUS_MESSAGE_ENDPOINT, uploadData)
+                        result = response.read()
+                        response.close()
+
+                        #u = urllib2.urlopen(NEXUS_MESSAGE_ENDPOINT, data = urllib.urlencode(data))
+                        #result = u.read()
+                        #u.close()
                         result = simplejson.loads(result)
                         if (result["result"]):
                             self.database.setUploaded(message["message_hash"])

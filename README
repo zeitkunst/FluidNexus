@@ -31,6 +31,10 @@ Data is sent over bluetooth without any transport layer encryption.  This is som
 
 Data is sent over link-local wifi using zeroconf for service discovery without any transport layer encryption.  This is something we plan on implementing in the future.
 
+= Licenses =
+
+MultipartPostHandlerUnicode.py is licensed under the LGPL and downloaded from http://peerit.blogspot.com/2007/07/multipartposthandler-doesnt-work-for.html
+
 = TODO =
 
 * Fix TextBrowser size in GUI
