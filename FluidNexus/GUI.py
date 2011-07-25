@@ -60,7 +60,7 @@ DEFAULTS = {
 # build our oauth request token request
 URL_BASE = "http://localhost:6543/api/01/"
 OAUTH_CALLBACK_URL = URL_BASE + "access_token"
-REQUEST_TOKEN_URL = URL_BASE + "request_token"
+REQUEST_TOKEN_URL = URL_BASE + "request_token/desktop"
 
 def build_request_token_request(url, key, secret, method='POST'):
     params = {                                            
@@ -1022,6 +1022,7 @@ class FluidNexusPreferencesDialog(QtGui.QDialog):
         result = u.read()
         u.close()
         url = simplejson.loads(unicode(result))
+        self.logger.debug("result is: " + str(url))
 
         QtGui.QDesktopServices.openUrl(QtCore.QUrl(url["result"]))
 
@@ -1572,9 +1573,9 @@ class FluidNexusDesktop(QtGui.QMainWindow):
             
             print mimeType
             if ("image" in mimeType[0]):
-                message_type = 1
-            elif ("audio" in mimeType[0]):
                 message_type = 2
+            elif ("audio" in mimeType[0]):
+                message_type = 1
             elif ("video" in mimeType[0]):
                 message_type = 3
             else:
