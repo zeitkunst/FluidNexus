@@ -47,7 +47,7 @@ SWITCH_DONE = 0x0041
 DONE_DONE = 0x00F0
 
 # Nexus constants
-NEXUS_ENDPOINT = "http://localhost:6543/api/01/nexus/message/desktop/update.json"
+NEXUS_ENDPOINT = "http://localhost:6543/api/01/nexus/message/update.json"
 NEXUS_HASH_ENDPOINT = "http://localhost:6543/api/01/nexus/hashes/%s.json"
 
 # TODO
