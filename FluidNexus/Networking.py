@@ -10,6 +10,7 @@ import select
 import socket
 import struct
 import time
+import urllib
 import urllib2
 
 # External imports
@@ -27,11 +28,11 @@ from Database import FluidNexusDatabase
 import Log
 
 class ZeroconfClientCompleteException(Exception): 
-    def __init__(self):
-        pass
+    def __init__(self, value):
+        self.value = value
 
     def __str__(self):
-        return "ZeroconfClientCompleteException"
+        return repr("ZeroconfClientCompleteException: " + self.value)
 
 FluidNexusUUID = "bd547e68-952b-11e0-a6c7-0023148b3104"
 
@@ -47,7 +48,8 @@ SWITCH_DONE = 0x0041
 DONE_DONE = 0x00F0
 
 # Nexus constants
-NEXUS_ENDPOINT = "http://localhost:6543/api/01/nexus/message/update.json"
+NEXUS_NONCE_ENDPOINT = "http://localhost:6543/api/01/nexus/message/nonce.json"
+NEXUS_MESSAGE_ENDPOINT = "http://localhost:6543/api/01/nexus/message/update.json"
 NEXUS_HASH_ENDPOINT = "http://localhost:6543/api/01/nexus/hashes/%s.json"
 
 # TODO
@@ -55,6 +57,12 @@ NEXUS_HASH_ENDPOINT = "http://localhost:6543/api/01/nexus/hashes/%s.json"
 # * Better error checking, deal with socket timeouts, socket closing, etc
 # * * Basically need to wrap all "recv" with a "read" that takes in socket, amount to read, and captures error of "bluetooth.btcommon.BluetoothError: (104, 'Connection reset by peer')"
 
+class NexusError(Exception):
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return repr("NexusError: " + self.value)
 
 class Networking(object):
     """Base class for all other networking activity.  Other networking modalities need to subclass from this class."""
@@ -328,14 +336,15 @@ class NexusNetworking(Networking):
         self.token = token
         self.token_secret = token_secret
 
-    def build_request(self, url, message, method="POST"):
+    def build_request(self, url, method="POST"):
         # TODO
         # do we need to add in oauth_callback to be in compliance?
         consumer = oauth2.Consumer(key = self.key, secret = self.secret)
-        params = {}
-        params.update(message)
+        #params = {}
+        #params.update(message)
         token = oauth2.Token(self.token, self.token_secret)
-        req = oauth2.Request.from_consumer_and_token(consumer, token = token, http_method=method, http_url=url, parameters=params)
+        #req = oauth2.Request.from_consumer_and_token(consumer, token = token, http_method=method, http_url=url, parameters=params)
+        req = oauth2.Request.from_consumer_and_token(consumer, token = token, http_method=method, http_url=url)
         signature_method = oauth2.SignatureMethod_HMAC_SHA1()
         req.sign_request(signature_method, consumer, token)
         return req
@@ -381,20 +390,38 @@ class NexusNetworking(Networking):
                         attachmentDataBase64 = base64.b64encode(attachmentData)
                         messageJSON = {"message_title": message["title"], "message_content": message["content"], "message_hash": message["message_hash"], "message_time": message["time"], "message_type": message["message_type"], "message_attachment_original_filename": message["attachment_original_filename"], "message_attachment": attachmentDataBase64}
 
-                    data = {"message": json.dumps(messageJSON)}
-                    request = self.build_request(NEXUS_ENDPOINT, data)
+                    request = self.build_request(NEXUS_NONCE_ENDPOINT)
                     try:
-                        u = urllib2.urlopen(NEXUS_ENDPOINT, data = request.to_postdata())
+                        # get our nonce
+                        u = urllib2.urlopen(NEXUS_NONCE_ENDPOINT, data = request.to_postdata())
+                        result = u.read()
+                        u.close()
+    
+                        result = json.loads(result)
+                        print "RESULT ", result
+                        nonce = result["nonce"]
+
+                        # Now take our nonce and add it to the message
+                        messageJSON["message_nonce"] = nonce
+                        messageJSON["message_key"] = self.key
+                        data = {"message": json.dumps(messageJSON)}
+                        u = urllib2.urlopen(NEXUS_MESSAGE_ENDPOINT, data = urllib.urlencode(data))
+                        result = u.read()
+                        u.close()
+                        result = simplejson.loads(result)
+                        if (result["result"]):
+                            self.database.setUploaded(message["message_hash"])
+                            return True
+                        else:
+                            raise NexusError(result["result"])
+
                     except urllib2.URLError, e:
                         self.logger.error("Some sort of urllib2 error: " + str(e))
                         return False
+                    except NexusError, e:
+                        self.logger.error("Error pushing message to the nexus: " + str(e))
+                        return False
 
-                    result = u.read()
-                    u.close()
-
-                    result = json.loads(result)
-                    self.logger.debug(result)
-                    self.database.setUploaded(message["message_hash"])
 
 
 
