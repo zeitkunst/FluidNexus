@@ -13,7 +13,7 @@
    height="1052.3622047"
    id="svg4232"
    version="1.1"
-   inkscape:version="0.47 r22583"
+   inkscape:version="0.48.1 r9760"
    sodipodi:docname="menu_add.svg">
   <defs
      id="defs4234">
@@ -66,33 +66,39 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1">
-    <path
-       sodipodi:type="arc"
-       style="fill:#8c8c8c;fill-opacity:1;fill-rule:evenodd;stroke:none"
-       id="path2846"
-       sodipodi:cx="26.207867"
-       sodipodi:cy="18.353283"
-       sodipodi:rx="17.342297"
-       sodipodi:ry="6.3769879"
-       d="m 43.550163,18.353283 a 17.342297,6.3769879 0 1 1 -34.6845929,0 17.342297,6.3769879 0 1 1 34.6845929,0 z"
-       transform="matrix(15.602794,0,0,15.260627,-47.487372,218.1561)"
-       inkscape:export-filename="/home/nknouf/Documents/Research/Projects/FluidNexus/code/FluidNexus/ui/res/originals/menu_add.png"
-       inkscape:export-xdpi="21.290001"
-       inkscape:export-ydpi="21.290001" />
-    <text
-       xml:space="preserve"
-       style="font-size:853.67504883000003701px;font-style:normal;font-weight:normal;fill:#b43737;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
-       x="150.7988"
-       y="720.53461"
-       id="text3620"
-       transform="scale(1.00411,0.99590685)"
-       inkscape:export-filename="/home/nknouf/Documents/Research/Projects/FluidNexus/code/FluidNexus/ui/res/originals/menu_add.png"
-       inkscape:export-xdpi="21.290001"
-       inkscape:export-ydpi="21.290001"><tspan
-         sodipodi:role="line"
-         id="tspan3622"
-         x="150.7988"
+    <g
+       id="g5351"
+       inkscape:export-filename="/home/nknouf/Documents/Research/Projects/FluidNexus/code/FluidNexusAndroid/res/drawable/menu_add.png"
+       inkscape:export-xdpi="10.64"
+       inkscape:export-ydpi="10.64">
+      <path
+         inkscape:export-ydpi="21.290001"
+         inkscape:export-xdpi="21.290001"
+         inkscape:export-filename="/home/nknouf/Documents/Research/Projects/FluidNexus/code/FluidNexus/ui/res/originals/menu_add.png"
+         transform="matrix(15.602794,0,0,15.260627,-47.487372,218.1561)"
+         d="m 43.550163,18.353283 a 17.342297,6.3769879 0 1 1 -34.6845929,0 17.342297,6.3769879 0 1 1 34.6845929,0 z"
+         sodipodi:ry="6.3769879"
+         sodipodi:rx="17.342297"
+         sodipodi:cy="18.353283"
+         sodipodi:cx="26.207867"
+         id="path2846"
+         style="fill:#8c8c8c;fill-opacity:1;fill-rule:evenodd;stroke:none"
+         sodipodi:type="arc" />
+      <text
+         inkscape:export-ydpi="21.290001"
+         inkscape:export-xdpi="21.290001"
+         inkscape:export-filename="/home/nknouf/Documents/Research/Projects/FluidNexus/code/FluidNexus/ui/res/originals/menu_add.png"
+         transform="scale(1.00411,0.99590685)"
+         id="text3620"
          y="720.53461"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#b43737;fill-opacity:1;font-family:Fontin Sans;-inkscape-font-specification:Fontin Sans Bold">+</tspan></text>
+         x="150.7988"
+         style="font-size:853.67504883000003701px;font-style:normal;font-weight:normal;fill:#b43737;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#b43737;fill-opacity:1;font-family:Fontin Sans;-inkscape-font-specification:Fontin Sans Bold"
+           y="720.53461"
+           x="150.7988"
+           id="tspan3622"
+           sodipodi:role="line">+</tspan></text>
+    </g>
   </g>
 </svg>
