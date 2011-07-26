@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'FluidNexus/ui/FluidNexusAbout.ui'
 #
-# Created: Sun Jul 24 13:24:19 2011
+# Created: Tue Jul 26 01:24:00 2011
 #      by: PyQt4 UI code generator 4.8.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -54,6 +54,7 @@ class Ui_FluidNexusAbout(object):
         self.AboutDialogVersion.setObjectName(_fromUtf8("AboutDialogVersion"))
         self.verticalLayout_2.addWidget(self.AboutDialogVersion)
         self.AboutDialogLink = QtGui.QLabel(self.verticalLayoutWidget)
+        self.AboutDialogLink.setOpenExternalLinks(True)
         self.AboutDialogLink.setObjectName(_fromUtf8("AboutDialogLink"))
         self.verticalLayout_2.addWidget(self.AboutDialogLink)
         self.horizontalLayout.addLayout(self.verticalLayout_2)

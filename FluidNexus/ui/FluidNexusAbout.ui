@@ -85,6 +85,9 @@
           <property name="text">
            <string>&lt;a href=&quot;http://fluidnexus.net&quot;&gt;http://fluidnexus.net&lt;/a&gt;</string>
           </property>
+          <property name="openExternalLinks">
+           <bool>true</bool>
+          </property>
          </widget>
         </item>
        </layout>

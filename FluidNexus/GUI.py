@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# vim: set fileencoding=utf-8 :
 
 # Standard library imports
 import hashlib
@@ -37,13 +38,14 @@ DEFAULTS = {
         "name": "FluidNexus.db"
     },
 
-    "app": {
+    "nexus": {
         "ttl": 30,
     },
 
     "network": {
         "bluetooth": 2,
-        "zeroconf": 2
+        "zeroconf": 2,
+        "nexus": 2,
     },
 
     "bluetooth": {
@@ -918,6 +920,7 @@ class FluidNexusPreferencesDialog(QtGui.QDialog):
     def __networkPreferencesUpdate(self):
         bluetooth = self.settings.value("network/bluetooth", 2).toInt()[0]
         zeroconf = self.settings.value("network/zeroconf", 2).toInt()[0]
+        nexus = self.settings.value("network/nexus", 2).toInt()[0]
 
         if (bluetooth == 2):
             self.ui.bluetoothEnabled.setCheckState(QtCore.Qt.Checked)
@@ -932,6 +935,14 @@ class FluidNexusPreferencesDialog(QtGui.QDialog):
         else:
             self.ui.zeroconfEnabled.setCheckState(QtCore.Qt.Unchecked)
             self.ui.FluidNexusPreferencesTabWidget.setTabEnabled(self.ZEROCONF_TAB, False)
+
+        if (nexus == 2):
+            self.ui.nexusEnabled.setCheckState(QtCore.Qt.Checked)
+            self.ui.FluidNexusPreferencesTabWidget.setTabEnabled(self.NEXUS_TAB, True)
+        else:
+            self.ui.nexusEnabled.setCheckState(QtCore.Qt.Unchecked)
+            self.ui.FluidNexusPreferencesTabWidget.setTabEnabled(self.NEXUS_TAB, False)
+
 
 
     def __bluetoothPreferencesUpdate(self):
@@ -949,6 +960,7 @@ class FluidNexusPreferencesDialog(QtGui.QDialog):
         self.ui.secretInput.setText(self.settings.value("nexus/secret", "").toString())
         self.ui.tokenInput.setText(self.settings.value("nexus/token", "").toString())
         self.ui.tokenSecretInput.setText(self.settings.value("nexus/tokenSecret", "").toString())
+        self.ui.ttlSpinBox.setValue(self.settings.value("nexus/ttl", 30).toInt()[0])
 
 
     def __updatePreferencesDialog(self):
@@ -984,6 +996,12 @@ class FluidNexusPreferencesDialog(QtGui.QDialog):
         else:
             self.ui.FluidNexusPreferencesTabWidget.setTabEnabled(self.ZEROCONF_TAB, False)
 
+    def nexusChanged(self, value):
+        self.preferencesToChange["network/nexus"] = value
+        if (value == 2):
+            self.ui.FluidNexusPreferencesTabWidget.setTabEnabled(self.NEXUS_TAB, True)
+        else:
+            self.ui.FluidNexusPreferencesTabWidget.setTabEnabled(self.NEXUS_TAB, False)
 
 
     def bluetoothScanFrequencyChanged(self, index):
@@ -1001,7 +1019,7 @@ class FluidNexusPreferencesDialog(QtGui.QDialog):
         self.parent.emit(QtCore.SIGNAL("zeroconfScanFrequencyChanged(QVariant)"), self.zeroconfScanFrequencies[index])
 
     def ttlFinished(self):
-        self.preferencesToChange["app/ttl"] = self.ui.ttlSpinBox.value()
+        self.preferencesToChange["nexus/ttl"] = self.ui.ttlSpinBox.value()
 
     def nexusKeyFinished(self):
         self.preferencesToChange["nexus/key"] = self.ui.keyInput.text()
@@ -1033,22 +1051,24 @@ class FluidNexusPreferencesDialog(QtGui.QDialog):
 
 class FluidNexusAboutDialog(QtGui.QDialog):
 
-    aboutText = """Copyright 2008-2011 Nicholas A. Knouf
+    aboutText = u"""<p>Copyright 2008-2011 Nicholas A. Knouf</p>
     
-Fluid Nexus is an application for mobile   phones that is primarily designed to enable activists or relief workers to send messages and data amongst themselves independent of a centralized cellular      network.  The idea is to provide a means of communication between people when   the centralized network has been shut down, either by the government during a   time of unrest, or by nature due to a massive disaster.  During such times the  use of the centralized network for voice or SMS is not possible.  Yet, if we    can use the fact that people still must move about the world, then we can use   ideas from sneaker-nets to turn people into carriers of data.  Given enough     people, we can create fluid, temporary, ad-hoc networks that pass messages one  person at a time, spreading out as a contagion and eventually reaching members  of the group.  This enables surreptitious communication via daily activity and  relies on a fluid view of reality.  Additionally, Fluid Nexus can be used as a  hyperlocal message board, loosely attached to physical locations.  
+<p>Fluid Nexus is an application for mobile   phones that is primarily designed to enable activists or relief workers to send messages and data amongst themselves independent of a centralized cellular      network.  The idea is to provide a means of communication between people when   the centralized network has been shut down, either by the government during a   time of unrest, or by nature due to a massive disaster.  During such times the  use of the centralized network for voice or SMS is not possible.  Yet, if we    can use the fact that people still must move about the world, then we can use   ideas from sneaker-nets to turn people into carriers of data.  Given enough     people, we can create fluid, temporary, ad-hoc networks that pass messages one  person at a time, spreading out as a contagion and eventually reaching members  of the group.  This enables surreptitious communication via daily activity and  relies on a fluid view of reality.  Additionally, Fluid Nexus can be used as a  hyperlocal message board, loosely attached to physical locations.  </p>
     
-Fluid Nexus is not designed as a general-purpose piece of software; rather, it is developed with specific types of users in mind.  Thus, while the ideas here could be very useful for social-networking or productivity applications, this is not what I am most interested in.  However, I definitely welcome the extension of these ideas into these other domains.  Indeed, Fluid Nexus is related to work in the following projects: mesh networking in the OLPC ( http://wiki.laptop.org/go/Mesh_Network_Details ), the Haggle project ( http://www.haggleproject.org/ ), and Comm.unity ( http://community.mit.edu/ ), among many  others."""
+<p>Fluid Nexus is not designed as a general-purpose piece of software; rather, it is developed with specific types of users in mind.  Thus, while the ideas here could be very useful for social-networking or productivity applications, this is not what I am most interested in.  However, I definitely welcome the extension of these ideas into these other domains.  Indeed, Fluid Nexus is related to work in the following projects: mesh networking in the OLPC ( http://wiki.laptop.org/go/Mesh_Network_Details ), the Haggle project ( http://www.haggleproject.org/ ), and Comm.unity ( http://community.mit.edu/ ), among many  others.</p>"""
 
-    creditsText = """Some credits text to go here.  Bruno, Luis, Maria, Claudia, Niranjan, etc."""
+    creditsText = u"""<h2>Initial Version Credits</h2>
+    <p>The initial version of Fluid Nexus for Series 60 Nokia phones running Python was written in conjunction with Bruno Vianna, Luis Ayuso; design help by Mónica Sánchez; and the support of <a href="http://medialab-prado.es">Medialab Prado</a> during the 2° Encuentro Inclusiva-net: redes digitales y espacio fisico.</p>"""
 
     def __init__(self, parent=None, title = None, message = None):
         QtGui.QDialog.__init__(self, parent)
 
         self.parent = parent
-
+    
         self.ui = Ui_FluidNexusAbout()
         self.ui.setupUi(self)
         self.ui.AboutDialogAboutText.setText(self.aboutText)
+        self.ui.AboutDialogCreditsText.setText(self.creditsText)
 
     def closeDialog(self):
         self.close()
@@ -1134,6 +1154,12 @@ class FluidNexusDesktop(QtGui.QMainWindow):
             self.zeroconfEnabled = True
         else:
             self.zeroconfEnabled = False
+
+        nexus = self.settings.value("network/nexus", 2).toInt()[0]
+        if (nexus == 2): 
+            self.nexusEnabled = True
+        else:
+            self.nexusEnabled = False
 
 
         # Start the network threads
@@ -1234,13 +1260,13 @@ class FluidNexusDesktop(QtGui.QMainWindow):
             
         # TODO
         # enable configuration of nexus sending
-
-        key = self.settings.value("nexus/key", "").toString()
-        secret = self.settings.value("nexus/secret", "").toString()
-        token = self.settings.value("nexus/token", "").toString()
-        token_secret = self.settings.value("nexus/tokenSecret", "").toString()
-        self.nexusThread = NexusNetworkingQt(parent = self, databaseDir = self.dataDir, databaseType = "pysqlite2", attachmentsDir = self.attachmentsDir, logPath = self.logPath, level = self.logLevel, key = key, secret = secret, token = token, token_secret = token_secret)
-        self.nexusThread.start()
+        if (self.nexusEnabled):
+            key = self.settings.value("nexus/key", "").toString()
+            secret = self.settings.value("nexus/secret", "").toString()
+            token = self.settings.value("nexus/token", "").toString()
+            token_secret = self.settings.value("nexus/tokenSecret", "").toString()
+            self.nexusThread = NexusNetworkingQt(parent = self, databaseDir = self.dataDir, databaseType = "pysqlite2", attachmentsDir = self.attachmentsDir, logPath = self.logPath, level = self.logLevel, key = key, secret = secret, token = token, token_secret = token_secret)
+            self.nexusThread.start()
 
     def __stopNetworkThreads(self):
         if (self.bluetoothEnabled):
@@ -1250,6 +1276,9 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         if (self.zeroconfEnabled):
             self.zeroconfServerThread.quit()
             self.zeroconfClientThread.quit()
+
+        if (self.nexusEnabled):
+            self.nexusThread.quit()
 
     def setupDisplay(self):
         """Setup our display with a bunch of text browsers."""
@@ -1314,15 +1343,19 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         self.connect(self.sysTray, QtCore.SIGNAL("activated(QSystemTrayIcon::ActivationReason)"), self.onSysTrayActivated)
 
         self.sysTrayMenu = QtGui.QMenu(self)
-        act = self.sysTrayMenu.addAction("FOO")
+        newMessageAction = self.sysTrayMenu.addAction(self.ui.actionNewMessage)
+        self.sysTray.setContextMenu(self.sysTrayMenu)
 
     def onSysTrayActivated(self, reason):
         """Handle systray actions."""
 
-        self.logger.debug("Handing actions: " + str(reason))
         if ((reason == 3) and (self.showing)):
-            self.hide()
-            self.showing = False
+            if (self.isActiveWindow() == False):
+                self.raise_()
+                self.activateWindow()
+            else:
+                self.hide()
+                self.showing = False
         elif ((reason == 3) and (not (self.showing))):
             self.show()
             self.showing = True
@@ -1444,7 +1477,10 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         if (self.zeroconfEnabled):
             self.zeroconfServerThread.replaceHash(hashToReplace, newHash)
             self.zeroconfClientThread.replaceHash(hashToReplace, newHash)
-   
+
+        if (self.nexusEnabled):
+            self.nexusThread.replaceHash(hashToReplace, newHash)
+  
     def removeHash(self, hashToRemove):
         """Remove a hash from our threads."""
 
@@ -1455,6 +1491,9 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         if (self.zeroconfEnabled):
             self.zeroconfServerThread.removeHash(hashToRemove)
             self.zeroconfClientThread.removeHash(hashToRemove)
+
+        if (self.nexusEnabled):
+            self.nexusThread.removeHash(hashToRemove)
 
 
     def getTextBrowserWidgetForHash(self, message_hash):
@@ -1612,3 +1651,6 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         if (self.zeroconfEnabled):
             self.zeroconfServerThread.addHash(message_hash)
             self.zeroconfClientThread.addHash(message_hash)
+
+        if (self.nexusEnabled):
+            self.nexusThread.addHash(message_hash)

@@ -353,6 +353,7 @@ class NexusNetworking(Networking):
 
     def run(self):
         self.openDatabase()
+        self.getHashesFromDatabase()
         publicMessages = self.database.public()
 
         # TODO
