@@ -61,7 +61,7 @@ class build_py(_build_py):
         regen_messages()
         _build_py.run(self)
 
-setup(name='FluidNexus',
+setup(name='fluid_nexus',
     version=FluidNexus.__version__,
     description='PyQt4 application that enables one to share messages and data independent of centralized data networks',
     author='Nicholas Knouf',
