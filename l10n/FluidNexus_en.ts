@@ -408,6 +408,46 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="FluidNexusPreferences.ui" line="384"/>
+        <source>Key:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="FluidNexusPreferences.ui" line="398"/>
+        <source>Secret:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="FluidNexusPreferences.ui" line="412"/>
+        <source>Request Nexus Authorization</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="FluidNexusPreferences.ui" line="422"/>
+        <source>Enter the values below after authorization</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="FluidNexusPreferences.ui" line="432"/>
+        <source>Token: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="FluidNexusPreferences.ui" line="449"/>
+        <source>Token Secret: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="FluidNexusPreferences.ui" line="463"/>
+        <source>Default TTL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="FluidNexusPreferences.ui" line="473"/>
+        <source>Default Time to Live (TTL), or the maximum number of &quot;hops&quot; allowed for a public message to attempt to be posted to the Nexus.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="FluidNexusPreferences.ui" line="303"/>
         <source>5 seconds</source>
         <comment>5</comment>
@@ -465,46 +505,6 @@
         <location filename="FluidNexusPreferences.ui" line="348"/>
         <source>1 hour</source>
         <comment>3600</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="FluidNexusPreferences.ui" line="384"/>
-        <source>Key:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="FluidNexusPreferences.ui" line="398"/>
-        <source>Secret:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="FluidNexusPreferences.ui" line="412"/>
-        <source>Request Nexus Authorization</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="FluidNexusPreferences.ui" line="422"/>
-        <source>Enter the values below after authorization</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="FluidNexusPreferences.ui" line="432"/>
-        <source>Token: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="FluidNexusPreferences.ui" line="449"/>
-        <source>Token Secret: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="FluidNexusPreferences.ui" line="463"/>
-        <source>Default TTL</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="FluidNexusPreferences.ui" line="473"/>
-        <source>Default Time to Live (TTL), or the maximum number of &quot;hops&quot; allowed for a public message to attempt to be posted to the Nexus.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
