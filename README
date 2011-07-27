@@ -1,7 +1,9 @@
-Fluid Nexus v0.1 alpha
+Fluid Nexus v0.2.2 alpha
 
 Nicholas A. Knouf
+
 http://fluidnexus.net
+
 fluidnexus@fluidnexus.net
 
 This software is ALPHA QUALITY and should only be used at your own risk.  More detailed instructions about theory, motivation, installation, and use can be found on the website.
@@ -11,17 +13,20 @@ The software has been testing on Ubuntu Maverick with python 2.6.6 and requires 
 Specific network modality notes:
 
 Bluetooth:
+
 * Should run without modification on Windows if pybluez is installed, but this hasn't been tested
+
 * Will not run on OS X due to lack of pybluez; the networking code will have to be ported to lightblue
 
 Zeroconf:
+
 * Should run without modification on Windows if pybonjour is installed, along with the Bonjour library from Apple; this has not been tested
+
 * Should run without modification on OS X if pybonjour is installed; this has not been tested
+
 * Linux will require the installation of a avahi-bonjour compatability library; on ubuntu this is libavahi-compat-libdnssd1.
 
-To run, type "./FluidNexus.py"; for help, type "./FluidNexus.py --help".
-
-The Nokia Series 60 port is on hold for the moment; archived code can be found in the "S60" directory.
+To run, type "fluid_nexus"; for help, type "fluid_nexus --help".
 
 = SECURITY NOTE =
 
@@ -35,12 +40,4 @@ Data is sent over link-local wifi using zeroconf for service discovery without a
 
 MultipartPostHandlerUnicode.py is licensed under the LGPL and downloaded from http://peerit.blogspot.com/2007/07/multipartposthandler-doesnt-work-for.html
 
-= TODO =
 
-* Fix TextBrowser size in GUI
-* * Almost there...still off by a bit
-* Shutdown server/client threads properly on GUI exist
-* Present dialog instead of status message if bluetooth, zeroconf are not enabled
-* Start server/client threads in headless version; shutdown properly by catching interrupts
-* Implement ad-hoc wifi
-* Implement SSL/TLS over the network modalities

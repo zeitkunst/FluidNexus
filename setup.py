@@ -41,8 +41,6 @@ def regen_messages():
             command = ["lconvert", "-i", "l10n/%s" % filename, "-o", "l10n/%s" % outFile]
             subprocess.call(command)
 
-print "MESSAGES ", get_messages()
-
 class build_py(_build_py):
     def run(self):
         uis = []
@@ -52,7 +50,7 @@ class build_py(_build_py):
 
         for ui in uis:
             out = ui.replace(".ui", "UI.py")
-            command = ["pyuic4", "-d", ui, "-o", out]
+            command = ["pyuic4", ui, "-o", out]
             # For some reason pyuic4 doesn't want to work here...
             subprocess.call(command)
             self.byte_compile(out)
@@ -69,14 +67,21 @@ setup(name='FluidNexus',
     author='Nicholas Knouf',
     author_email='fluidnexus@fluidnexus.net',
     url='http://fluidnexus.net',
+    download_url="http://fluidnexus.net/download",
     long_description=README + '\n\n' +  CHANGES,
     classifiers=[
+        "Development Status :: 3 - Alpha",
+        "Environment :: X11 Applications :: Qt",
+        "Environment :: Win32 (MS Windows)",
+        "Intended Audience :: End Users/Desktop",
+        "License :: OSI Approved :: GNU General Public License (GPL)",
+        "Operating System :: Microsoft :: Windows",
+        "Operating System :: POSIX :: Linux",
         "Programming Language :: Python",
-        "Framework :: Pylons",
-        "Topic :: Internet :: WWW/HTTP",
-        "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
+        "Topic :: Artistic Software",
+        "Topic :: Communications",
     ],
-    keywords='web wsgi bfg pylons pyramid',
+    keywords=["ad-hoc networking", "activism", "bluetooth", "zeroconf", "communication"],
     packages=find_packages(),
     package_data={"FluidNexus.ui":["*.ui"]},
     data_files = [("share/FluidNexus/l10n", get_messages())],
