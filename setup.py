@@ -10,12 +10,11 @@ from setuptools import setup, find_packages
 import FluidNexus
 
 here = os.path.abspath(os.path.dirname(__file__))
-README = open(os.path.join(here, 'README.txt')).read()
-CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
+README = open(os.path.join(here, 'README')).read()
+CHANGES = open(os.path.join(here, 'CHANGES')).read()
 
 requires = [
         'textile',
-        'bluetooth',
         'simplejson',
         'pybonjour',
         'sqlalchemy',
@@ -78,6 +77,7 @@ setup(name='FluidNexus',
     packages=find_packages(),
     package_data={"FluidNexus.ui":["*.ui"]},
     data_file = [("/usr/share/FluidNexus/lang", get_messages())],
+    scripts=["scripts/fluid_nexus"],
     include_package_data=True,
     zip_safe=False,
     install_requires = requires,
