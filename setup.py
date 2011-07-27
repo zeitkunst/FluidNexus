@@ -18,6 +18,7 @@ requires = [
         'simplejson',
         'pybonjour',
         'sqlalchemy',
+        'pyqt',
         ]
 
 if sys.version_info[:3] < (2,5,0):
@@ -25,20 +26,16 @@ if sys.version_info[:3] < (2,5,0):
 
 def get_messages():
     msgfiles = []
-    for filename in os.listdir("po/"):
+    for filename in os.listdir("l10n/"):
         if filename.endswith(".qm"):
-            msgfiles.append("po/%s" % filename)
+            msgfiles.append("l10n/%s" % filename)
     return msgfiles
 
 def regen_messages():
-    po_files = []
-    for filename in os.listdir("po/"):
-        if filename.endswith(".po"):
-            po_files.append("-i")
-            po_files.append(filename)
-            po_files.append("-o")
-            outFile = filename.replace(".po", ".qm")
-            command = ["lconvert", "-i", "po/%s" % filename, "-o", "po/%s" % outFile]
+    for filename in os.listdir("l10n/"):
+        if filename.endswith(".ts"):
+            outFile = filename.replace(".ts", ".qm")
+            command = ["lconvert", "-i", "l10n/%s" % filename, "-o", "l10n/%s" % outFile]
             subprocess.call(command)
 
 class build_py(_build_py):
@@ -76,7 +73,7 @@ setup(name='FluidNexus',
     keywords='web wsgi bfg pylons pyramid',
     packages=find_packages(),
     package_data={"FluidNexus.ui":["*.ui"]},
-    data_file = [("/usr/share/FluidNexus/lang", get_messages())],
+    data_file = [("/usr/share/FluidNexus/l10n", get_messages())],
     scripts=["scripts/fluid_nexus"],
     include_package_data=True,
     zip_safe=False,
