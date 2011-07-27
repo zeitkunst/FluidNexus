@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'FluidNexus/ui/FluidNexusPreferences.ui'
 #
-# Created: Tue Jul 26 14:41:29 2011
+# Created: Wed Jul 27 01:51:53 2011
 #      by: PyQt4 UI code generator 4.8.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -254,7 +254,7 @@ class Ui_FluidNexusPreferences(object):
         self.FluidNexusPreferencesTabWidget.setTabText(self.FluidNexusPreferencesTabWidget.indexOf(self.adhocWifiTab), QtGui.QApplication.translate("FluidNexusPreferences", "Ad-hoc Wifi", None, QtGui.QApplication.UnicodeUTF8))
         self.keyLabel.setText(QtGui.QApplication.translate("FluidNexusPreferences", "Key:", None, QtGui.QApplication.UnicodeUTF8))
         self.secretLabel.setText(QtGui.QApplication.translate("FluidNexusPreferences", "Secret:", None, QtGui.QApplication.UnicodeUTF8))
-        self.generateRequestTokenButton.setText(QtGui.QApplication.translate("FluidNexusPreferences", "Request Authorization", None, QtGui.QApplication.UnicodeUTF8))
+        self.generateRequestTokenButton.setText(QtGui.QApplication.translate("FluidNexusPreferences", "Request Nexus Authorization", None, QtGui.QApplication.UnicodeUTF8))
         self.noteLabel.setText(QtGui.QApplication.translate("FluidNexusPreferences", "Enter the values below after authorization", None, QtGui.QApplication.UnicodeUTF8))
         self.tokenLabel.setText(QtGui.QApplication.translate("FluidNexusPreferences", "Token: ", None, QtGui.QApplication.UnicodeUTF8))
         self.tokenSecretLabel.setText(QtGui.QApplication.translate("FluidNexusPreferences", "Token Secret: ", None, QtGui.QApplication.UnicodeUTF8))

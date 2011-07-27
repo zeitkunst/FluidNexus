@@ -21,6 +21,7 @@ requires = [
         'simplejson',
         'pybonjour',
         'sqlalchemy',
+        'oauth2',
         ]
 
 if sys.version_info[:3] < (2,5,0):
@@ -47,17 +48,18 @@ class build_py(_build_py):
         uis = []
         for filename in os.listdir("FluidNexus/ui/"):
             if filename.endswith(".ui"):
-                uis.append(filename)
+                uis.append(os.path.join("FluidNexus", "ui", filename))
 
         for ui in uis:
             out = ui.replace(".ui", "UI.py")
-            command = ["pyuic4", "-o", out, ui]
-            #subprocess.call(command)
+            command = ["pyuic4", "-d", ui, "-o", out]
+            # For some reason pyuic4 doesn't want to work here...
+            subprocess.call(command)
             self.byte_compile(out)
 
         res = "FluidNexus/ui/FluidNexus_rc.py"
-        command = ["pyrcc4", "FluidNexus/ui/FluidNexus.qrc", "-o", res]
-        #subprocess.call(command)
+        command = ["pyrcc4", "FluidNexus/ui/res/FluidNexus.qrc", "-o", res]
+        subprocess.call(command)
         regen_messages()
         _build_py.run(self)
 
