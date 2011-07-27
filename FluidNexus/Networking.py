@@ -420,7 +420,7 @@ class NexusNetworking(Networking):
                         #u = urllib2.urlopen(NEXUS_MESSAGE_ENDPOINT, data = urllib.urlencode(data))
                         #result = u.read()
                         #u.close()
-                        result = simplejson.loads(result)
+                        result = json.loads(result)
                         if (result["result"]):
                             self.database.setUploaded(message["message_hash"])
                             return True

@@ -152,7 +152,7 @@
      <item row="3" column="1">
       <widget class="QCheckBox" name="nexusCheckBox">
        <property name="text">
-        <string>Public (post to Nexus?)</string>
+        <string>Public (pust to Nexus?)</string>
        </property>
       </widget>
      </item>

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'FluidNexus/ui/FluidNexusNewMessage.ui'
 #
-# Created: Tue Jul 26 01:24:01 2011
+# Created: Tue Jul 26 14:41:29 2011
 #      by: PyQt4 UI code generator 4.8.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -100,6 +100,6 @@ class Ui_FluidNexusNewMessage(object):
         self.fileRemoveButton.setText(QtGui.QApplication.translate("FluidNexusNewMessage", "Remove File", None, QtGui.QApplication.UnicodeUTF8))
         self.cancelButton.setText(QtGui.QApplication.translate("FluidNexusNewMessage", "Cancel", None, QtGui.QApplication.UnicodeUTF8))
         self.saveButton.setText(QtGui.QApplication.translate("FluidNexusNewMessage", "Save", None, QtGui.QApplication.UnicodeUTF8))
-        self.nexusCheckBox.setText(QtGui.QApplication.translate("FluidNexusNewMessage", "Public (post to Nexus?)", None, QtGui.QApplication.UnicodeUTF8))
+        self.nexusCheckBox.setText(QtGui.QApplication.translate("FluidNexusNewMessage", "Public (pust to Nexus?)", None, QtGui.QApplication.UnicodeUTF8))
 
 import FluidNexus_rc
