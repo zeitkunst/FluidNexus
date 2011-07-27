@@ -4,8 +4,11 @@ import os
 import subprocess
 import sys
 
-from setuptools.command.build_py import build_py as _build_py
-from setuptools import setup, find_packages
+from distutils.command.build_py import build_py as _build_py
+from distutils.core import setup
+from setuptools import find_packages
+#from setuptools.command.build_py import build_py as _build_py
+#from setuptools import setup, find_packages
 
 import FluidNexus
 
@@ -37,6 +40,8 @@ def regen_messages():
             command = ["lconvert", "-i", "l10n/%s" % filename, "-o", "l10n/%s" % outFile]
             subprocess.call(command)
 
+print "MESSAGES ", get_messages()
+
 class build_py(_build_py):
     def run(self):
         uis = []
@@ -47,12 +52,12 @@ class build_py(_build_py):
         for ui in uis:
             out = ui.replace(".ui", "UI.py")
             command = ["pyuic4", "-o", out, ui]
-            subprocess.call(command)
+            #subprocess.call(command)
             self.byte_compile(out)
 
         res = "FluidNexus/ui/FluidNexus_rc.py"
         command = ["pyrcc4", "FluidNexus/ui/FluidNexus.qrc", "-o", res]
-        subprocess.call(command)
+        #subprocess.call(command)
         regen_messages()
         _build_py.run(self)
 
