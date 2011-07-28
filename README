@@ -1,4 +1,5 @@
 Fluid Nexus v0.2.1 alpha
+========================
 
 Nicholas A. Knouf
 
@@ -10,7 +11,8 @@ This software is ALPHA QUALITY and should only be used at your own risk.  More d
 
 The software has been testing on Ubuntu Maverick with python 2.6.6 and requires the following python modules: pyqt4, pybonjour, sqlalchemy, textile, pybluez, oauth2, protobuf (version 2.3.0 or higher).
 
-Specific network modality notes:
+Specific network modality notes
+-------------------------------
 
 Bluetooth:
 
@@ -28,7 +30,8 @@ Zeroconf:
 
 To run, type "fluid_nexus"; for help, type "fluid_nexus --help".
 
-= SECURITY NOTE =
+SECURITY NOTE
+=============
 
 Data is stored unencrypted in a local sqlite database.  It is best that you take care of encryption yourself, such as by using ecryptfs home directories or LUKS encrypted devices on Linux.
 
@@ -36,7 +39,8 @@ Data is sent over bluetooth without any transport layer encryption.  This is som
 
 Data is sent over link-local wifi using zeroconf for service discovery without any transport layer encryption.  This is something we plan on implementing in the future.
 
-= Licenses =
+Licenses
+========
 
 MultipartPostHandlerUnicode.py is licensed under the LGPL and downloaded from http://peerit.blogspot.com/2007/07/multipartposthandler-doesnt-work-for.html
 

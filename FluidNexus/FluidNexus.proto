@@ -1,6 +1,6 @@
 package FluidNexus;
 
-option java_package = "net.fluidnexus.FluidNexus";
+option java_package = "net.fluidnexus.FluidNexusAndroid";
 option java_outer_classname = "Protos";
 option optimize_for = LITE_RUNTIME;
 
