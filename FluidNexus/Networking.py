@@ -449,12 +449,12 @@ TODO
     def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsDir = ".", logPath = "FluidNexus.log", level = logging.DEBUG, numConnections = 5, setup = False):
         super(BluetoothServerVer3, self).__init__(databaseDir = databaseDir, databaseType = databaseType, attachmentsDir = attachmentsDir, logPath = logPath, level = level)
     
-    self.numConnections = numConnections
+        self.numConnections = numConnections
 
-    if setup:
-        # Do initial setup
-        self.setupServerSockets(numConnections = self.numConnections)
-        self.setupService()
+        if setup:
+            # Do initial setup
+            self.setupServerSockets(numConnections = self.numConnections)
+            self.setupService()
 
 
     def testBluetooth(self):

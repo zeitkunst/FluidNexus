@@ -44,7 +44,7 @@ def regen_messages():
 class build_py(_build_py):
     def run(self):
         uis = []
-        for filename in os.listdir("FluidNexus/ui/"):
+        for filename in os.listdir(os.path.join("FluidNexus", "ui")):
             if filename.endswith(".ui"):
                 uis.append(os.path.join("FluidNexus", "ui", filename))
 
