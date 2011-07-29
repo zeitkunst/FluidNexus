@@ -446,19 +446,31 @@ TODO
 * Deal with different libraries such as lightblue."""
 
 
-    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsDir = ".", logPath = "FluidNexus.log", level = logging.DEBUG, numConnections = 5):
+    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsDir = ".", logPath = "FluidNexus.log", level = logging.DEBUG, numConnections = 5, setup = False):
         super(BluetoothServerVer3, self).__init__(databaseDir = databaseDir, databaseType = databaseType, attachmentsDir = attachmentsDir, logPath = logPath, level = level)
+    
+    self.numConnections = numConnections
 
+    if setup:
         # Do initial setup
-        self.setupServerSockets(numConnections = numConnections)
+        self.setupServerSockets(numConnections = self.numConnections)
         self.setupService()
+
 
     def testBluetooth(self):
         """Test the bluetooth connection."""
         try:
+            # Do initial setup
+            self.setupServerSockets(numConnections = self.numConnections)
+            self.setupService()
+
             nearbyDevices = discover_devices(duration = 1)
             return True
         except BluetoothError, e:
+            self.logger.error("Unable to setup bluetooth, BluetoothError: " + str(e))
+            return False
+        except IOError, e:
+            self.logger.error("Unable to setup bluetooth, IOError: " + str(e))
             return False
 
     def setupServerSockets(self, numConnections = 5, blocking = 0):
