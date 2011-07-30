@@ -1,4 +1,4 @@
-Fluid Nexus v0.2.1 alpha
+Fluid Nexus v0.2.2 alpha
 ========================
 
 Nicholas A. Knouf

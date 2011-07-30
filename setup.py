@@ -27,6 +27,14 @@ requires = [
 if sys.version_info[:3] < (2,5,0):
     requires.append('pysqlite')
 
+if (os.name == "posix"):
+    os_name = "posix"
+elif (os.name in ["nt", "dos"]):
+    os_name = "windows"
+
+if (os_name == "windows"):
+    import py2exe
+
 def get_messages():
     msgfiles = []
     for filename in os.listdir("l10n/"):
@@ -50,13 +58,20 @@ class build_py(_build_py):
 
         for ui in uis:
             out = ui.replace(".ui", "UI.py")
-            command = ["pyuic4", ui, "-o", out]
+            if (os_name == "windows"):
+                command = ["pyuic4.bat", ui, "-o", out]
+            else:
+                command = ["pyuic4", ui, "-o", out]
+
             # For some reason pyuic4 doesn't want to work here...
             subprocess.call(command)
             self.byte_compile(out)
 
         res = "FluidNexus/ui/FluidNexus_rc.py"
-        command = ["pyrcc4", "FluidNexus/ui/res/FluidNexus.qrc", "-o", res]
+        if (os_name == "windows"):
+            command = ["pyrcc4.exe", "FluidNexus/ui/res/FluidNexus.qrc", "-o", res]
+        else:
+            command = ["pyrcc4", "FluidNexus/ui/res/FluidNexus.qrc", "-o", res]
         subprocess.call(command)
         regen_messages()
         _build_py.run(self)

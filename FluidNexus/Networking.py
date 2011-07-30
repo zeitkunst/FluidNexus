@@ -84,6 +84,21 @@ class Networking(object):
     STATE_WRITE_DONE = 0x00A0
     STATE_QUIT = 0x00F0
 
+    stateMapping = {0x0000: "STATE_START",
+                    0x0001: "STATE_WAITING",
+                    0x0010: "STATE_READ_HELO",
+                    0x0020: "STATE_WRITE_HELO",
+                    0x0030: "STATE_READ_HASHES",
+                    0x0040: "STATE_WRITE_MESSAGES",
+                    0x0050: "STATE_READ_SWITCH",
+                    0x0060: "STATE_WRITE_HASHES",
+                    0x0070: "STATE_READ_MESSAGES",
+                    0x0080: "STATE_WRITE_SWITCH",
+                    0x0090: "STATE_READ_DONE",
+                    0x00A0: "STATE_WRITE_DONE",
+                    0x00F0: "STATE_QUIT",
+                   }
+
     # Commands
     HELO = 0x0010
     HASHES = 0x0020
@@ -113,8 +128,10 @@ class Networking(object):
 
     def setState(self, state):
         """Set our state."""
-        tmpNewState = str(state)
-        tmpOldState = str(self.state)
+        #tmpNewState = str(state)
+        tmpNewState = self.stateMapping[state]
+        #tmpOldState = str(self.state)
+        tmpOldState = self.stateMapping[self.state]
 
         self.logger.debug("Changing state from %s to %s" % (tmpOldState, tmpNewState))
         self.state = state
