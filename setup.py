@@ -27,10 +27,12 @@ requires = [
 if sys.version_info[:3] < (2,5,0):
     requires.append('pysqlite')
 
-if (os.name == "posix"):
+if (sys.platform.startswith("linux")):
     os_name = "posix"
-elif (os.name in ["nt", "dos"]):
+elif (sys.platform == "win32"):
     os_name = "windows"
+elif (sys.platform == "darwin"):
+    os_name = "darwin"
 
 if (os_name == "windows"):
     import py2exe
@@ -73,7 +75,8 @@ class build_py(_build_py):
         else:
             command = ["pyrcc4", "FluidNexus/ui/res/FluidNexus.qrc", "-o", res]
         subprocess.call(command)
-        regen_messages()
+        if (os_name != "windows"):
+            regen_messages()
         _build_py.run(self)
 
 setup(name='fluid_nexus',
@@ -101,6 +104,11 @@ setup(name='fluid_nexus',
     package_data={"FluidNexus.ui":["*.ui"]},
     data_files = [("share/FluidNexus/l10n", get_messages())],
     scripts=["scripts/fluid_nexus"],
+    zipfile = "lib/library.zip",
+    windows=[{
+        "script": "scripts/fluid_nexus",
+        "icon_resources": [(1, "FluidNexus/ui/res/icons/fluid_nexus_icon.ico")]}],
+    options = {"py2exe": { "includes": ["sip", "simplejson", "pysqlite2", "google.protobuf", "sqlalchemy"], "packages": ["sqlalchemy.dialects.sqlite"]} },
     include_package_data=True,
     zip_safe=False,
     install_requires = requires,
