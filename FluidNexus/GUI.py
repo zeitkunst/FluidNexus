@@ -1221,7 +1221,8 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         homeDir = os.path.expanduser('~')
 
         if sys.platform == "win32":
-            homeDir = self.findAppDirWin()
+            # We don't want a centralized location for app data, especially on multi-user systems
+            #homeDir = self.findAppDirWin()
             self.dataDir = os.path.join(homeDir, "FluidNexusData")
         else:
             self.dataDir = os.path.join(homeDir, ".FluidNexus")
