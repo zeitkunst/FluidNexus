@@ -1,5 +1,6 @@
 include README.rst
 include CHANGES.rst
+include LICENSE
 include FluidNexus/ui/res/FluidNexus.qrc
 include FluidNexus/ui/res/icons/*.png
 include FluidNexus/ui/res/icons/*.ico
