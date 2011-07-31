@@ -14,7 +14,7 @@ def getLogger(logPath = "FluidNexus.log", level = logging.DEBUG, console = True)
         #level = getattr(logging, config.get("Station", "defaultLogLevel").upper())
         logger.addHandler(fileHandler)
 
-        if (console):
+        if (console and (sys.platform != "win32")):
             logger.addHandler(ConsoleHandler())
         logger.setLevel(level)
         _loggerSetup = True

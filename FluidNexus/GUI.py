@@ -1209,6 +1209,11 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         if (event.oldSize() != self.ui.centralwidget.size()):
             self.ui.FluidNexusScrollArea.resize(self.ui.centralwidget.size())
 
+    def findAppDirWin(self):
+        if hasattr(sys, "frozen"):
+            return os.path.dirname(sys.executable)
+
+        return os.path.dirname(sys.argv[0])
 
     def __setupAppData(self):
         """ Setup the application data directory in the home directory."""
@@ -1216,6 +1221,7 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         homeDir = os.path.expanduser('~')
 
         if sys.platform == "win32":
+            homeDir = self.findAppDirWin()
             self.dataDir = os.path.join(homeDir, "FluidNexusData")
         else:
             self.dataDir = os.path.join(homeDir, ".FluidNexus")
