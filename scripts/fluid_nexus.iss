@@ -10,16 +10,17 @@
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
-AppId={{A323E88C-5280-4DE4-891A-C85533E9B95C}
+AppId={{ECF9D701-538C-4B3D-8B5C-ACBED296F45B}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 ;AppVerName={#MyAppName} {#MyAppVersion}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-DefaultDirName={pf}\FluidNexus
+DefaultDirName={pf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
-AllowNoIcons=yes
+LicenseFile=C:\Users\nknouf\Development\Android\FluidNexus\LICENSE
+InfoBeforeFile=C:\Users\nknouf\Development\Android\FluidNexus\README.rst
 OutputBaseFilename={#MyAppName} {#MyAppVersion} Setup
 Compression=lzma
 SolidCompression=yes
@@ -32,11 +33,13 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 0,6.1
 
 [Files]
+Source: "C:\Users\nknouf\Development\Android\FluidNexus\dist\fluid_nexus.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Users\nknouf\Development\Android\FluidNexus\dist\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
+Name: "{group}\{cm:ProgramOnTheWeb,{#MyAppName}}"; Filename: "{#MyAppURL}"
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
 Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: quicklaunchicon
