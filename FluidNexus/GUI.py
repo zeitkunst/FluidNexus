@@ -1073,7 +1073,10 @@ class FluidNexusHelpDialog(QtGui.QDialog):
 
         if (sys.platform == "win32"):
             prefix = self.findAppDirWin()
-            manualPath = os.path.join(prefix, "share", "FluidNexus", "manual", "index.html")
+            if (prefix.startswith(sys.prefix)):
+                manualPath = os.path.join(os.path.abspath(prefix), "share", "FluidNexus", "manual", "index.html")
+            else:
+                manualPath = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), "manual", "index.html")
         else:
             # Get our current path
             currentPath = os.path.dirname(os.path.abspath(sys.argv[0]))
@@ -1089,8 +1092,18 @@ class FluidNexusHelpDialog(QtGui.QDialog):
             fp = open(manualPath, "r")
             manualText = fp.read()
             fp.close()
-            fixImagePathRegex = re.compile(r'src="images', re.MULTILINE)
-            manualText = re.sub(fixImagePathRegex, 'src="%s' % os.path.join(os.path.dirname(manualPath), "images"), manualText)
+            
+            if (sys.platform == "win32"):
+                fixImagePathWindowsRegex = re.compile(r'src="([^"]*)"', re.MULTILINE)
+                fixImagePathRegex = re.compile(r'src="images', re.MULTILINE)
+                manualText = fixImagePathRegex.sub('src="%s' % os.path.join(os.path.dirname(manualPath).replace("\\", "\\\\"), "images"), manualText)
+                def replaceSlashes(match):
+                    result = match.group().replace("/", "\\")
+                    return result
+                manualText = fixImagePathWindowsRegex.sub(replaceSlashes, manualText)
+            else:
+                fixImagePathRegex = re.compile(r'src="images', re.MULTILINE)
+                manualText = fixImagePathRegex.sub('src="%s' % os.path.join(os.path.dirname(manualPath), "images"), manualText)
             return manualText
         except IOError, e:
             self.parent.logger.error("Unable to open manual: " + str(e))

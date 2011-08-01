@@ -45,7 +45,11 @@ def get_messages():
     return msgfiles
 
 def get_manual():
-    return [filename for filename in os.listdir("manual/")]
+    manual_filenames = []
+    for dirpath, dirs, filenames in os.walk("manual/"):
+        manual_filenames.extend([os.path.join(dirpath, filename) for filename in filenames])
+        
+    return manual_filenames
 
 def regen_messages():
     for filename in os.listdir("l10n/"):
