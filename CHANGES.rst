@@ -1,6 +1,12 @@
 ChangeLog
 =========
 
+v0.2.3
+------
+
+* Added manual, accessible from help menu
+* Improved bundling of code on Windows to enable the creation of an installer
+
 v0.2.2
 ------
 
