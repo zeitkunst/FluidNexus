@@ -1,5 +1,8 @@
 <RCC>
   <qresource prefix="icons">
+    <file>icons/32x32/menu_help.png</file>
+    <file>icons/32x32/attachment_icon.png</file>
+    <file>icons/32x32/menu_public_other.png</file>
     <file>icons/32x32/menu_all.png</file>
     <file>icons/32x32/menu_outgoing.png</file>
     <file>icons/32x32/menu_blacklist.png</file>
@@ -9,5 +12,6 @@
     <file>icons/32x32/menu_delete.png</file>
     <file>icons/32x32/menu_edit.png</file>
     <file>icons/32x32/menu_enable_outgoing.png</file>
+    <file>icons/32x32/menu_public.png</file>
   </qresource>
 </RCC>

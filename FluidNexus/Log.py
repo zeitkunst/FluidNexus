@@ -3,7 +3,7 @@ import logging
 import sys
 
 _loggerSetup = False
-def getLogger(logPath = "FluidNexus.log", level = logging.DEBUG, console = True):
+def getLogger(logPath = "FluidNexus.log", level = logging.WARN, console = True):
     global _loggerSetup
 
     if (_loggerSetup == False):
@@ -14,7 +14,7 @@ def getLogger(logPath = "FluidNexus.log", level = logging.DEBUG, console = True)
         #level = getattr(logging, config.get("Station", "defaultLogLevel").upper())
         logger.addHandler(fileHandler)
 
-        if (console):
+        if (console and (sys.platform != "win32")):
             logger.addHandler(ConsoleHandler())
         logger.setLevel(level)
         _loggerSetup = True

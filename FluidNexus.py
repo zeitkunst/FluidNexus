@@ -6,6 +6,8 @@ import os
 import sys
 
 
+
+
 def start(verbosity = 0, headless = False):
     if (verbosity >= 3):
         level = logging.DEBUG
@@ -32,7 +34,7 @@ def start(verbosity = 0, headless = False):
     else:
         from PyQt4 import QtGui
         from FluidNexus.GUI import FluidNexusDesktop
-
+        
         app = QtGui.QApplication(sys.argv)
         fluidNexus = FluidNexusDesktop(level = level)
         fluidNexus.show()
@@ -40,9 +42,13 @@ def start(verbosity = 0, headless = False):
 
 if __name__ == "__main__":
     parser = OptionParser()
-    parser.add_option("-v", "--verbose", dest = "verbosity", action = "count",  help = "How verbose to be.  Use up to 3 v's for full debug logging.")
+    parser.add_option("-v", "--verbose", dest = "verbosity", action = "count",  help = "How verbose to be.  Use up to 3 v's for full debug.")
+
     # TODO
     # Better short option...
-    parser.add_option("-e", "--headless", dest = "headless", action = "store_true",  help = "Whether to run the network services without the GUI")
+    # Disabling headless until we're able to figure out how to handle all of the threads, the sleeping, etc.
+    #parser.add_option("-e", "--headless", dest = "headless", action = "store_true",  help = "Whether to run the network services without the GUI")
     (options, args) = parser.parse_args()
-    start(verbosity = options.verbosity, headless = options.headless)
+
+    #start(verbosity = options.verbosity, headless = options.headless)
+    start(verbosity = options.verbosity)

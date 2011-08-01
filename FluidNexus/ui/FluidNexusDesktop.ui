@@ -88,6 +88,7 @@
     <property name="title">
      <string>&amp;Help</string>
     </property>
+    <addaction name="actionHelp"/>
     <addaction name="actionAbout"/>
    </widget>
    <widget class="QMenu" name="menu_View">
@@ -95,6 +96,7 @@
      <string>&amp;View</string>
     </property>
     <addaction name="actionViewAll"/>
+    <addaction name="actionViewPublic"/>
     <addaction name="actionViewOutgoing"/>
     <addaction name="actionViewBlacklist"/>
    </widget>
@@ -116,6 +118,7 @@
    <addaction name="actionNewMessage"/>
    <addaction name="separator"/>
    <addaction name="actionViewAll"/>
+   <addaction name="actionViewPublic"/>
    <addaction name="actionViewOutgoing"/>
    <addaction name="actionViewBlacklist"/>
   </widget>
@@ -170,7 +173,7 @@
      <normaloff>:/icons/icons/32x32/menu_all.png</normaloff>:/icons/icons/32x32/menu_all.png</iconset>
    </property>
    <property name="text">
-    <string>View All</string>
+    <string>View &amp;All</string>
    </property>
    <property name="toolTip">
     <string>View all messages</string>
@@ -185,7 +188,7 @@
      <normaloff>:/icons/icons/32x32/menu_outgoing.png</normaloff>:/icons/icons/32x32/menu_outgoing.png</iconset>
    </property>
    <property name="text">
-    <string>View Outgoing</string>
+    <string>View &amp;Outgoing</string>
    </property>
    <property name="toolTip">
     <string>View outgoing messages</string>
@@ -200,10 +203,37 @@
      <normaloff>:/icons/icons/32x32/menu_blacklist.png</normaloff>:/icons/icons/32x32/menu_blacklist.png</iconset>
    </property>
    <property name="text">
-    <string>View Blacklist</string>
+    <string>View &amp;Blacklist</string>
    </property>
    <property name="toolTip">
     <string>View blacklisted messages</string>
+   </property>
+  </action>
+  <action name="actionViewPublic">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="res/FluidNexus.qrc">
+     <normaloff>:/icons/icons/32x32/menu_public_other.png</normaloff>:/icons/icons/32x32/menu_public_other.png</iconset>
+   </property>
+   <property name="text">
+    <string>View &amp;Public</string>
+   </property>
+   <property name="toolTip">
+    <string>View Public Messages</string>
+   </property>
+  </action>
+  <action name="actionHelp">
+   <property name="icon">
+    <iconset resource="res/FluidNexus.qrc">
+     <normaloff>:/icons/icons/32x32/menu_help.png</normaloff>:/icons/icons/32x32/menu_help.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Help</string>
+   </property>
+   <property name="toolTip">
+    <string>Open the manual for Fluid Nexus</string>
    </property>
   </action>
  </widget>

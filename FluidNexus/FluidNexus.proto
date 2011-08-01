@@ -1,10 +1,8 @@
 package FluidNexus;
 
-option java_package = "net.fluidnexus.FluidNexus";
+option java_package = "net.fluidnexus.FluidNexusAndroid";
 option java_outer_classname = "Protos";
 option optimize_for = LITE_RUNTIME;
-
-//"create table FluidNexusData (_id integer primary key autoincrement,    source varchar(32), time bigint, type integer, title varchar(40), data long     varchar, hash varchar(32), cellID varchar(20), mine bit);";
 
 message FluidNexusHashes {
     repeated string message_hash = 1;
@@ -14,11 +12,13 @@ message FluidNexusMessage {
     optional string message_title = 1;
     optional string message_content = 2;
     optional float message_timestamp = 3;
+    optional float message_received_timestamp = 10;
     optional string message_hash = 4;
     optional string message_source = 5;
     optional bool message_mine = 6;
+    optional bool message_public = 16;
+    optional int32 message_ttl = 17 [default = 0];
 
-    // Do we want to do it this way, or use mime-types?
     enum MessageType {
         TEXT = 0;
         AUDIO = 1;

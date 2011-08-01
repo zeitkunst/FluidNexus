@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>452</width>
-    <height>357</height>
+    <width>501</width>
+    <height>350</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,7 +20,7 @@
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
-     <x>90</x>
+     <x>150</x>
      <y>310</y>
      <width>341</width>
      <height>32</height>
@@ -41,7 +41,7 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>421</width>
+     <width>481</width>
      <height>291</height>
     </rect>
    </property>
@@ -97,9 +97,9 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QCheckBox" name="zeroconfCheckbox">
+       <widget class="QCheckBox" name="zeroconfEnabled">
         <property name="enabled">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
         <property name="text">
          <string>Zeroconf</string>
@@ -107,7 +107,7 @@
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="QCheckBox" name="adhocCheckbox">
+       <widget class="QCheckBox" name="adhocEnabled">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -116,7 +116,7 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="1">
+      <item row="4" column="1">
        <widget class="QPlainTextEdit" name="networkInfo">
         <property name="palette">
          <palette>
@@ -163,6 +163,16 @@
         </property>
         <property name="plainText">
          <string>If you make changes to these values you must restart the program for the changes to take effect.</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QCheckBox" name="nexusEnabled">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="text">
+         <string>Nexus</string>
         </property>
        </widget>
       </item>
@@ -260,11 +270,215 @@
     <attribute name="title">
      <string>Zeroconf</string>
     </attribute>
+    <widget class="QWidget" name="formLayoutWidget_3">
+     <property name="geometry">
+      <rect>
+       <x>9</x>
+       <y>9</y>
+       <width>391</width>
+       <height>241</height>
+      </rect>
+     </property>
+     <layout class="QFormLayout" name="formLayout_2">
+      <item row="0" column="0">
+       <widget class="QLabel" name="zeroconfScanFrequencyLabel">
+        <property name="text">
+         <string>Scan Frequency:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="zeroconfScanFrequency">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip">
+         <string>How often to scan for nearby devices.  Lower values will severely impact battery life.</string>
+        </property>
+        <item>
+         <property name="text">
+          <string comment="5">5 seconds</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string comment="10">10 seconds</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string comment="30">30 seconds</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string comment="60">1 minute</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string comment="120">2 minutes</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string comment="300">5 minutes</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string comment="600">10 minutes</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string comment="1200">20 minutes</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string comment="1800">30 minutes</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string comment="3600">1 hour</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </widget>
    <widget class="QWidget" name="adhocWifiTab">
     <attribute name="title">
      <string>Ad-hoc Wifi</string>
     </attribute>
+   </widget>
+   <widget class="QWidget" name="tab">
+    <attribute name="title">
+     <string>Nexus</string>
+    </attribute>
+    <widget class="QWidget" name="formLayoutWidget_4">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>451</width>
+       <height>241</height>
+      </rect>
+     </property>
+     <layout class="QFormLayout" name="formLayout_3">
+      <item row="0" column="0">
+       <widget class="QLabel" name="keyLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Key:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="keyInput">
+        <property name="maxLength">
+         <number>20</number>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="secretLabel">
+        <property name="text">
+         <string>Secret:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="secretInput">
+        <property name="maxLength">
+         <number>20</number>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QPushButton" name="generateRequestTokenButton">
+        <property name="text">
+         <string>Request Nexus Authorization</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLabel" name="noteLabel">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="text">
+         <string>Enter the values below after authorization</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="tokenLabel">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="text">
+         <string>Token: </string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QLineEdit" name="tokenInput">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="tokenSecretLabel">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="text">
+         <string>Token Secret: </string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="QLineEdit" name="tokenSecretInput">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0">
+       <widget class="QLabel" name="ttlLabel">
+        <property name="text">
+         <string>Default TTL</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1">
+       <widget class="QSpinBox" name="ttlSpinBox">
+        <property name="toolTip">
+         <string>Default Time to Live (TTL), or the maximum number of &quot;hops&quot; allowed for a public message to attempt to be posted to the Nexus.</string>
+        </property>
+        <property name="value">
+         <number>30</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </widget>
   </widget>
  </widget>
@@ -336,9 +550,162 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>zeroconfEnabled</sender>
+   <signal>stateChanged(int)</signal>
+   <receiver>FluidNexusPreferences</receiver>
+   <slot>zeroconfChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>100</x>
+     <y>86</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>160</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>zeroconfScanFrequency</sender>
+   <signal>activated(int)</signal>
+   <receiver>FluidNexusPreferences</receiver>
+   <slot>zeroconfScanFrequencyChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>183</x>
+     <y>64</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>450</x>
+     <y>125</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>keyInput</sender>
+   <signal>editingFinished()</signal>
+   <receiver>FluidNexusPreferences</receiver>
+   <slot>nexusKeyFinished()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>299</x>
+     <y>64</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>78</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>secretInput</sender>
+   <signal>editingFinished()</signal>
+   <receiver>FluidNexusPreferences</receiver>
+   <slot>nexusSecretFinished()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>347</x>
+     <y>92</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>498</x>
+     <y>188</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>generateRequestTokenButton</sender>
+   <signal>clicked()</signal>
+   <receiver>FluidNexusPreferences</receiver>
+   <slot>onRequestAuthorization()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>229</x>
+     <y>127</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>98</x>
+     <y>321</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tokenInput</sender>
+   <signal>editingFinished()</signal>
+   <receiver>FluidNexusPreferences</receiver>
+   <slot>tokenFinished()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>155</x>
+     <y>177</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>0</x>
+     <y>228</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tokenSecretInput</sender>
+   <signal>editingFinished()</signal>
+   <receiver>FluidNexusPreferences</receiver>
+   <slot>tokenSecretFinished()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>145</x>
+     <y>215</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>2</x>
+     <y>273</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>nexusEnabled</sender>
+   <signal>stateChanged(int)</signal>
+   <receiver>FluidNexusPreferences</receiver>
+   <slot>nexusChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>42</x>
+     <y>135</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>6</x>
+     <y>204</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ttlSpinBox</sender>
+   <signal>editingFinished()</signal>
+   <receiver>FluidNexusPreferences</receiver>
+   <slot>ttlFinished()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>154</x>
+     <y>232</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>49</x>
+     <y>334</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>bluetoothScanFrequencyChanged(int)</slot>
   <slot>bluetoothChanged(int)</slot>
+  <slot>zeroconfChanged(int)</slot>
+  <slot>zeroconfScanFrequencyChanged(int)</slot>
+  <slot>nexusKeyFinished()</slot>
+  <slot>nexusSecretFinished()</slot>
+  <slot>onRequestAuthorization()</slot>
+  <slot>ttlFinished()</slot>
+  <slot>tokenFinished()</slot>
+  <slot>tokenSecretFinished()</slot>
+  <slot>nexusChanged()</slot>
  </slots>
 </ui>
