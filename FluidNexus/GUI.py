@@ -1076,12 +1076,13 @@ class FluidNexusHelpDialog(QtGui.QDialog):
             manualPath = os.path.join(os.path.abspath(prefix), "share", "FluidNexus", "manual", "index.html")
         else:
             # Get our current path
-            currentPath = os.path.dirname(os.path.abspath(sys.argv[0]))
+            #currentPath = os.path.dirname(os.path.abspath(sys.argv[0]))
+            currentPath = os.path.dirname(os.path.abspath(self.__file__))
             
-            if (currentPath.startswith(sys.prefix)):
-                prefix = sys.prefix
-            else:
-                prefix = currentPath
+            #if (currentPath.startswith(sys.prefix)):
+            #    prefix = sys.prefix
+            #else:
+            #    prefix = currentPath
 
             manualPath = os.path.join(prefix, "share", "FluidNexus", "manual", "index.html")
 
