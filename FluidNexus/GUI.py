@@ -1077,7 +1077,7 @@ class FluidNexusHelpDialog(QtGui.QDialog):
         else:
             # Get our current path
             #currentPath = os.path.dirname(os.path.abspath(sys.argv[0]))
-            currentPath = os.path.dirname(os.path.abspath(self.__file__))
+            currentPath = os.path.dirname(os.path.abspath(__file__))
             
             #if (currentPath.startswith(sys.prefix)):
             #    prefix = sys.prefix
