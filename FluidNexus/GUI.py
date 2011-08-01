@@ -1073,20 +1073,18 @@ class FluidNexusHelpDialog(QtGui.QDialog):
 
         if (sys.platform == "win32"):
             prefix = self.findAppDirWin()
-            if (prefix.startswith(sys.prefix)):
-                manualPath = os.path.join(os.path.abspath(prefix), "share", "FluidNexus", "manual", "index.html")
-            else:
-                manualPath = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), "manual", "index.html")
+            manualPath = os.path.join(os.path.abspath(prefix), "share", "FluidNexus", "manual", "index.html")
         else:
             # Get our current path
             currentPath = os.path.dirname(os.path.abspath(sys.argv[0]))
             
             if (currentPath.startswith(sys.prefix)):
                 prefix = sys.prefix
-                manualPath = os.path.join(prefix, "share", "FluidNexus", "manual", "index.html")
             else:
                 prefix = currentPath
-                manualPath = os.path.join(prefix, "manual", "index.html")
+
+            manualPath = os.path.join(prefix, "share", "FluidNexus", "manual", "index.html")
+
 
         try:
             fp = open(manualPath, "r")

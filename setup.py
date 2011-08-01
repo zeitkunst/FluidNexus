@@ -46,7 +46,7 @@ def get_messages():
 
 def get_manual():
     manual_filenames = []
-    for dirpath, dirs, filenames in os.walk("manual/"):
+    for dirpath, dirs, filenames in os.walk(os.path.join("share", "FluidNexus", "manual")):
         manual_filenames.extend([os.path.join(dirpath, filename) for filename in filenames])
         
     return manual_filenames
