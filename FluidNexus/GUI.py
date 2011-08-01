@@ -24,6 +24,7 @@ from ui.FluidNexusDesktopUI import Ui_FluidNexus
 from ui.FluidNexusNewMessageUI import Ui_FluidNexusNewMessage
 from ui.FluidNexusAboutUI import Ui_FluidNexusAbout
 from ui.FluidNexusPreferencesUI import Ui_FluidNexusPreferences
+from ui.FluidNexusHelpUI import Ui_FluidNexusHelp
 from Database import FluidNexusDatabase
 from Networking import BluetoothServerVer3, BluetoothClientVer3, ZeroconfClient, ZeroconfServer, NexusNetworking
 import Log
@@ -1049,6 +1050,55 @@ class FluidNexusPreferencesDialog(QtGui.QDialog):
         self.close()
 
 
+class FluidNexusHelpDialog(QtGui.QDialog):
+    def __init__(self, parent=None, title = None, message = None):
+        QtGui.QDialog.__init__(self, parent)
+
+        self.parent = parent
+    
+        self.ui = Ui_FluidNexusHelp()
+        self.ui.setupUi(self)
+        self.ui.fluidNexusHelpBrowser.setText(self.findManual())
+
+    def findAppDirWin(self):
+        if hasattr(sys, "frozen"):
+            return os.path.dirname(sys.executable)
+
+        return os.path.dirname(sys.argv[0])
+
+    def findManual(self):
+        """Try and find our manual..."""
+        # TODO
+        # This is probably very brittle and needs some work...
+
+        if (sys.platform == "win32"):
+            prefix = self.findAppDirWin()
+            manualPath = os.path.join(prefix, "share", "FluidNexus", "manual", "index.html")
+        else:
+            # Get our current path
+            currentPath = os.path.dirname(os.path.abspath(sys.argv[0]))
+            
+            if (currentPath.startswith(sys.prefix)):
+                prefix = sys.prefix
+                manualPath = os.path.join(prefix, "share", "FluidNexus", "manual", "index.html")
+            else:
+                prefix = currentPath
+                manualPath = os.path.join(prefix, "manual", "index.html")
+
+        try:
+            fp = open(manualPath, "r")
+            manualText = fp.read()
+            fp.close()
+            fixImagePathRegex = re.compile(r'src="images', re.MULTILINE)
+            manualText = re.sub(fixImagePathRegex, 'src="%s' % os.path.join(os.path.dirname(manualPath), "images"), manualText)
+            return manualText
+        except IOError, e:
+            self.parent.logger.error("Unable to open manual: " + str(e))
+            return ""
+
+    def closeDialog(self):
+        self.close()
+
 class FluidNexusAboutDialog(QtGui.QDialog):
 
     aboutText = u"""<p>Copyfarleft 2008-2011 Nicholas A. Knouf</p>
@@ -1344,6 +1394,7 @@ class FluidNexusDesktop(QtGui.QMainWindow):
     def setupActions(self):
         """Setup the actions that we already know about."""
         self.connect(self.ui.actionAbout, QtCore.SIGNAL('triggered()'), self.displayAbout)
+        self.connect(self.ui.actionHelp, QtCore.SIGNAL('triggered()'), self.displayHelp)
         self.connect(self.ui.actionQuit, QtCore.SIGNAL('triggered()'), self.handleQuit)
         self.connect(self.ui.actionNewMessage, QtCore.SIGNAL('triggered()'), self.handleNewMessage)
         self.connect(self.ui.actionPreferences, QtCore.SIGNAL('triggered()'), self.handlePreferences)
@@ -1454,6 +1505,12 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         """Display our about box."""
         self.aboutDialog = FluidNexusAboutDialog(parent = self)
         self.aboutDialog.exec_()
+
+    def displayHelp(self):
+        """Display our about box."""
+        self.helpDialog = FluidNexusHelpDialog(parent = self)
+        self.helpDialog.exec_()
+
 
     def newMessages(self, newMessages):
         """Slot for when an incoming message was added by the server thread."""

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'FluidNexus/ui/FluidNexusDesktop.ui'
 #
-# Created: Sun Jul 31 20:25:05 2011
+# Created: Sun Jul 31 21:35:00 2011
 #      by: PyQt4 UI code generator 4.8.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -104,10 +104,16 @@ class Ui_FluidNexus(object):
         icon6.addPixmap(QtGui.QPixmap(_fromUtf8(":/icons/icons/32x32/menu_public_other.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionViewPublic.setIcon(icon6)
         self.actionViewPublic.setObjectName(_fromUtf8("actionViewPublic"))
+        self.actionHelp = QtGui.QAction(FluidNexus)
+        icon7 = QtGui.QIcon()
+        icon7.addPixmap(QtGui.QPixmap(_fromUtf8(":/icons/icons/32x32/menu_help.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionHelp.setIcon(icon7)
+        self.actionHelp.setObjectName(_fromUtf8("actionHelp"))
         self.menuFile.addAction(self.actionNewMessage)
         self.menuFile.addAction(self.actionPreferences)
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.actionQuit)
+        self.menuHelp.addAction(self.actionHelp)
         self.menuHelp.addAction(self.actionAbout)
         self.menu_View.addAction(self.actionViewAll)
         self.menu_View.addAction(self.actionViewPublic)
@@ -147,5 +153,7 @@ class Ui_FluidNexus(object):
         self.actionViewBlacklist.setToolTip(QtGui.QApplication.translate("FluidNexus", "View blacklisted messages", None, QtGui.QApplication.UnicodeUTF8))
         self.actionViewPublic.setText(QtGui.QApplication.translate("FluidNexus", "View &Public", None, QtGui.QApplication.UnicodeUTF8))
         self.actionViewPublic.setToolTip(QtGui.QApplication.translate("FluidNexus", "View Public Messages", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionHelp.setText(QtGui.QApplication.translate("FluidNexus", "&Help", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionHelp.setToolTip(QtGui.QApplication.translate("FluidNexus", "Open the manual for Fluid Nexus", None, QtGui.QApplication.UnicodeUTF8))
 
 import FluidNexus_rc

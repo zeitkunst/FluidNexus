@@ -88,6 +88,7 @@
     <property name="title">
      <string>&amp;Help</string>
     </property>
+    <addaction name="actionHelp"/>
     <addaction name="actionAbout"/>
    </widget>
    <widget class="QMenu" name="menu_View">
@@ -221,6 +222,18 @@
    </property>
    <property name="toolTip">
     <string>View Public Messages</string>
+   </property>
+  </action>
+  <action name="actionHelp">
+   <property name="icon">
+    <iconset resource="res/FluidNexus.qrc">
+     <normaloff>:/icons/icons/32x32/menu_help.png</normaloff>:/icons/icons/32x32/menu_help.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Help</string>
+   </property>
+   <property name="toolTip">
+    <string>Open the manual for Fluid Nexus</string>
    </property>
   </action>
  </widget>

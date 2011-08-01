@@ -34,7 +34,7 @@ def start(verbosity = 0, headless = False):
     else:
         from PyQt4 import QtGui
         from FluidNexus.GUI import FluidNexusDesktop
-
+        
         app = QtGui.QApplication(sys.argv)
         fluidNexus = FluidNexusDesktop(level = level)
         fluidNexus.show()
