@@ -44,9 +44,9 @@ def get_messages():
             msgfiles.append("l10n/%s" % filename)
     return msgfiles
 
-def get_manual():
+def get_manual_images():
     manual_filenames = []
-    for dirpath, dirs, filenames in os.walk(os.path.join("share", "FluidNexus", "manual")):
+    for dirpath, dirs, filenames in os.walk(os.path.join("share", "FluidNexus", "manual", "images")):
         manual_filenames.extend([os.path.join(dirpath, filename) for filename in filenames])
         
     return manual_filenames
@@ -110,7 +110,8 @@ setup(name='fluid_nexus',
     packages=find_packages(),
     package_data={"FluidNexus.ui":["*.ui"]},
     data_files = [("share/FluidNexus/l10n", get_messages()), 
-                 ("share/FluidNexus/manual", get_manual())],
+                  ("share/FluidNexus/manual", ["share/FluidNexus/manual/index.html"]),
+                 ("share/FluidNexus/manual/images", get_manual_images())],
     scripts=["scripts/fluid_nexus"],
     zipfile = "lib/library.zip",
     windows=[{
