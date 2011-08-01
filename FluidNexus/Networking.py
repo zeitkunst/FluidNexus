@@ -119,9 +119,10 @@ class Networking(object):
         self.databaseDir = databaseDir
         self.databaseType = databaseType
         self.attachmentsDir = attachmentsDir
+        self.logLevel = level
 
     def openDatabase(self):
-        self.database = FluidNexusDatabase(databaseDir = self.databaseDir, databaseType = self.databaseType)
+        self.database = FluidNexusDatabase(databaseDir = self.databaseDir, databaseType = self.databaseType, level = self.logLevel)
 
     def closeDatabase(self):
         self.database.close()
@@ -394,8 +395,8 @@ class NexusNetworking(Networking):
                 # If the result is true, then the message has already been uploaded by someone else and we should save this result
                 if (result["result"]):
                     self.database.setUploaded(message["message_hash"])
-                else:
-                    self.logger.debug("NO MESSAGE WITH HASH %s FOUND" % message["message_hash"])
+                #else:
+                #    self.logger.debug("NO MESSAGE WITH HASH %s FOUND" % message["message_hash"])
 
                     # Check that the token is not ""
                     if (self.token == ""):
@@ -423,7 +424,7 @@ class NexusNetworking(Networking):
                         u.close()
     
                         result = json.loads(result)
-                        print "RESULT ", result
+                        
                         nonce = result["nonce"]
 
                         # Now take our nonce and add it to the message

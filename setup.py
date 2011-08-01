@@ -44,6 +44,9 @@ def get_messages():
             msgfiles.append("l10n/%s" % filename)
     return msgfiles
 
+def get_manual():
+    return [filename for filename in os.listdir("manual/")]
+
 def regen_messages():
     for filename in os.listdir("l10n/"):
         if filename.endswith(".ts"):
@@ -102,7 +105,8 @@ setup(name='fluid_nexus',
     keywords=["ad-hoc networking", "activism", "bluetooth", "zeroconf", "communication"],
     packages=find_packages(),
     package_data={"FluidNexus.ui":["*.ui"]},
-    data_files = [("share/FluidNexus/l10n", get_messages())],
+    data_files = [("share/FluidNexus/l10n", get_messages()), 
+                 ("share/FluidNexus/manual", get_manual())],
     scripts=["scripts/fluid_nexus"],
     zipfile = "lib/library.zip",
     windows=[{

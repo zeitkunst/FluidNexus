@@ -24,6 +24,7 @@ import time
 import os
 import re
 import hashlib
+import logging
 
 # Other imports
 from sqlalchemy import create_engine, desc
@@ -74,10 +75,12 @@ class Blacklist(Base):
 class FluidNexusDatabase(object):
     """Uses sqlalchemy and ORM to work with the Fluid Nexus database."""
 
-    def __init__(self, databaseDir = ".", databaseType = "e32", databaseName = 'FluidNexus.db', logPath = "FluidNexus.log"):
+    def __init__(self, databaseDir = ".", databaseType = "e32", databaseName = 'FluidNexus.db', logPath = "FluidNexus.log", level = logging.ERROR):
         """Initialization method that makes sure the database file and directory exist, and creates/opens the database file, and prepares the database view."""
 
-        self.logger = Log.getLogger(logPath = logPath)
+        self.logger = Log.getLogger(logPath = logPath, level = level)
+        self.logLevel = level
+
         #self.logger = Logger(os.path.join(databaseDir, u'FluidNexus.log'), prefix = 'database: ')
         #sys.stderr = sys.stdout = self.logger
 

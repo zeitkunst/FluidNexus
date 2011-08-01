@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'FluidNexus\ui\FluidNexusDesktop.ui'
+# Form implementation generated from reading ui file 'FluidNexus/ui/FluidNexusDesktop.ui'
 #
-# Created: Sun Jul 31 17:19:39 2011
-#      by: PyQt4 UI code generator 4.8.4
+# Created: Sun Jul 31 20:25:05 2011
+#      by: PyQt4 UI code generator 4.8.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -39,7 +39,7 @@ class Ui_FluidNexus(object):
         self.FluidNexusScrollArea.setWidgetResizable(True)
         self.FluidNexusScrollArea.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.FluidNexusScrollArea.setObjectName(_fromUtf8("FluidNexusScrollArea"))
-        self.scrollAreaWidgetContents = QtGui.QWidget()
+        self.scrollAreaWidgetContents = QtGui.QWidget(self.FluidNexusScrollArea)
         self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 374, 557))
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)

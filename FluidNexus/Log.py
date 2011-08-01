@@ -3,7 +3,7 @@ import logging
 import sys
 
 _loggerSetup = False
-def getLogger(logPath = "FluidNexus.log", level = logging.DEBUG, console = True):
+def getLogger(logPath = "FluidNexus.log", level = logging.WARN, console = True):
     global _loggerSetup
 
     if (_loggerSetup == False):

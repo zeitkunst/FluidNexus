@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'FluidNexus\ui\FluidNexusNewMessage.ui'
+# Form implementation generated from reading ui file 'FluidNexus/ui/FluidNexusNewMessage.ui'
 #
-# Created: Sun Jul 31 17:19:39 2011
-#      by: PyQt4 UI code generator 4.8.4
+# Created: Sun Jul 31 20:25:01 2011
+#      by: PyQt4 UI code generator 4.8.1
 #
 # WARNING! All changes made in this file will be lost!
 

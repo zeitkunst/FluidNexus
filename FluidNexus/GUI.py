@@ -744,7 +744,7 @@ class MessageTextBrowser(QtGui.QTextBrowser):
 
     def newMessageSaveButtonClicked(self, message_title, message_content, message_filename, public):
         """Respond to the new (edit) message save button."""
-        print public
+        
         ttl = self.parent.settings.value("app/ttl", 30).toInt()[0]
         new_message_hash = unicode(hashlib.sha256(unicode(message_title) + unicode(message_content)).hexdigest())
         message_title = unicode(message_title)
@@ -1051,14 +1051,24 @@ class FluidNexusPreferencesDialog(QtGui.QDialog):
 
 class FluidNexusAboutDialog(QtGui.QDialog):
 
-    aboutText = u"""<p>Copyright 2008-2011 Nicholas A. Knouf</p>
+    aboutText = u"""<p>Copyfarleft 2008-2011 Nicholas A. Knouf</p>
     
-<p>Fluid Nexus is an application for mobile   phones that is primarily designed to enable activists or relief workers to send messages and data amongst themselves independent of a centralized cellular      network.  The idea is to provide a means of communication between people when   the centralized network has been shut down, either by the government during a   time of unrest, or by nature due to a massive disaster.  During such times the  use of the centralized network for voice or SMS is not possible.  Yet, if we    can use the fact that people still must move about the world, then we can use   ideas from sneaker-nets to turn people into carriers of data.  Given enough     people, we can create fluid, temporary, ad-hoc networks that pass messages one  person at a time, spreading out as a contagion and eventually reaching members  of the group.  This enables surreptitious communication via daily activity and  relies on a fluid view of reality.  Additionally, Fluid Nexus can be used as a  hyperlocal message board, loosely attached to physical locations.  </p>
-    
-<p>Fluid Nexus is not designed as a general-purpose piece of software; rather, it is developed with specific types of users in mind.  Thus, while the ideas here could be very useful for social-networking or productivity applications, this is not what I am most interested in.  However, I definitely welcome the extension of these ideas into these other domains.  Indeed, Fluid Nexus is related to work in the following projects: mesh networking in the OLPC ( http://wiki.laptop.org/go/Mesh_Network_Details ), the Haggle project ( http://www.haggleproject.org/ ), and Comm.unity ( http://community.mit.edu/ ), among many  others.</p>"""
+<p>Fluid Nexus is an application for mobile phones and desktop devices that is primarily designed to enable activists to send messages and data amongst themselves independent of a centralized network. The idea is to provide a means of communication between people when the centralized network has been shut down, either by the government during a time of unrest, or by nature due to a massive disaster. During such times the use of the centralized network for voice or SMS is not possible. Yet, if we can use the fact that people still must move about the world, then we can use ideas from sneaker-nets to turn people into carriers of data. Given enough people, we can create fluid, temporary, ad-hoc networks that pass messages one person at a time, spreading out as a contagion and eventually reaching members of the group. This enables surreptitious communication via daily activity and relies on a fluid view of reality. Additionally, Fluid Nexus can be used as a hyperlocal message board, loosely attached to physical locations.</p>
+            <p>For more information, see the paper <a href="http://localhost:6543/static/pdfs/DCM2009Submitted.pdf">"Transnetworks and the Fluid Nexus Project"</a>, to be published in Fall 2011 in the proceedings of dis/connecting/media 2009.</p>"""
+                    
+    creditsText = u""" <h2>Contact</h2>
+                <p>You can contact all of the members of the project at fluidnexus {{@}} fluidnexus [[.]] net.</p>
 
-    creditsText = u"""<h2>Initial Version Credits</h2>
-    <p>The initial version of Fluid Nexus for Series 60 Nokia phones running Python was written in conjunction with Bruno Vianna, Luis Ayuso; design help by Mónica Sánchez; and the support of <a href="http://medialab-prado.es">Medialab Prado</a> during the 2° Encuentro Inclusiva-net: redes digitales y espacio fisico.</p>"""
+                            <p>If you prefer to send us a private, encrypted e-mail, you can use our web-form at PrivacyBox.de: <a href="http://privacybox.de/fluidnexus.msg">http://privacybox.de/fluidnexus.msg</a>. The contact form is also available using a Tor hidden service at <a href="http://c4wcxidkfhvmzhw6.onion/fluidnexus.msg">http://c4wcxidkfhvmzhw6.onion/fluidnexus.msg</a> or using an Invisible Internet Project node at <a href="http://privacybox.i2p/fluidnexus.msg">http://privacybox.i2p/fluidnexus.msg</a>.</p>
+                                        <p>Nicholas A. Knouf can be contacted at nknouf {{@}} zeitkunst [[.]] org; his <a href="http://pgp.mit.edu:11371/pks/lookup?op=get&search=0xA070C588A43C9CC9">pgp public key is also available</a>.</p>
+                                                    <h2>Updates</h2>
+
+                                                                <p>If you'd like to keep up-to-date with information about the software, please e-mail fluidnexus {{@}} fluidnexus [[.]] net.  <em>We will never share your e-mail address with anyone</em>.
+                                                                            <h2>Donate</h2>
+                                                                                        <p>You can donate to our bitcoin address: 18GD6vMjmXthGhDNDhNMEoEthoGkUXkQR3.  Even a fraction of a coin helps us know that our work is appreciated.  Thanks!</p>
+                                                                                                    <h2>Initial Version Credits</h2>
+                                                                                                                <p>The initial version of Fluid Nexus for Series 60 Nokia phones running Python was written in conjunction with Bruno Vianna, Luis Ayuso; design help by Mónica Sánchez; and the support of <a href="http://medialab-prado.es">Medialab Prado</a> during the 2° Encuentro Inclusiva-net: redes digitales y espacio fisico.</p>"""
+
 
     def __init__(self, parent=None, title = None, message = None):
         QtGui.QDialog.__init__(self, parent)
@@ -1165,6 +1175,8 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         # Start the network threads
         self.__startNetworkThreads()
 
+        # Somewhere along the line the level is not getting set properly...this fixes it
+        self.logger.setLevel(self.logLevel)
 
     def __setupDefaultSettings(self):
         self.settings.clear()
@@ -1629,7 +1641,6 @@ class FluidNexusDesktop(QtGui.QMainWindow):
             # Guess type
             mimeType = mimetypes.guess_type(attachment_original_filename)
             
-            print mimeType
             if ("image" in mimeType[0]):
                 message_type = 2
             elif ("audio" in mimeType[0]):

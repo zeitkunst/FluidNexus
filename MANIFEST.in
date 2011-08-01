@@ -8,3 +8,5 @@ include FluidNexus/ui/res/icons/32x32/*.png
 include FluidNexus/ui/*.ui
 include l10n/*.qm
 include l10n/*.ts
+include manual/index.html
+include manual/images/*

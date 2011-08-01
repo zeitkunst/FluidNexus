@@ -1,7 +1,15 @@
-* Fix TextBrowser size in GUI
-* * Almost there...still off by a bit
+SOONER
+======
+
 * Shutdown server/client threads properly on GUI exist
 * Present dialog instead of status message if bluetooth, zeroconf are not enabled
+
+LATER
+=====
+
+* Fix TextBrowser size in GUI
+* * Almost there...still off by a bit
 * Start server/client threads in headless version; shutdown properly by catching interrupts
 * Implement ad-hoc wifi
-* Implement SSL/TLS over the network modalities
+* Implement SSL/TLS option over the network modalities
+
