@@ -84,8 +84,10 @@ class build_py(_build_py):
         else:
             command = ["pyrcc4", "FluidNexus/ui/res/FluidNexus.qrc", "-o", res]
         subprocess.call(command)
-        if (os_name != "windows"):
-            regen_messages()
+       
+        # Removing the language conversion for now
+        #if (os_name != "windows"):
+        #    regen_messages()
         _build_py.run(self)
 
 data_files = [("share/FluidNexus/l10n", get_messages()), 
