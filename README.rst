@@ -14,7 +14,7 @@ The software has been testing on Ubuntu Maverick with python 2.6.6 and requires 
 Installing on Ubuntu
 --------------------
 
-Installation on Ubuntu requires a number of packages which can be installed using ``sudo apt-get apt-get install python-bluez python-qt4 pyqt4-dev-     tools python-protobuf libavahi-compat-libdnssd1``.
+Installation on Ubuntu requires a number of packages which can be installed using ``sudo apt-get apt-get install python-bluez python-qt4 pyqt4-dev-tools python-protobuf libavahi-compat-libdnssd1``.  Other distributions will need their equivalent.  The code should work on python 2.5, but this hasn't been tested.
 
 Installing on Windows
 ---------------------
@@ -44,7 +44,7 @@ To run, type "fluid_nexus"; for help, type "fluid_nexus --help".
 SECURITY NOTE
 =============
 
-Data is stored unencrypted in a local sqlite database.  It is best that you take care of encryption yourself, such as by using ecryptfs home directories or LUKS encrypted devices on Linux.
+Data is stored unencrypted in a local sqlite database.  It is best that you take care of encryption yourself, such as by using ecryptfs home directories or LUKS encrypted devices on Linux.  On Windows, the database and received attachments are stored in the ``FluidNexusData`` folder in your home directory.  It ought to be possible to mount this folder from a TrueCrypt volume.
 
 Data is sent over bluetooth without any transport layer encryption.  This is something we plan on implementing in the future.
 
