@@ -88,6 +88,16 @@ class build_py(_build_py):
             regen_messages()
         _build_py.run(self)
 
+data_files = [("share/FluidNexus/l10n", get_messages()), 
+              ("share/FluidNexus/manual", ["share/FluidNexus/manual/index.html"]),
+             ("share/FluidNexus/manual/images", get_manual_images())]
+
+if (os_name == "windows"):
+    data_files.append(("Microsoft.VC90.CRT", glob.glob(r"C:\WINDOWS\WinSxS\x86_Microsoft.VC90.CRT_1fc8b3b9a1e18e3b_9.0.21022.8_x-ww_d08d0375\*.*")))
+    data_files.append(("Microsoft.VC90.CRT", [r"C:\WINDOWS\WinSxS\Manifests\x86_Microsoft.VC90.CRT_1fc8b3b9a1e18e3b_9.0.21022.8_x-ww_d08d0375.manifest"]))
+    data_files.append(("Microsoft.VC90.MFC", glob.glob(r"C:\WINDOWS\WinSxS\x86_Microsoft.VC90.MFC_1fc8b3b9a1e18e3b_9.0.21022.8_x-ww_a173767a\*.*")))
+    data_files.append(("Microsoft.VC90.MFC", [r"C:\WINDOWS\WinSxS\Manifests\x86_Microsoft.VC90.MFC_1fc8b3b9a1e18e3b_9.0.21022.8_x-ww_a173767a.manifest"]))
+
 setup(name='fluid_nexus',
     version=FluidNexus.__version__,
     description='PyQt4 application that enables one to share messages and data independent of centralized data networks',
@@ -111,13 +121,7 @@ setup(name='fluid_nexus',
     keywords=["ad-hoc networking", "activism", "bluetooth", "zeroconf", "communication"],
     packages=find_packages(),
     package_data={"FluidNexus.ui":["*.ui"]},
-    data_files = [("share/FluidNexus/l10n", get_messages()), 
-                  ("share/FluidNexus/manual", ["share/FluidNexus/manual/index.html"]),
-		  ("Microsoft.VC90.CRT", glob.glob(r"C:\WINDOWS\WinSxS\x86_Microsoft.VC90.CRT_1fc8b3b9a1e18e3b_9.0.21022.8_x-ww_d08d0375\*.*")),
-		  ("Microsoft.VC90.CRT", [r"C:\WINDOWS\WinSxS\Manifests\x86_Microsoft.VC90.CRT_1fc8b3b9a1e18e3b_9.0.21022.8_x-ww_d08d0375.manifest"]),
-		  ("Microsoft.VC90.MFC", glob.glob(r"C:\WINDOWS\WinSxS\x86_Microsoft.VC90.MFC_1fc8b3b9a1e18e3b_9.0.21022.8_x-ww_a173767a\*.*")),
-		  ("Microsoft.VC90.MFC", [r"C:\WINDOWS\WinSxS\Manifests\x86_Microsoft.VC90.MFC_1fc8b3b9a1e18e3b_9.0.21022.8_x-ww_a173767a.manifest"]),
-                 ("share/FluidNexus/manual/images", get_manual_images())],
+    data_files = data_files,
     scripts=["scripts/fluid_nexus"],
     zipfile = "lib/library.zip",
     windows=[{
