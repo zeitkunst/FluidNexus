@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 
+import glob
 import os
 import subprocess
 import sys
+sys.path.append(r"C:\WINDOWS\WinSxS\x86_Microsoft.VC90.CRT_1fc8b3b9a1e18e3b_9.0.21022.8_x-ww_d08d0375")
 
 from distutils.command.build_py import build_py as _build_py
 from distutils.core import setup
@@ -111,6 +113,10 @@ setup(name='fluid_nexus',
     package_data={"FluidNexus.ui":["*.ui"]},
     data_files = [("share/FluidNexus/l10n", get_messages()), 
                   ("share/FluidNexus/manual", ["share/FluidNexus/manual/index.html"]),
+		  ("Microsoft.VC90.CRT", glob.glob(r"C:\WINDOWS\WinSxS\x86_Microsoft.VC90.CRT_1fc8b3b9a1e18e3b_9.0.21022.8_x-ww_d08d0375\*.*")),
+		  ("Microsoft.VC90.CRT", [r"C:\WINDOWS\WinSxS\Manifests\x86_Microsoft.VC90.CRT_1fc8b3b9a1e18e3b_9.0.21022.8_x-ww_d08d0375.manifest"]),
+		  ("Microsoft.VC90.MFC", glob.glob(r"C:\WINDOWS\WinSxS\x86_Microsoft.VC90.MFC_1fc8b3b9a1e18e3b_9.0.21022.8_x-ww_a173767a\*.*")),
+		  ("Microsoft.VC90.MFC", [r"C:\WINDOWS\WinSxS\Manifests\x86_Microsoft.VC90.MFC_1fc8b3b9a1e18e3b_9.0.21022.8_x-ww_a173767a.manifest"]),
                  ("share/FluidNexus/manual/images", get_manual_images())],
     scripts=["scripts/fluid_nexus"],
     zipfile = "lib/library.zip",
@@ -123,4 +129,3 @@ setup(name='fluid_nexus',
     install_requires = requires,
     cmdclass={"build_py": build_py}
 )
-

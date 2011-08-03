@@ -19,8 +19,8 @@ AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName={pf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
-LicenseFile=C:\Users\nknouf\Development\Android\FluidNexus\LICENSE
-InfoBeforeFile=C:\Users\nknouf\Development\Android\FluidNexus\README.rst
+LicenseFile=C:\Documents and Settings\Nicholas Knouf\Development\Android\FluidNexus\LICENSE
+InfoBeforeFile=C:\Documents and Settings\Nicholas Knouf\Development\Android\FluidNexus\README.rst
 OutputBaseFilename={#MyAppName} {#MyAppVersion} Setup
 Compression=lzma
 SolidCompression=yes
@@ -33,8 +33,12 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 0,6.1
 
 [Files]
-Source: "C:\Users\nknouf\Development\Android\FluidNexus\dist\fluid_nexus.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\nknouf\Development\Android\FluidNexus\dist\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\Documents and Settings\Nicholas Knouf\Development\Android\FluidNexus\dist\fluid_nexus.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Documents and Settings\Nicholas Knouf\Development\Android\FluidNexus\dist\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\Documents and Settings\Nicholas Knouf\Development\Android\FluidNexus\dist\share\*"; DestDir: "{app}\share"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\Documents and Settings\Nicholas Knouf\Development\Android\FluidNexus\dist\Microsoft.VC90.CRT\*.*"; DestDir: "{app}\Microsoft.VC90.CRT"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\Documents and Settings\Nicholas Knouf\Development\Android\FluidNexus\dist\Microsoft.VC90.CRT\*.*"; DestDir: "{app}\lib\Microsoft.VC90.CRT"; Flags: ignoreversion recursesubdirs createallsubdirs
+
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
@@ -46,4 +50,3 @@ Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}"; Fil
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, "&", "&&")}}"; Flags: nowait postinstall skipifsilent
-

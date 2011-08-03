@@ -8,163 +8,103 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="FluidNexusDesktopScrollArea.ui" line="31"/>
-        <source>Incoming</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="FluidNexusDesktopScrollArea.ui" line="354"/>
-        <source>Delete</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="FluidNexusDesktopScrollArea.ui" line="119"/>
-        <source>Outgoing</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="FluidNexusDesktopScrollArea.ui" line="141"/>
-        <source>New Message</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="FluidNexusDesktopScrollArea.ui" line="172"/>
-        <source>Edit</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="FluidNexusDesktopScrollArea.ui" line="203"/>
-        <source>Toggle Outgoing</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="FluidNexusDesktopScrollArea.ui" line="310"/>
-        <source>File</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="FluidNexusDesktopScrollArea.ui" line="318"/>
-        <source>Help</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="FluidNexusDesktopScrollArea.ui" line="332"/>
-        <source>New message</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="FluidNexusDesktopScrollArea.ui" line="335"/>
-        <source>Create new message</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="FluidNexusDesktopScrollArea.ui" line="340"/>
-        <source>Quit</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="FluidNexusDesktopScrollArea.ui" line="345"/>
-        <source>About...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="FluidNexusDesktopScrollArea.ui" line="357"/>
-        <source>Delete Message</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="FluidNexusDesktop.ui" line="80"/>
         <source>&amp;File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="FluidNexusDesktop.ui" line="89"/>
+        <location filename="FluidNexusDesktop.ui" line="233"/>
         <source>&amp;Help</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="FluidNexusDesktop.ui" line="95"/>
+        <location filename="FluidNexusDesktop.ui" line="96"/>
         <source>&amp;View</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="FluidNexusDesktop.ui" line="109"/>
+        <location filename="FluidNexusDesktop.ui" line="110"/>
         <source>FluidNexusToolbar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="FluidNexusDesktop.ui" line="130"/>
+        <location filename="FluidNexusDesktop.ui" line="131"/>
         <source>&amp;About FluidNexus...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="FluidNexusDesktop.ui" line="140"/>
+        <location filename="FluidNexusDesktop.ui" line="141"/>
         <source>&amp;New Message...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="FluidNexusDesktop.ui" line="143"/>
+        <location filename="FluidNexusDesktop.ui" line="144"/>
         <source>Ctrl+N</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="FluidNexusDesktop.ui" line="148"/>
+        <location filename="FluidNexusDesktop.ui" line="149"/>
         <source>&amp;Quit...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="FluidNexusDesktop.ui" line="151"/>
+        <location filename="FluidNexusDesktop.ui" line="152"/>
         <source>Ctrl+Q</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="FluidNexusDesktop.ui" line="160"/>
+        <location filename="FluidNexusDesktop.ui" line="161"/>
         <source>&amp;Preferences...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="FluidNexusDesktop.ui" line="163"/>
+        <location filename="FluidNexusDesktop.ui" line="164"/>
         <source>Ctrl+P</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="FluidNexusDesktop.ui" line="175"/>
+        <location filename="FluidNexusDesktop.ui" line="176"/>
         <source>View &amp;All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="FluidNexusDesktop.ui" line="178"/>
+        <location filename="FluidNexusDesktop.ui" line="179"/>
         <source>View all messages</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="FluidNexusDesktop.ui" line="190"/>
+        <location filename="FluidNexusDesktop.ui" line="191"/>
         <source>View &amp;Outgoing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="FluidNexusDesktop.ui" line="193"/>
+        <location filename="FluidNexusDesktop.ui" line="194"/>
         <source>View outgoing messages</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="FluidNexusDesktop.ui" line="205"/>
+        <location filename="FluidNexusDesktop.ui" line="206"/>
         <source>View &amp;Blacklist</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="FluidNexusDesktop.ui" line="208"/>
+        <location filename="FluidNexusDesktop.ui" line="209"/>
         <source>View blacklisted messages</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="FluidNexusDesktop.ui" line="220"/>
+        <location filename="FluidNexusDesktop.ui" line="221"/>
         <source>View &amp;Public</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="FluidNexusDesktop.ui" line="223"/>
+        <location filename="FluidNexusDesktop.ui" line="224"/>
         <source>View Public Messages</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="FluidNexusDesktop.ui" line="236"/>
+        <source>Open the manual for Fluid Nexus</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -204,58 +144,66 @@
 <context>
     <name>FluidNexusDesktop</name>
     <message>
-        <location filename="GUI.py" line="1096"/>
+        <location filename="GUI.py" line="1169"/>
         <source>Messages loaded.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI.py" line="1290"/>
+        <location filename="GUI.py" line="1372"/>
         <source>Fluid Nexus: View All Messages</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI.py" line="1293"/>
+        <location filename="GUI.py" line="1375"/>
         <source>Fluid Nexus: View Public Messages</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI.py" line="1296"/>
+        <location filename="GUI.py" line="1378"/>
         <source>Fluid Nexus: View Outgoing Messages</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI.py" line="1299"/>
+        <location filename="GUI.py" line="1381"/>
         <source>Fluid Nexus: View Blacklisted Messages</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI.py" line="1452"/>
+        <location filename="GUI.py" line="1541"/>
         <source>New messages received.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI.py" line="1460"/>
+        <location filename="GUI.py" line="1549"/>
         <source>Bluetooth not enabled; shutting off bluetooth service.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI.py" line="1468"/>
+        <location filename="GUI.py" line="1557"/>
         <source>Zeroconf not enabled; shutting off zeroconf service.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI.py" line="1542"/>
+        <location filename="GUI.py" line="1631"/>
         <source>Do you really want to delete this message?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI.py" line="1569"/>
+        <location filename="GUI.py" line="1658"/>
         <source>Do you really want to unblacklist this message?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI.py" line="1571"/>
+        <location filename="GUI.py" line="1660"/>
         <source>Do you really want to blacklist this message?</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>FluidNexusHelp</name>
+    <message>
+        <location filename="FluidNexusHelp.ui" line="14"/>
+        <source>Dialog</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -310,37 +258,37 @@
 <context>
     <name>FluidNexusNewMessageDialog</name>
     <message>
-        <location filename="GUI.py" line="844"/>
+        <location filename="GUI.py" line="845"/>
         <source>Yes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI.py" line="845"/>
+        <location filename="GUI.py" line="846"/>
         <source>No</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI.py" line="847"/>
+        <location filename="GUI.py" line="848"/>
         <source>Message has changed; do you want to save?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI.py" line="859"/>
+        <location filename="GUI.py" line="860"/>
         <source>Choose file for attachment</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI.py" line="875"/>
+        <location filename="GUI.py" line="876"/>
         <source>OK</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI.py" line="877"/>
+        <location filename="GUI.py" line="878"/>
         <source>This message already exists in the database.  Please change the title and/or the content.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI.py" line="878"/>
+        <location filename="GUI.py" line="879"/>
         <source>FluidNexus</source>
         <translation type="unfinished"></translation>
     </message>
@@ -511,17 +459,12 @@
 <context>
     <name>MessageTextBrowser</name>
     <message>
-        <location filename="GUI.py" line="740"/>
+        <location filename="GUI.py" line="741"/>
         <source>Edit Message</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>RequestAuthorizationDialog</name>
-    <message>
-        <location filename="FluidNexusRequestAuthorization.ui" line="14"/>
-        <source>Request Authorization</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 </TS>

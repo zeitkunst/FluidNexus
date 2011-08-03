@@ -1,4 +1,4 @@
-Fluid Nexus v0.2.2 alpha
+Fluid Nexus v0.2.3 alpha
 ========================
 
 Nicholas A. Knouf
@@ -41,6 +41,8 @@ Data is sent over link-local wifi using zeroconf for service discovery without a
 
 Licenses
 ========
+
+Fluid Nexus is currently licensed under the GPLv3.
 
 MultipartPostHandlerUnicode.py is licensed under the LGPL and downloaded from http://peerit.blogspot.com/2007/07/multipartposthandler-doesnt-work-for.html
 
