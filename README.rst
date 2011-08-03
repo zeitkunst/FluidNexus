@@ -11,6 +11,17 @@ This software is ALPHA QUALITY and should only be used at your own risk.  More d
 
 The software has been testing on Ubuntu Maverick with python 2.6.6 and requires the following python modules: pyqt4, pybonjour, sqlalchemy, textile, pybluez, oauth2, protobuf (version 2.3.0 or higher).
 
+Installing on Ubuntu
+--------------------
+
+Installation on Ubuntu requires a number of packages which can be installed using ``sudo apt-get apt-get install python-bluez python-qt4 pyqt4-dev-     tools python-protobuf libavahi-compat-libdnssd1``.
+
+Installing on Windows
+---------------------
+
+The setup file below will install all of the needed packages, including the python interpreter.  It's recommended to use this instead of download the source code, unless you know what you are doing.
+
+
 Specific network modality notes
 -------------------------------
 

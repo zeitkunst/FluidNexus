@@ -1711,14 +1711,17 @@ class FluidNexusDesktop(QtGui.QMainWindow):
             # Guess type
             mimeType = mimetypes.guess_type(attachment_original_filename)
             
-            if ("image" in mimeType[0]):
-                message_type = 2
-            elif ("audio" in mimeType[0]):
-                message_type = 1
-            elif ("video" in mimeType[0]):
-                message_type = 3
-            else:
+            if (mimeType is None):
                 message_type = 0
+            else:
+                if ("image" in mimeType[0]):
+                    message_type = 2
+                elif ("audio" in mimeType[0]):
+                    message_type = 1
+                elif ("video" in mimeType[0]):
+                    message_type = 3
+                else:
+                    message_type = 0
 
             # Add to database
             self.database.addMine(message_type = message_type, title = unicode(message_title), content = unicode(message_content), attachment_path = attachment_path, attachment_original_filename = attachment_original_filename, public = public, ttl = ttl)
