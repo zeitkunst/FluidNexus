@@ -96,9 +96,9 @@ data_files = [("share/FluidNexus/l10n", get_messages()),
 
 if (os_name == "windows"):
     data_files.append(("Microsoft.VC90.CRT", glob.glob(r"C:\WINDOWS\WinSxS\x86_Microsoft.VC90.CRT_1fc8b3b9a1e18e3b_9.0.21022.8_x-ww_d08d0375\*.*")))
-    data_files.append(("Microsoft.VC90.CRT", [r"C:\WINDOWS\WinSxS\Manifests\x86_Microsoft.VC90.CRT_1fc8b3b9a1e18e3b_9.0.21022.8_x-ww_d08d0375.manifest"]))
-    data_files.append(("Microsoft.VC90.MFC", glob.glob(r"C:\WINDOWS\WinSxS\x86_Microsoft.VC90.MFC_1fc8b3b9a1e18e3b_9.0.21022.8_x-ww_a173767a\*.*")))
-    data_files.append(("Microsoft.VC90.MFC", [r"C:\WINDOWS\WinSxS\Manifests\x86_Microsoft.VC90.MFC_1fc8b3b9a1e18e3b_9.0.21022.8_x-ww_a173767a.manifest"]))
+    data_files.append(("Microsoft.VC90.CRT", [r"scripts\Microsoft.VC90.CRT.manifest"]))
+    #data_files.append(("Microsoft.VC90.MFC", glob.glob(r"C:\WINDOWS\WinSxS\x86_Microsoft.VC90.MFC_1fc8b3b9a1e18e3b_9.0.21022.8_x-ww_a173767a\*.*")))
+    #data_files.append(("Microsoft.VC90.MFC", [r"scripts\Microsoft.VC90.MFC.manifest"])),
 
 setup(name='fluid_nexus',
     version=FluidNexus.__version__,

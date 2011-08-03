@@ -2,11 +2,9 @@
 
 import logging
 from optparse import OptionParser
+import multiprocessing
 import os
 import sys
-
-
-
 
 def start(verbosity = 0, headless = False):
     if (verbosity >= 3):
@@ -41,6 +39,7 @@ def start(verbosity = 0, headless = False):
         sys.exit(app.exec_())
 
 if __name__ == "__main__":
+    multiprocessing.freeze_support()
     parser = OptionParser()
     parser.add_option("-v", "--verbose", dest = "verbosity", action = "count",  help = "How verbose to be.  Use up to 3 v's for full debug.")
 
