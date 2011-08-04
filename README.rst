@@ -25,15 +25,17 @@ The setup file below will install all of the needed packages, including the pyth
 Specific network modality notes
 -------------------------------
 
-Bluetooth:
+Bluetooth
++++++++++
 
 * Should run without modification on Windows if pybluez is installed, but this hasn't been tested
 
 * Will not run on OS X due to lack of pybluez; the networking code will have to be ported to lightblue
 
-Zeroconf:
+Zeroconf
+++++++++
 
-* Should run without modification on Windows if pybonjour is installed, along with the Bonjour library from Apple; this has not been tested
+* Has been tested to work on Windows XP with Bonjour for Windows installed.  You may have to allow UDP port 5353 (for zeroconf) through your firewall.
 
 * Should run without modification on OS X if pybonjour is installed; this has not been tested
 
