@@ -25,6 +25,7 @@ from ui.FluidNexusNewMessageUI import Ui_FluidNexusNewMessage
 from ui.FluidNexusAboutUI import Ui_FluidNexusAbout
 from ui.FluidNexusPreferencesUI import Ui_FluidNexusPreferences
 from ui.FluidNexusHelpUI import Ui_FluidNexusHelp
+import version
 from Database import FluidNexusDatabase
 from Networking import BluetoothServerVer3, BluetoothClientVer3, ZeroconfClient, ZeroconfServer, NexusNetworking
 import Log
@@ -61,7 +62,7 @@ DEFAULTS = {
 }
 
 # build our oauth request token request
-URL_BASE = "http://localhost:6543/api/01/"
+URL_BASE = "http://dev.fluidnexus.net/api/01/"
 OAUTH_CALLBACK_URL = URL_BASE + "access_token"
 REQUEST_TOKEN_URL = URL_BASE + "request_token/desktop"
 
@@ -1114,24 +1115,31 @@ class FluidNexusHelpDialog(QtGui.QDialog):
 
 class FluidNexusAboutDialog(QtGui.QDialog):
 
-    aboutText = u"""<p>Copyfarleft 2008-2011 Nicholas A. Knouf</p>
-    
-<p>Fluid Nexus is an application for mobile phones and desktop devices that is primarily designed to enable activists to send messages and data amongst themselves independent of a centralized network. The idea is to provide a means of communication between people when the centralized network has been shut down, either by the government during a time of unrest, or by nature due to a massive disaster. During such times the use of the centralized network for voice or SMS is not possible. Yet, if we can use the fact that people still must move about the world, then we can use ideas from sneaker-nets to turn people into carriers of data. Given enough people, we can create fluid, temporary, ad-hoc networks that pass messages one person at a time, spreading out as a contagion and eventually reaching members of the group. This enables surreptitious communication via daily activity and relies on a fluid view of reality. Additionally, Fluid Nexus can be used as a hyperlocal message board, loosely attached to physical locations.</p>
-            <p>For more information, see the paper <a href="http://localhost:6543/static/pdfs/DCM2009Submitted.pdf">"Transnetworks and the Fluid Nexus Project"</a>, to be published in Fall 2011 in the proceedings of dis/connecting/media 2009.</p>"""
-                    
-    creditsText = u""" <h2>Contact</h2>
-                <p>You can contact all of the members of the project at fluidnexus {{@}} fluidnexus [[.]] net.</p>
+    aboutText = u"""<p>Copyfarleft 2008-2011 Nicholas A. Knouf.  Code is licensed under the GPLv3 and is available on <a href="https://github.com/zeitkunst/FluidNexus">github</a>.</p>
+    <p>Fluid Nexus is an intervention into staid practices surrounding networks. In the second decade of the twenty-first century, networks continue to be defined by their stable topology, their ability to be captured in an image or graph. Peer-to-peer technologies have promised new arrangements absent centralized control, but they still rely on stationary devices. Mobile phones bring movement and motion but nevertheless remain wedded to conventional network providers.</p>
+                <p>Networks do not need to be understood as stable entities with well-traversed paths. Instead, we can combine peer-to-peer with movement to use machines and humans as equal parts of an information transfer infrastructure. Fluid, temporary, ad-hoc networks can be created and destroyed as necessary, passing information from one person to another, spreading out as a contagion and eventually reaching everyone using the service. People become mobile nodes in the network (known in computer science as a <a href="http://en.wikipedia.org/wiki/Sneakernet">sneakernet</a>) while their devices take care of transferring data from one device to another.</p>
+                            <p>Since information in Fluid Nexus does not travel through any centralized networks it cannot be saved by any Internet intermediary, potentially revealing identifiable information. Nor can any intermediary decide to censor a particular message. These facts make Fluid Nexus an important tool for activists. Access to the data stored by Fluid Nexus requires a search warrant&mdash;or another device running the software. Indeed it is this "broadcast" nature of Fluid Nexus that makes it such a potent tool. In the long-run, anyone else running the software will eventually have every message sent by any other user, making it nigh impossible to censor any single message. No identifying information regarding the sender is attached to a message&mdash;the sender is in control of what he or she wishes to reveal. And in conjunction with other software such as <a href="https://guardianproject.info/apps/securecam/">ObscuraCam</a> identities can be further obfuscated as desired or necessary.</p>
 
+                                        <p>Yet sometimes it is important for information to reach a broader audience, and at this time that requires going through the Internet. To facilitate this we've created the <a href="http://fluidnexus.net/nexus">Nexus</a>, a place for certain types of messages which are marked as "public" to be automatically uploaded by any Fluid Nexus user to this website. Again, the control of whether a message can be uploaded or not is left in the fingertips of the sender. The <a href="http://fluidnexus.net/nexus">Nexus</a> can become a place to distribute necessary bits of text, audio, images, and video to a wider audience.</p>
+                                                    <p>For more information regarding our theoretical motivations, see the paper <a href="http://fluidnexus.net/static/pdfs/DCM2009Submitted.pdf">"Transnetworks and the Fluid Nexus Project"</a>, to be published in Fall 2011 in the proceedings of dis/connecting/media 2009.</p>""" 
+
+    creditsText = u"""<h2>Contact</h2>
+                <p>You can contact all of the members of the project at fluidnexus {{@}} fluidnexus [[.]] net.</p>
+                
                             <p>If you prefer to send us a private, encrypted e-mail, you can use our web-form at PrivacyBox.de: <a href="http://privacybox.de/fluidnexus.msg">http://privacybox.de/fluidnexus.msg</a>. The contact form is also available using a Tor hidden service at <a href="http://c4wcxidkfhvmzhw6.onion/fluidnexus.msg">http://c4wcxidkfhvmzhw6.onion/fluidnexus.msg</a> or using an Invisible Internet Project node at <a href="http://privacybox.i2p/fluidnexus.msg">http://privacybox.i2p/fluidnexus.msg</a>.</p>
                                         <p>Nicholas A. Knouf can be contacted at nknouf {{@}} zeitkunst [[.]] org; his <a href="http://pgp.mit.edu:11371/pks/lookup?op=get&search=0xA070C588A43C9CC9">pgp public key is also available</a>.</p>
                                                     <h2>Updates</h2>
-
+                                                    
                                                                 <p>If you'd like to keep up-to-date with information about the software, please e-mail fluidnexus {{@}} fluidnexus [[.]] net.  <em>We will never share your e-mail address with anyone</em>.
                                                                             <h2>Donate</h2>
                                                                                         <p>You can donate to our bitcoin address: 18GD6vMjmXthGhDNDhNMEoEthoGkUXkQR3.  Even a fraction of a coin helps us know that our work is appreciated.  Thanks!</p>
-                                                                                                    <h2>Initial Version Credits</h2>
-                                                                                                                <p>The initial version of Fluid Nexus for Series 60 Nokia phones running Python was written in conjunction with Bruno Vianna, Luis Ayuso; design help by Mónica Sánchez; and the support of <a href="http://medialab-prado.es">Medialab Prado</a> during the 2° Encuentro Inclusiva-net: redes digitales y espacio fisico.</p>"""
-
+                                                                                                    <h2>Thanks</h2>
+                                                                                                                <p>Thanks to Niranjan Sivakumar for testing help. Thanks also to Claudia Costa Pederson for support during the writing of this software.</p>
+                                                                                                                            <h2>Inspiration</h2>
+                                                                                                                            
+                                                                                                                                        <p>Fluid Nexus has been inspired by the following projects: <a href="http://k0a1a.net/netless/">netless, by Danja Vasiliev</a>; <a href="http://www.deadswap.net/">Dead Swap, by Telekommunisten</a>; <a href="http://www.feraltrade.org/">Feral Trade, by Kate Rich</a>; and most importantly, <a href="http://www.appliedautonomy.com/txtmob.html">TXTmob, by the Institute for Applied Autonomy</a>.</p>
+                                                                                                                                                    <h2>Initial Version Credits</h2>
+                                                                                                                                                                <p>The initial version of Fluid Nexus for Series 60 Nokia phones running Python was written in conjunction with Bruno Vianna, Luis Ayuso; design help by Mónica Sánchez; and the support of <a href="http://medialab-prado.es">Medialab Prado</a> during the 2° Encuentro Inclusiva-net: redes digitales y espacio fisico.</p>"""
 
     def __init__(self, parent=None, title = None, message = None):
         QtGui.QDialog.__init__(self, parent)
@@ -1140,6 +1148,7 @@ class FluidNexusAboutDialog(QtGui.QDialog):
     
         self.ui = Ui_FluidNexusAbout()
         self.ui.setupUi(self)
+        self.ui.AboutDialogVersion.setText("Version " + version.__version__)
         self.ui.AboutDialogAboutText.setText(self.aboutText)
         self.ui.AboutDialogCreditsText.setText(self.creditsText)
 
