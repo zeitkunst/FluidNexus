@@ -381,7 +381,6 @@ class NexusNetworking(Networking):
 
         # TODO
         # Check that we can access internet
-
         for message in publicMessages:
             if (not message["uploaded"]):
                 try:
@@ -397,8 +396,8 @@ class NexusNetworking(Networking):
                 # If the result is true, then the message has already been uploaded by someone else and we should save this result
                 if (result["result"]):
                     self.database.setUploaded(message["message_hash"])
-                #else:
-                #    self.logger.debug("NO MESSAGE WITH HASH %s FOUND" % message["message_hash"])
+                else:
+                    self.logger.debug("NO MESSAGE WITH HASH %s FOUND" % message["message_hash"])
 
                     # Check that the token is not ""
                     if (self.token == ""):
@@ -427,6 +426,9 @@ class NexusNetworking(Networking):
     
                         result = json.loads(result)
                         
+                        if (not result.has_key("nonce")):
+                            break
+
                         nonce = result["nonce"]
 
                         # Now take our nonce and add it to the message

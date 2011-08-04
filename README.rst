@@ -1,5 +1,5 @@
-Fluid Nexus v0.2.3 alpha
-========================
+Fluid Nexus
+===========
 
 Nicholas A. Knouf
 
@@ -28,9 +28,11 @@ Specific network modality notes
 Bluetooth
 +++++++++
 
-* Should run without modification on Windows if pybluez is installed, but this hasn't been tested
+* Has been tested to work on Windows XP and Windows 7 using a dlink DBT-120 USB bluetooth adapter, the Windows bluetooth drivers, and pybluez.
 
 * Will not run on OS X due to lack of pybluez; the networking code will have to be ported to lightblue
+
+* Works on Linux using pybluez.
 
 Zeroconf
 ++++++++
