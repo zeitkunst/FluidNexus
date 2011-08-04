@@ -103,24 +103,31 @@ class FluidNexusDatabase(object):
         Session = sessionmaker(bind=self.engine)
         self.session = Session()
 
+    def createRandomMessages(self, number = 100):
+        """Create a set of random messages; mainly used for testing UI rendering."""
+
+        import uuid
+        for x in xrange(0, number):
+            self.addReceived(message_type = 0, title = str(uuid.uuid4()), content = "Random message", timestamp = time.time(), received_timestamp = time.time())
+
     def addDummyData(self):
         """Add some dummy data to the database."""
         # Insert some dummy data
         # This is from text messages listed in the TxTMob CHI paper
         title = u'Run'
-        content = u'Run against Bush in progress (just went through times sq).  media march starts at 7, 52nd and broadway'
+        content = u'[SAMPLE MESSAGE] Run against Bush in progress (just went through times sq).  media march starts at 7, 52nd and broadway'
         now = time.time()
         message_hash = hashlib.sha256(title + content).hexdigest()
         self.session.add(Messages(title = title, content = content, time = now, received_time = now, message_hash = message_hash))
 
         title = u'Federal agents'
-        content = u'Video dispatch. Federal agents trailing activists at 6th Ave and 9th St. Situation tense.'
+        content = u'[SAMPLE MESSAGE] Video dispatch. Federal agents trailing activists at 6th Ave and 9th St. Situation tense.'
         message_hash = hashlib.sha256(title + content).hexdigest()
         now = time.time()
         self.session.add(Messages(title = title, content = content, time = now, received_time = now, message_hash = message_hash))
 
         title = u'Mobilize to dine'
-        content = u'CT delegation @ Maison (7th Ave. & 53rd).  Outdoor dining area.  Try to get people there.'
+        content = u'[SAMPLE MESSAGE] CT delegation @ Maison (7th Ave. & 53rd).  Outdoor dining area.  Try to get people there.'
         message_hash = hashlib.sha256(title + content).hexdigest()
         now = time.time()
         self.session.add(Messages(title = title, content = content, time = now, received_time = now, message_hash = message_hash))
