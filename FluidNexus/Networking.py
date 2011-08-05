@@ -11,12 +11,17 @@ import os
 import select
 import socket
 import struct
+import sys
 import time
 import urllib
 import urllib2
 
 # External imports
-from bluetooth import *
+if (sys.platform == "darwin"):
+    import lightblue
+else:
+    from bluetooth import *
+
 import oauth2
 import simplejson as json
 
@@ -484,6 +489,10 @@ TODO
 
     def testBluetooth(self):
         """Test the bluetooth connection."""
+        # Don't try and run bluetooth code for now
+        if (sys.platform == "darwin"):
+            return False
+
         try:
             # Do initial setup
             self.setupServerSockets(numConnections = self.numConnections)

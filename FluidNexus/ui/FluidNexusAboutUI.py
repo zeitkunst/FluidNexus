@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'FluidNexus\ui\FluidNexusAbout.ui'
+# Form implementation generated from reading ui file 'FluidNexus/ui/FluidNexusAbout.ui'
 #
-# Created: Wed Aug 03 19:22:38 2011
-#      by: PyQt4 UI code generator 4.8.4
+# Created: Fri Aug  5 17:29:10 2011
+#      by: PyQt4 UI code generator 4.8.5
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -18,6 +18,7 @@ class Ui_FluidNexusAbout(object):
     def setupUi(self, FluidNexusAbout):
         FluidNexusAbout.setObjectName(_fromUtf8("FluidNexusAbout"))
         FluidNexusAbout.resize(372, 533)
+        FluidNexusAbout.setWindowTitle(QtGui.QApplication.translate("FluidNexusAbout", "About Fluid Nexus", None, QtGui.QApplication.UnicodeUTF8))
         self.buttonBox = QtGui.QDialogButtonBox(FluidNexusAbout)
         self.buttonBox.setGeometry(QtCore.QRect(20, 490, 341, 32))
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
@@ -46,15 +47,18 @@ class Ui_FluidNexusAbout(object):
         self.AboutDialogTitle = QtGui.QLabel(self.verticalLayoutWidget)
         font = QtGui.QFont()
         font.setPointSize(20)
-        font.setWeight(75)
         font.setBold(True)
+        font.setWeight(75)
         self.AboutDialogTitle.setFont(font)
+        self.AboutDialogTitle.setText(QtGui.QApplication.translate("FluidNexusAbout", "Fluid Nexus", None, QtGui.QApplication.UnicodeUTF8))
         self.AboutDialogTitle.setObjectName(_fromUtf8("AboutDialogTitle"))
         self.verticalLayout_2.addWidget(self.AboutDialogTitle)
         self.AboutDialogVersion = QtGui.QLabel(self.verticalLayoutWidget)
+        self.AboutDialogVersion.setText(QtGui.QApplication.translate("FluidNexusAbout", "Version 0.1 Alpha", None, QtGui.QApplication.UnicodeUTF8))
         self.AboutDialogVersion.setObjectName(_fromUtf8("AboutDialogVersion"))
         self.verticalLayout_2.addWidget(self.AboutDialogVersion)
         self.AboutDialogLink = QtGui.QLabel(self.verticalLayoutWidget)
+        self.AboutDialogLink.setText(QtGui.QApplication.translate("FluidNexusAbout", "<a href=\"http://fluidnexus.net\">http://fluidnexus.net</a>", None, QtGui.QApplication.UnicodeUTF8))
         self.AboutDialogLink.setOpenExternalLinks(True)
         self.AboutDialogLink.setObjectName(_fromUtf8("AboutDialogLink"))
         self.verticalLayout_2.addWidget(self.AboutDialogLink)
@@ -127,10 +131,6 @@ class Ui_FluidNexusAbout(object):
         QtCore.QMetaObject.connectSlotsByName(FluidNexusAbout)
 
     def retranslateUi(self, FluidNexusAbout):
-        FluidNexusAbout.setWindowTitle(QtGui.QApplication.translate("FluidNexusAbout", "About Fluid Nexus", None, QtGui.QApplication.UnicodeUTF8))
-        self.AboutDialogTitle.setText(QtGui.QApplication.translate("FluidNexusAbout", "Fluid Nexus", None, QtGui.QApplication.UnicodeUTF8))
-        self.AboutDialogVersion.setText(QtGui.QApplication.translate("FluidNexusAbout", "Version 0.1 Alpha", None, QtGui.QApplication.UnicodeUTF8))
-        self.AboutDialogLink.setText(QtGui.QApplication.translate("FluidNexusAbout", "<a href=\"http://fluidnexus.net\">http://fluidnexus.net</a>", None, QtGui.QApplication.UnicodeUTF8))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.AboutDialogAboutTab), QtGui.QApplication.translate("FluidNexusAbout", "About", None, QtGui.QApplication.UnicodeUTF8))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.AboutDialogCreditsTab), QtGui.QApplication.translate("FluidNexusAbout", "Credits", None, QtGui.QApplication.UnicodeUTF8))
 
