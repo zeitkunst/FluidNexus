@@ -78,6 +78,7 @@ class build_py(_build_py):
             subprocess.call(command)
             self.byte_compile(out)
 
+        print "RUNNING"
         res = "FluidNexus/ui/FluidNexus_rc.py"
         if (os_name == "windows"):
             command = ["pyrcc4.exe", "FluidNexus/ui/res/FluidNexus.qrc", "-o", res]
@@ -125,11 +126,31 @@ setup(name='fluid_nexus',
     package_data={"FluidNexus.ui":["*.ui"]},
     data_files = data_files,
     scripts=["scripts/fluid_nexus"],
+    setup_requires=["py2app"],
     zipfile = "lib/library.zip",
     windows=[{
         "script": "scripts/fluid_nexus",
         "icon_resources": [(1, "FluidNexus/ui/res/icons/fluid_nexus_icon.ico")]}],
-    options = {"py2exe": { "includes": ["sip", "simplejson", "pysqlite2", "google.protobuf", "sqlalchemy"], "packages": ["sqlalchemy.dialects.sqlite"]} },
+    app=["FluidNexusApp.py"],
+    options = {
+        "py2exe": { 
+            "includes": ["sip", "simplejson", "pysqlite2", "google.protobuf", "sqlalchemy"], 
+            "packages": ["sqlalchemy.dialects.sqlite"]
+        },
+        "py2app": {
+            "argv_emulation": True,
+            "iconfile": "FluidNexus/ui/res/icons/fluid_nexus_icon.icns",
+            "includes": ["sip", "LightAquaBlue", "lightblue", "pysqlite2", "simplejson", "sqlalchemy", "google.protobuf", "sqlalchemy.dialects.sqlite"],
+            "packages": ["Foundation"],
+            "plist": dict(
+                CFBundleName               = "FluidNexus",
+                CFBundleShortVersionString = FluidNexus.version.__version__,     # must be in X.X.X format
+                CFBundleGetInfoString      = "Fluid Nexus %s" % FluidNexus.version.__version__,
+                #CFBundleExecutable         = "FluidNexusApp.py",
+                CFBundleIdentifier         = "net.fluidnexus.FluidNexus",
+            ),
+        },
+    },
     include_package_data=True,
     zip_safe=False,
     install_requires = requires,

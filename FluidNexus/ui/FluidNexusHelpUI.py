@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'FluidNexus\ui\FluidNexusHelp.ui'
+# Form implementation generated from reading ui file 'FluidNexus/ui/FluidNexusHelp.ui'
 #
-# Created: Wed Aug 03 19:22:39 2011
-#      by: PyQt4 UI code generator 4.8.4
+# Created: Fri Aug  5 17:29:11 2011
+#      by: PyQt4 UI code generator 4.8.5
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -18,6 +18,7 @@ class Ui_FluidNexusHelp(object):
     def setupUi(self, FluidNexusHelp):
         FluidNexusHelp.setObjectName(_fromUtf8("FluidNexusHelp"))
         FluidNexusHelp.resize(400, 573)
+        FluidNexusHelp.setWindowTitle(QtGui.QApplication.translate("FluidNexusHelp", "Dialog", None, QtGui.QApplication.UnicodeUTF8))
         self.buttonBox = QtGui.QDialogButtonBox(FluidNexusHelp)
         self.buttonBox.setGeometry(QtCore.QRect(40, 530, 341, 32))
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
@@ -33,5 +34,5 @@ class Ui_FluidNexusHelp(object):
         QtCore.QMetaObject.connectSlotsByName(FluidNexusHelp)
 
     def retranslateUi(self, FluidNexusHelp):
-        FluidNexusHelp.setWindowTitle(QtGui.QApplication.translate("FluidNexusHelp", "Dialog", None, QtGui.QApplication.UnicodeUTF8))
+        pass
 
