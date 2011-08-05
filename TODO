@@ -1,12 +1,15 @@
 SOONER
 ======
 
+* Add option to not pass along blacklisted messages
+* Ensure ordering of messages is done desc by received time
 * Shutdown server/client threads properly on GUI exist
 * Present dialog instead of status message if bluetooth, zeroconf are not enabled
 
 LATER
 =====
 
+* Ensure both received and posted time show up in UI
 * Fix TextBrowser size in GUI
 * * Almost there...still off by a bit
 * Start server/client threads in headless version; shutdown properly by catching interrupts

@@ -819,9 +819,12 @@ class ZeroconfServer(Networking):
     def takedownService(self):
         """Stop the zeroconf service"""
         #self.group.Reset()
-        self.sdRef.close()
-        self.serverSocket.shutdown(1)
-        self.serverSocket.close()
+        try:
+            self.sdRef.close()
+            self.serverSocket.shutdown(1)
+            self.serverSocket.close()
+        except socket.error, e:
+            self.logger.error("Socket error in takedown service: " + str(e))
 
     def cleanup(self, cs):
         """Do some sort of socket error handling if we ever get a command or data that we don't expect."""
