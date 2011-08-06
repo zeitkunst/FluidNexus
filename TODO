@@ -1,8 +1,7 @@
 SOONER
 ======
 
-* Add option to not pass along blacklisted messages
-* Ensure ordering of messages is done desc by received time
+* Add created time to message display
 * Shutdown server/client threads properly on GUI exit
 * Present dialog instead of status message if bluetooth, zeroconf are not enabled
 

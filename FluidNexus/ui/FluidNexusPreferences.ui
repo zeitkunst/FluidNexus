@@ -54,7 +54,7 @@
     </attribute>
     <widget class="QCheckBox" name="sendBlacklistedMessagesCheckbox">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="geometry">
       <rect>
@@ -525,8 +525,8 @@
    <slot>bluetoothScanFrequencyChanged(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>169</x>
-     <y>61</y>
+     <x>234</x>
+     <y>74</y>
     </hint>
     <hint type="destinationlabel">
      <x>444</x>
@@ -557,8 +557,8 @@
    <slot>zeroconfChanged(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>100</x>
-     <y>86</y>
+     <x>104</x>
+     <y>77</y>
     </hint>
     <hint type="destinationlabel">
      <x>-1</x>
@@ -573,8 +573,8 @@
    <slot>zeroconfScanFrequencyChanged(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>183</x>
-     <y>64</y>
+     <x>234</x>
+     <y>74</y>
     </hint>
     <hint type="destinationlabel">
      <x>450</x>
@@ -589,8 +589,8 @@
    <slot>nexusKeyFinished()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>299</x>
-     <y>64</y>
+     <x>220</x>
+     <y>74</y>
     </hint>
     <hint type="destinationlabel">
      <x>499</x>
@@ -605,8 +605,8 @@
    <slot>nexusSecretFinished()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>347</x>
-     <y>92</y>
+     <x>220</x>
+     <y>104</y>
     </hint>
     <hint type="destinationlabel">
      <x>498</x>
@@ -621,8 +621,8 @@
    <slot>onRequestAuthorization()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>229</x>
-     <y>127</y>
+     <x>220</x>
+     <y>135</y>
     </hint>
     <hint type="destinationlabel">
      <x>98</x>
@@ -637,8 +637,8 @@
    <slot>tokenFinished()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>155</x>
-     <y>177</y>
+     <x>220</x>
+     <y>187</y>
     </hint>
     <hint type="destinationlabel">
      <x>0</x>
@@ -653,8 +653,8 @@
    <slot>tokenSecretFinished()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>145</x>
-     <y>215</y>
+     <x>220</x>
+     <y>217</y>
     </hint>
     <hint type="destinationlabel">
      <x>2</x>
@@ -669,8 +669,8 @@
    <slot>nexusChanged()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>42</x>
-     <y>135</y>
+     <x>51</x>
+     <y>144</y>
     </hint>
     <hint type="destinationlabel">
      <x>6</x>
@@ -685,12 +685,28 @@
    <slot>ttlFinished()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>154</x>
-     <y>232</y>
+     <x>176</x>
+     <y>247</y>
     </hint>
     <hint type="destinationlabel">
      <x>49</x>
      <y>334</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sendBlacklistedMessagesCheckbox</sender>
+   <signal>stateChanged(int)</signal>
+   <receiver>FluidNexusPreferences</receiver>
+   <slot>sendBlacklistedChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>79</x>
+     <y>59</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>59</x>
+     <y>308</y>
     </hint>
    </hints>
   </connection>
@@ -707,5 +723,6 @@
   <slot>tokenFinished()</slot>
   <slot>tokenSecretFinished()</slot>
   <slot>nexusChanged()</slot>
+  <slot>sendBlacklistedChanged(int)</slot>
  </slots>
 </ui>

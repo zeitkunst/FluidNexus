@@ -119,13 +119,14 @@ class Networking(object):
 
     newMessages = []
 
-    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsDir = ".", logPath = "FluidNexus.log", level = logging.DEBUG):
+    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsDir = ".", logPath = "FluidNexus.log", level = logging.DEBUG, sendBlacklist = False):
         self.logger = Log.getLogger(logPath = logPath, level = level)
 
         self.databaseDir = databaseDir
         self.databaseType = databaseType
         self.attachmentsDir = attachmentsDir
         self.logLevel = level
+        self.sendBlacklist = sendBlacklist
 
     def openDatabase(self):
         self.database = FluidNexusDatabase(databaseDir = self.databaseDir, databaseType = self.databaseType, level = self.logLevel)
@@ -150,8 +151,11 @@ class Networking(object):
 
     def getHashesFromDatabase(self):
         """Get the current list of hashes from the database."""
-
-        self.ourHashes = self.database.hashes()
+        
+        if (self.sendBlacklist):
+            self.ourHashes = self.database.hashes()
+        else:
+            self.ourHashes = self.database.hashesNoBlacklist()
 
     def addHash(self, hashToAdd):
         self.ourHashes.append(hashToAdd)
@@ -357,9 +361,9 @@ class Networking(object):
 class NexusNetworking(Networking):
     """Class for dealing with uploading public messages to the nexus."""
 
-    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsDir = ".", logPath = "FluidNexus.log", level = logging.DEBUG, key = "", secret = "", token = "", token_secret = ""):
+    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsDir = ".", logPath = "FluidNexus.log", level = logging.DEBUG, key = "", secret = "", token = "", token_secret = "", sendBlacklist = False):
 
-        super(NexusNetworking, self).__init__(databaseDir = databaseDir, databaseType = databaseType, attachmentsDir = attachmentsDir, logPath = logPath, level = level)
+        super(NexusNetworking, self).__init__(databaseDir = databaseDir, databaseType = databaseType, attachmentsDir = attachmentsDir, logPath = logPath, level = level, sendBlacklist = sendBlacklist)
 
         self.key = key
         self.secret = secret
@@ -476,8 +480,8 @@ TODO
 * Deal with different libraries such as lightblue."""
 
 
-    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsDir = ".", logPath = "FluidNexus.log", level = logging.DEBUG, numConnections = 5, setup = False):
-        super(BluetoothServerVer3, self).__init__(databaseDir = databaseDir, databaseType = databaseType, attachmentsDir = attachmentsDir, logPath = logPath, level = level)
+    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsDir = ".", logPath = "FluidNexus.log", level = logging.DEBUG, numConnections = 5, setup = False, sendBlacklist = False):
+        super(BluetoothServerVer3, self).__init__(databaseDir = databaseDir, databaseType = databaseType, attachmentsDir = attachmentsDir, logPath = logPath, level = level, sendBlacklist = sendBlacklist)
     
         self.numConnections = numConnections
 
@@ -632,8 +636,8 @@ TODO
 * Deal with different libraries such as lightblue."""
 
 
-    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsDir = ".", logPath = "FluidNexus.log", level = logging.DEBUG, numConnections = 5):
-        super(BluetoothClientVer3, self).__init__(databaseDir = databaseDir, databaseType = databaseType, attachmentsDir = attachmentsDir, logPath = logPath, level = level)
+    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsDir = ".", logPath = "FluidNexus.log", level = logging.DEBUG, numConnections = 5, sendBlacklist = False):
+        super(BluetoothClientVer3, self).__init__(databaseDir = databaseDir, databaseType = databaseType, attachmentsDir = attachmentsDir, logPath = logPath, level = level, sendBlacklist = sendBlacklist)
         self.setState(self.STATE_START)
 
     def testBluetooth(self):
@@ -772,8 +776,8 @@ TODO
 class ZeroconfServer(Networking):
     """Class that deals with zeroconf networking using version 3 of the protocol, specifically using protocol buffers."""
 
-    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsDir = ".", logPath = "FluidNexus.log", level = logging.DEBUG, numConnections = 5, host = "", port = 17897):
-        super(ZeroconfServer, self).__init__(databaseDir = databaseDir, databaseType = databaseType, attachmentsDir = attachmentsDir, logPath = logPath, level = level)
+    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsDir = ".", logPath = "FluidNexus.log", level = logging.DEBUG, numConnections = 5, host = "", port = 17897, sendBlacklist = False):
+        super(ZeroconfServer, self).__init__(databaseDir = databaseDir, databaseType = databaseType, attachmentsDir = attachmentsDir, logPath = logPath, level = level, sendBlacklist = sendBlacklist)
         self.host = host
         self.port = port
         self.name = hashlib.md5(str(time.time())).hexdigest()
@@ -949,8 +953,8 @@ class ZeroconfClient(Networking):
     timeout = 5
     resolved = []
 
-    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsDir = ".", logPath = "FluidNexus.log", level = logging.DEBUG, host = "", port = 9999, loopType = "glib"):
-        super(ZeroconfClient, self).__init__(databaseDir = databaseDir, databaseType = databaseType, attachmentsDir = attachmentsDir, logPath = logPath, level = level)
+    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsDir = ".", logPath = "FluidNexus.log", level = logging.DEBUG, host = "", port = 9999, loopType = "glib", sendBlacklist = False):
+        super(ZeroconfClient, self).__init__(databaseDir = databaseDir, databaseType = databaseType, attachmentsDir = attachmentsDir, logPath = logPath, level = level, sendBlacklist = sendBlacklist)
         self.host = host
         self.port = port
         self.loopType = loopType

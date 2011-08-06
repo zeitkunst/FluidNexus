@@ -159,11 +159,12 @@ class ServiceThread(QtCore.QThread):
 
 class NexusNetworkingQt(ServiceThread):
 
-    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsDir = ".", logPath = "FluidNexus.log", level = logging.WARN, scanFrequency = 300, parent = None, threadName = "NexusNetworkingThread", key = "", secret = "", token = "", token_secret = ""):
+    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsDir = ".", logPath = "FluidNexus.log", level = logging.WARN, scanFrequency = 300, parent = None, threadName = "NexusNetworkingThread", key = "", secret = "", token = "", token_secret = "", sendBlacklist = False):
         self.key = unicode(key)
         self.secret = unicode(secret)
         self.token = unicode(token)
         self.token_secret = unicode(token_secret)
+        self.sendBlacklist = sendBlacklist
 
         super(NexusNetworkingQt, self).__init__(databaseDir = databaseDir, databaseType = databaseType, attachmentsDir = attachmentsDir, logPath = logPath, level = level, parent = parent, scanFrequency = scanFrequency, threadName = threadName)
 
@@ -178,7 +179,7 @@ class NexusNetworkingQt(ServiceThread):
     def setupService(self):
         """Setup our nexus service."""
 
-        self.service = NexusNetworking(databaseDir = self.databaseDir, databaseType = self.databaseType, attachmentsDir = self.attachmentsDir, logPath = self.logPath, key = self.key, secret = self.secret, token = self.token, token_secret = self.token_secret)
+        self.service = NexusNetworking(databaseDir = self.databaseDir, databaseType = self.databaseType, attachmentsDir = self.attachmentsDir, logPath = self.logPath, key = self.key, secret = self.secret, token = self.token, token_secret = self.token_secret, sendBlacklist = self.sendBlacklist)
 
     def run(self):
         self.service.run()
@@ -191,14 +192,17 @@ class NexusNetworkingQt(ServiceThread):
 
 class ZeroconfClientQt(ServiceThread):
 
-    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsDir = ".", logPath = "FluidNexus.log", level = logging.WARN, scanFrequency = 300, parent = None, threadName = "ZeroconfClientThread", loopType = "qt"):
+    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsDir = ".", logPath = "FluidNexus.log", level = logging.WARN, scanFrequency = 300, parent = None, threadName = "ZeroconfClientThread", loopType = "qt", sendBlacklist = False):
+
         self.loopType = loopType
+        self.sendBlacklist = sendBlacklist
+
         super(ZeroconfClientQt, self).__init__(databaseDir = databaseDir, databaseType = databaseType, attachmentsDir = attachmentsDir, logPath = logPath, level = level, parent = parent, scanFrequency = scanFrequency, threadName = threadName)
 
     def setupService(self):
         """Setup our zeroconf service."""
 
-        self.service = ZeroconfClient(databaseDir = self.databaseDir, databaseType = self.databaseType, attachmentsDir = self.attachmentsDir, logPath = self.logPath, loopType = self.loopType)
+        self.service = ZeroconfClient(databaseDir = self.databaseDir, databaseType = self.databaseType, attachmentsDir = self.attachmentsDir, logPath = self.logPath, loopType = self.loopType, sendBlacklist = self.sendBlacklist)
 
         self.connect(self.parent, QtCore.SIGNAL("zeroconfScanFrequencyChanged(QVariant)"), self.handleZeroconfScanFrequencyChanged)
 
@@ -224,13 +228,15 @@ class ZeroconfClientQt(ServiceThread):
 
 class ZeroconfServerQt(ServiceThread):
 
-    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsDir = ".", logPath = "FluidNexus.log", level = logging.WARN, parent = None, threadName = "ZeroconfServerThread"):
+    def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsDir = ".", logPath = "FluidNexus.log", level = logging.WARN, parent = None, threadName = "ZeroconfServerThread", sendBlacklist = False):
+        self.sendBlacklist = sendBlacklist
+
         super(ZeroconfServerQt, self).__init__(databaseDir = databaseDir, databaseType = databaseType, attachmentsDir = attachmentsDir, logPath = logPath, level = level, parent = parent, threadName = threadName)
 
     def setupService(self):
         """Setup our zeroconf service."""
 
-        self.service = ZeroconfServer(databaseDir = self.databaseDir, databaseType = self.databaseType, attachmentsDir = self.attachmentsDir, logPath = self.logPath)
+        self.service = ZeroconfServer(databaseDir = self.databaseDir, databaseType = self.databaseType, attachmentsDir = self.attachmentsDir, logPath = self.logPath, sendBlacklist = self.sendBlacklist)
 
     def run(self):
         newMessages = self.service.run()
@@ -240,7 +246,7 @@ class ZeroconfServerQt(ServiceThread):
 
 
 class FluidNexusServerQt(QtCore.QThread):
-    def __init__(self, dataDir = None, databaseType = None, attachmentsDir = None, logPath = "FluidNexus.log", parent = None, level = logging.WARN):
+    def __init__(self, dataDir = None, databaseType = None, attachmentsDir = None, logPath = "FluidNexus.log", parent = None, level = logging.WARN, sendBlacklist = False):
         QtCore.QThread.__init__(self, parent)
 
         self.databaseDir = dataDir
@@ -248,9 +254,10 @@ class FluidNexusServerQt(QtCore.QThread):
         self.attachmentsDir = attachmentsDir
         self.parent = parent
         self.logger = Log.getLogger(logPath = logPath, level = level)
+        self.sendBlacklist = sendBlacklist
 
 
-        self.btServer = BluetoothServerVer3(databaseDir = dataDir, databaseType = databaseType, attachmentsDir = attachmentsDir, logPath = logPath)
+        self.btServer = BluetoothServerVer3(databaseDir = dataDir, databaseType = databaseType, attachmentsDir = attachmentsDir, logPath = logPath, sendBlacklist = self.sendBlacklist)
 
         self.connect(self, QtCore.SIGNAL("newMessages"), self.parent.newMessages)
         self.connect(self, QtCore.SIGNAL("started()"), self.handleStarted)
@@ -297,7 +304,7 @@ class FluidNexusServerQt(QtCore.QThread):
 
 
 class FluidNexusClientQt(QtCore.QThread):
-    def __init__(self, dataDir = None, databaseType = None, attachmentsDir = None, logPath = "FluidNexus.log", parent = None, level = logging.WARN, scanFrequency = 300):
+    def __init__(self, dataDir = None, databaseType = None, attachmentsDir = None, logPath = "FluidNexus.log", parent = None, level = logging.WARN, scanFrequency = 300, sendBlacklist = False):
         QtCore.QThread.__init__(self, parent)
 
         self.databaseDir = dataDir
@@ -305,10 +312,11 @@ class FluidNexusClientQt(QtCore.QThread):
         self.attachmentsDir = attachmentsDir
         self.parent = parent
         self.logger = Log.getLogger(logPath = logPath, level = level)
+        self.sendBlacklist = sendBlacklist
 
         self.scanFrequency = scanFrequency
 
-        self.btClient = BluetoothClientVer3(databaseDir = dataDir, databaseType = databaseType, attachmentsDir = attachmentsDir, logPath = logPath)
+        self.btClient = BluetoothClientVer3(databaseDir = dataDir, databaseType = databaseType, attachmentsDir = attachmentsDir, logPath = logPath, sendBlacklist = self.sendBlacklist)
 
 
         self.connect(self, QtCore.SIGNAL("newMessages"), self.parent.newMessages)
@@ -1022,6 +1030,13 @@ class FluidNexusPreferencesDialog(QtGui.QDialog):
             self.settings.setValue(key, self.preferencesToChange[key])
         QtGui.QDialog.accept(self)
 
+    def sendBlacklistedChanged(self, value):
+        self.preferencesToChange["general/sendBlacklist"] = value
+        if (value == 2):
+            self.sendBlacklist = True
+        else:
+            self.sendBlacklist = False
+
     def bluetoothChanged(self, value):
         self.preferencesToChange["network/bluetooth"] = value
         if (value == 2):
@@ -1262,6 +1277,13 @@ class FluidNexusDesktop(QtGui.QMainWindow):
 
         self.setupSysTray()
 
+        # Check on our send blacklist option
+        sendBlacklist = self.settings.value("general/sendBlacklist", 0).toInt()[0]
+        if (sendBlacklist == 2):
+            self.sendBlacklist = True
+        else:
+            self.sendBlacklist = False
+
         # Set our enabled/disabled network modalities; we'll refer to these values throughout the course of the program
         bluetooth = self.settings.value("network/bluetooth", 2).toInt()[0]
         if (bluetooth == 2): 
@@ -1362,7 +1384,7 @@ class FluidNexusDesktop(QtGui.QMainWindow):
     def __startNetworkThreads(self):
 
         if (self.bluetoothEnabled):
-            self.bluetoothServerThread = FluidNexusServerQt(parent = self, dataDir = self.dataDir, databaseType = "pysqlite2", attachmentsDir = self.attachmentsDir, logPath = self.logPath, level = self.logLevel)
+            self.bluetoothServerThread = FluidNexusServerQt(parent = self, dataDir = self.dataDir, databaseType = "pysqlite2", attachmentsDir = self.attachmentsDir, logPath = self.logPath, level = self.logLevel, sendBlacklist = self.sendBlacklist)
 
             # TODO
             # Any faster way to determine whether or not it's enabled?
@@ -1372,19 +1394,19 @@ class FluidNexusDesktop(QtGui.QMainWindow):
                 self.bluetoothServerThread.start()
             
                 scanFrequency = self.settings.value("bluetooth/scanFrequency", 300).toInt()[0]
-                self.bluetoothClientThread = FluidNexusClientQt(parent = self, dataDir = self.dataDir, databaseType = "pysqlite2", attachmentsDir = self.attachmentsDir, logPath = self.logPath, level = self.logLevel, scanFrequency = scanFrequency)
+                self.bluetoothClientThread = FluidNexusClientQt(parent = self, dataDir = self.dataDir, databaseType = "pysqlite2", attachmentsDir = self.attachmentsDir, logPath = self.logPath, level = self.logLevel, scanFrequency = scanFrequency, sendBlacklist = self.sendBlacklist)
     
                 self.bluetoothClientThread.start()
 
         if (self.zeroconfEnabled):
             scanFrequency = self.settings.value("zeroconf/scanFrequency", 300).toInt()[0]
-            self.zeroconfClientThread = ZeroconfClientQt(parent = self, databaseDir = self.dataDir, databaseType = "pysqlite2", attachmentsDir = self.attachmentsDir, logPath = self.logPath, level = self.logLevel, scanFrequency = scanFrequency, loopType = "qt")
+            self.zeroconfClientThread = ZeroconfClientQt(parent = self, databaseDir = self.dataDir, databaseType = "pysqlite2", attachmentsDir = self.attachmentsDir, logPath = self.logPath, level = self.logLevel, scanFrequency = scanFrequency, loopType = "qt", sendBlacklist = self.sendBlacklist)
             enabled = self.zeroconfClientThread.testZeroconf()
 
             if (enabled):
                 self.zeroconfClientThread.start()
     
-                self.zeroconfServerThread = ZeroconfServerQt(parent = self, databaseDir = self.dataDir, databaseType = "pysqlite2", attachmentsDir = self.attachmentsDir, logPath = self.logPath, level = self.logLevel)
+                self.zeroconfServerThread = ZeroconfServerQt(parent = self, databaseDir = self.dataDir, databaseType = "pysqlite2", attachmentsDir = self.attachmentsDir, logPath = self.logPath, level = self.logLevel, sendBlacklist = self.sendBlacklist)
                 self.zeroconfServerThread.start()
             
         # TODO
@@ -1394,7 +1416,7 @@ class FluidNexusDesktop(QtGui.QMainWindow):
             secret = self.settings.value("nexus/secret", "").toString()
             token = self.settings.value("nexus/token", "").toString()
             token_secret = self.settings.value("nexus/tokenSecret", "").toString()
-            self.nexusThread = NexusNetworkingQt(parent = self, databaseDir = self.dataDir, databaseType = "pysqlite2", attachmentsDir = self.attachmentsDir, logPath = self.logPath, level = self.logLevel, key = key, secret = secret, token = token, token_secret = token_secret)
+            self.nexusThread = NexusNetworkingQt(parent = self, databaseDir = self.dataDir, databaseType = "pysqlite2", attachmentsDir = self.attachmentsDir, logPath = self.logPath, level = self.logLevel, key = key, secret = secret, token = token, token_secret = token_secret, sendBlacklist = self.sendBlacklist)
             self.nexusThread.start()
 
     def __stopNetworkThreads(self):

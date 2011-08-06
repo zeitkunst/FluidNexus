@@ -142,6 +142,15 @@ class FluidNexusDatabase(object):
 
         return hashes
 
+    def hashesNoBlacklist(self):
+        """Get a list of non-blacklisted hashes from the database, ordered by time desc."""
+
+        hashes = []
+        for message_hash in self.session.query(Messages.message_hash).filter(Messages.blacklist != True).order_by(desc(Messages.received_time)):
+            hashes.append(message_hash[0])
+
+        return hashes
+
     def addMine(self, message_type = 0, title = "", content = "", attachment_path = None, attachment_original_filename = None, public = False, ttl = 30):
         """Add one of our own messages to the database."""
         message_hash = hashlib.sha256(title.encode("utf-8") + content.encode("utf-8")).hexdigest()
