@@ -372,10 +372,13 @@ class MessageTextBrowser(QtGui.QTextBrowser):
         <td><h3>%1</h3></td>
         </tr>
         <tr>
-            <td>%2</td>
+            <td>
+                <p>%3</p>
+                <p>%2</p>
+            </td>
         </tr>
         <tr>
-        <td align='right'>%3&nbsp;&nbsp;&nbsp;<a href='fluidnexus://editmessage' title='Edit Message'><img src=':/icons/icons/32x32/menu_edit.png' width='32'/></a>&nbsp;&nbsp;&nbsp;<a href='fluidnexus://deletemessage' title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
+        <td align='right'><a href='fluidnexus://editmessage' title='Edit Message'><img src=':/icons/icons/32x32/menu_edit.png' width='32'/></a>&nbsp;&nbsp;&nbsp;<a href='fluidnexus://deletemessage' title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
         </tr>
     </table>
     """
@@ -387,10 +390,13 @@ class MessageTextBrowser(QtGui.QTextBrowser):
         <td><h3>%1</h3></td>
         </tr>
         <tr>
-            <td>%2</td>
+            <td>
+                <p>%3</p>
+                <p>%2</p>
+            </td>
         </tr>
         <tr>
-        <td align='right'>%3&nbsp;&nbsp;&nbsp;<a href='fluidnexus://editmessage' title='Edit Message'><img src=':/icons/icons/32x32/menu_edit.png' width='32'/></a>&nbsp;&nbsp;&nbsp;<a href='fluidnexus://deletemessage' title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
+        <td align='right'><a href='fluidnexus://editmessage' title='Edit Message'><img src=':/icons/icons/32x32/menu_edit.png' width='32'/></a>&nbsp;&nbsp;&nbsp;<a href='fluidnexus://deletemessage' title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
         </tr>
     </table>
     """
@@ -403,13 +409,16 @@ class MessageTextBrowser(QtGui.QTextBrowser):
         <td><h3>%1</h3></td>
         </tr>
         <tr>
-            <td>%2</td>
+            <td>
+                <p>%3</p>
+                <p>%2</p>
+            </td>
         </tr>
         <tr>
             <td align='right'><img src=':/icons/icons/32x32/attachment_icon.png'/>&nbsp;&nbsp;<a href='%5'>%4</a></td>
         </tr>
         <tr>
-            <td align='right'>%3&nbsp;&nbsp;&nbsp;<a href="fluidnexus://editmessage" title='Edit Message'><img src=':/icons/icons/32x32/menu_edit.png' width='32'/></a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage" title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
+            <td align='right'><a href="fluidnexus://editmessage" title='Edit Message'><img src=':/icons/icons/32x32/menu_edit.png' width='32'/></a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage" title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
         </tr>
     </table>
     """
@@ -421,13 +430,16 @@ class MessageTextBrowser(QtGui.QTextBrowser):
         <td><h3>%1</h3></td>
         </tr>
         <tr>
-            <td>%2</td>
+            <td>
+                <p>%3</p>
+                <p>%2</p>
+            </td>
         </tr>
         <tr>
             <td align='right'><img src=':/icons/icons/32x32/attachment_icon.png'/>&nbsp;&nbsp;<a href='%5'>%4</a></td>
         </tr>
         <tr>
-            <td align='right'>%3&nbsp;&nbsp;&nbsp;<a href="fluidnexus://editmessage" title='Edit Message'><img src=':/icons/icons/32x32/menu_edit.png' width='32'/></a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage" title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
+            <td align='right'><a href="fluidnexus://editmessage" title='Edit Message'><img src=':/icons/icons/32x32/menu_edit.png' width='32'/></a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage" title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
         </tr>
     </table>
     """
@@ -440,10 +452,13 @@ class MessageTextBrowser(QtGui.QTextBrowser):
             <td><h3>%1</h3></td>
         </tr>
         <tr>
-            <td>%2</td>
+            <td>
+                <p>%3</p>
+                <p>%2</p>
+            </td>
         </tr>
         <tr>
-            <td align='right'>%3&nbsp;&nbsp;&nbsp;<a href="fluidnexus://blacklistmessage" title="Blacklist Message"><img src=":/icons/icons/32x32/menu_blacklist.png" width="32"/></a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage" title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
+            <td align='right'><a href="fluidnexus://blacklistmessage" title="Blacklist Message"><img src=":/icons/icons/32x32/menu_blacklist.png" width="32"/></a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage" title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
         </tr>
 
     </table>
@@ -456,10 +471,13 @@ class MessageTextBrowser(QtGui.QTextBrowser):
             <td><h3>%1</h3></td>
         </tr>
         <tr>
-            <td>%2</td>
+            <td>
+                <p>%3</p>
+                <p>%2</p>
+            </td>
         </tr>
         <tr>
-            <td align='right'>%3&nbsp;&nbsp;&nbsp;<a href="fluidnexus://blacklistmessage" title="Blacklist Message"><img src=":/icons/icons/32x32/menu_blacklist.png" width="32"/></a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage" title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
+            <td align='right'><a href="fluidnexus://blacklistmessage" title="Blacklist Message"><img src=":/icons/icons/32x32/menu_blacklist.png" width="32"/></a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage" title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
         </tr>
 
     </table>
@@ -473,10 +491,13 @@ class MessageTextBrowser(QtGui.QTextBrowser):
             <td><h3>%1</h3></td>
         </tr>
         <tr>
-            <td>%2</td>
+            <td>
+                <p>%3</p>
+                <p>%2</p>
+            </td>
         </tr>
         <tr>
-            <td align='right'>%3&nbsp;&nbsp;&nbsp;<a href="fluidnexus://unblacklistmessage" title="Unblacklist Message"><img src=":/icons/icons/32x32/menu_all.png" width="32"/></a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage" title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
+            <td align='right'><a href="fluidnexus://unblacklistmessage" title="Unblacklist Message"><img src=":/icons/icons/32x32/menu_all.png" width="32"/></a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage" title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
         </tr>
 
     </table>
@@ -489,10 +510,13 @@ class MessageTextBrowser(QtGui.QTextBrowser):
             <td><h3>%1</h3></td>
         </tr>
         <tr>
-            <td>%2</td>
+            <td>
+                <p>%3</p>
+                <p>%2</p>
+            </td>
         </tr>
         <tr>
-            <td align='right'>%3&nbsp;&nbsp;&nbsp;<a href="fluidnexus://unblacklistmessage" title="Unblacklist Message"><img src=":/icons/icons/32x32/menu_all.png" width="32"/></a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage" title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
+            <td align='right'><a href="fluidnexus://unblacklistmessage" title="Unblacklist Message"><img src=":/icons/icons/32x32/menu_all.png" width="32"/></a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage" title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
         </tr>
 
     </table>
@@ -507,13 +531,16 @@ class MessageTextBrowser(QtGui.QTextBrowser):
             <td><h3>%1</h3></td>
         </tr>
         <tr>
-            <td>%2</td>
+            <td>
+                <p>%3</p>
+                <p>%2</p>
+            </td>
         </tr>
         <tr>
         <td align='right'><img src=':/icons/icons/32x32/attachment_icon.png'/>&nbsp;&nbsp;<a href='%5'>%4</a></td>
         </tr>
         <tr>
-            <td align='right'>%3&nbsp;&nbsp;&nbsp;<a href="fluidnexus://blacklistmessage" title="Blacklist Message"><img src=":/icons/icons/32x32/menu_blacklist.png" width="32"/></a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage" title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
+            <td align='right'><a href="fluidnexus://blacklistmessage" title="Blacklist Message"><img src=":/icons/icons/32x32/menu_blacklist.png" width="32"/></a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage" title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
         </tr>
 
     </table>
@@ -526,13 +553,17 @@ class MessageTextBrowser(QtGui.QTextBrowser):
             <td><h3>%1</h3></td>
         </tr>
         <tr>
-            <td>%2</td>
+            <td>
+                <p>%3</p>
+                <p>%2</p>
+            </td>
+
         </tr>
         <tr>
         <td align='right'><img src=':/icons/icons/32x32/attachment_icon.png'/>&nbsp;&nbsp;<a href='%5'>%4</a></td>
         </tr>
         <tr>
-            <td align='right'>%3&nbsp;&nbsp;&nbsp;<a href="fluidnexus://blacklistmessage" title="Blacklist Message"><img src=":/icons/icons/32x32/menu_blacklist.png" width="32"/></a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage" title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
+            <td align='right'><a href="fluidnexus://blacklistmessage" title="Blacklist Message"><img src=":/icons/icons/32x32/menu_blacklist.png" width="32"/></a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage" title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
         </tr>
 
     </table>
@@ -546,13 +577,17 @@ class MessageTextBrowser(QtGui.QTextBrowser):
             <td><h3>%1</h3></td>
         </tr>
         <tr>
-            <td>%2</td>
+            <td>
+                <p>%3</p>
+                <p>%2</p>
+            </td>
+
         </tr>
         <tr>
             <td align='right'><img src=':/icons/icons/32x32/attachment_icon.png'/>&nbsp;&nbsp;<a href='%5'>%4</a></td>
         </tr>
         <tr>
-            <td align='right'>%3&nbsp;&nbsp;&nbsp;<a href="fluidnexus://unblacklistmessage" title="Unblacklist Message"><img src=":/icons/icons/32x32/menu_all.png" width="32"/></a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage" title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
+            <td align='right'><a href="fluidnexus://unblacklistmessage" title="Unblacklist Message"><img src=":/icons/icons/32x32/menu_all.png" width="32"/></a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage" title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
         </tr>
 
     </table>
@@ -565,13 +600,16 @@ class MessageTextBrowser(QtGui.QTextBrowser):
             <td><h3>%1</h3></td>
         </tr>
         <tr>
-            <td>%2</td>
+            <td>
+                <p>%3</p>
+                <p>%2</p>
+            </td>
         </tr>
         <tr>
             <td align='right'><img src=':/icons/icons/32x32/attachment_icon.png'/>&nbsp;&nbsp;<a href='%5'>%4</a></td>
         </tr>
         <tr>
-            <td align='right'>%3&nbsp;&nbsp;&nbsp;<a href="fluidnexus://unblacklistmessage" title="Unblacklist Message"><img src=":/icons/icons/32x32/menu_all.png" width="32"/></a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage" title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
+            <td align='right'><a href="fluidnexus://unblacklistmessage" title="Unblacklist Message"><img src=":/icons/icons/32x32/menu_all.png" width="32"/></a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage" title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
         </tr>
 
     </table>
@@ -1391,7 +1429,7 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         items.reverse()
 
         for item in items:
-            message_timestamp = item['time']
+            message_timestamp = item['received_time']
             message_hash = item['message_hash']
             message_title = item['title']
             message_content = item['content']
