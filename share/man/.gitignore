@@ -1,0 +1,5 @@
+*.pyc
+*.swp
+FluidNexus/*.pyc
+FluidNexus/*.swp
+FluidNexus/ui/*.pyc

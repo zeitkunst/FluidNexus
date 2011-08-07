@@ -1,10 +1,31 @@
 #!/usr/bin/env python
+# vim: set fileencoding=utf-8
+# Copyright (C) 2011, Nicholas Knouf
+# 
+# This file is part of Fluid Nexus
+#
+# Fluid Nexus is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import logging
 from optparse import OptionParser
 import multiprocessing
 import os
 import sys
+
+import FluidNexus
+from FluidNexus.Cmdline import get_optparser
 
 def start(verbosity = 0, headless = False):
     if (verbosity >= 3):
@@ -40,13 +61,12 @@ def start(verbosity = 0, headless = False):
 
 if __name__ == "__main__":
     multiprocessing.freeze_support()
-    parser = OptionParser()
-    parser.add_option("-v", "--verbose", dest = "verbosity", action = "count",  help = "How verbose to be.  Use up to 3 v's for full debug.")
 
     # TODO
     # Better short option...
     # Disabling headless until we're able to figure out how to handle all of the threads, the sleeping, etc.
     #parser.add_option("-e", "--headless", dest = "headless", action = "store_true",  help = "Whether to run the network services without the GUI")
+    parser = get_optparser()
     (options, args) = parser.parse_args()
 
     #start(verbosity = options.verbosity, headless = options.headless)

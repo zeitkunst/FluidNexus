@@ -1,5 +1,5 @@
 # vim: set fileencoding=utf-8
-# Copyright (C) 2008, Nick Knouf, Bruno Vianna, and Luis Ayuso
+# Copyright (C) 2011, Nicholas Knouf
 # 
 # This file is part of Fluid Nexus
 #

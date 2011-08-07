@@ -13,6 +13,7 @@ from setuptools import find_packages
 #from setuptools import setup, find_packages
 
 import FluidNexus
+from FluidNexus.BuildManpage import build_manpage
 
 here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.rst')).read()
@@ -39,7 +40,14 @@ elif (sys.platform == "darwin"):
 if (os_name == "windows"):
     import py2exe
 
+if (os_name == "darwin"):
+    setup_requires = ["py2app"]
+else:
+    setup_requires = []
+
+
 def get_messages():
+    """Get the QT translations."""
     msgfiles = []
     for filename in os.listdir("l10n/"):
         if filename.endswith(".qm"):
@@ -47,6 +55,7 @@ def get_messages():
     return msgfiles
 
 def get_manual_images():
+    """Get all of the images in the manual."""
     manual_filenames = []
     for dirpath, dirs, filenames in os.walk(os.path.join("share", "FluidNexus", "manual", "images")):
         manual_filenames.extend([os.path.join(dirpath, filename) for filename in filenames])
@@ -54,6 +63,7 @@ def get_manual_images():
     return manual_filenames
 
 def regen_messages():
+    """Regenerate QT translations."""
     for filename in os.listdir("l10n/"):
         if filename.endswith(".ts"):
             outFile = filename.replace(".ts", ".qm")
@@ -61,6 +71,7 @@ def regen_messages():
             subprocess.call(command)
 
 class build_py(_build_py):
+    """Builds our PyQt files from the ui files."""
     def run(self):
         uis = []
         for filename in os.listdir(os.path.join("FluidNexus", "ui")):
@@ -78,7 +89,6 @@ class build_py(_build_py):
             subprocess.call(command)
             self.byte_compile(out)
 
-        print "RUNNING"
         res = "FluidNexus/ui/FluidNexus_rc.py"
         if (os_name == "windows"):
             command = ["pyrcc4.exe", "FluidNexus/ui/res/FluidNexus.qrc", "-o", res]
@@ -91,17 +101,19 @@ class build_py(_build_py):
         #    regen_messages()
         _build_py.run(self)
 
+
+
+# Add in our manual and translation files
 data_files = [("share/FluidNexus/l10n", get_messages()), 
               ("share/FluidNexus/manual", ["share/FluidNexus/manual/index.html"]),
              ("share/FluidNexus/manual/images", get_manual_images())]
 
+# Add in Visual Studio runtime on windows
 if (os_name == "windows"):
     data_files.append(("Microsoft.VC90.CRT", glob.glob(r"C:\WINDOWS\WinSxS\x86_Microsoft.VC90.CRT_1fc8b3b9a1e18e3b_9.0.21022.8_x-ww_d08d0375\*.*")))
     data_files.append(("Microsoft.VC90.CRT", [r"scripts\Microsoft.VC90.CRT.manifest"]))
-    #data_files.append(("Microsoft.VC90.MFC", glob.glob(r"C:\WINDOWS\WinSxS\x86_Microsoft.VC90.MFC_1fc8b3b9a1e18e3b_9.0.21022.8_x-ww_a173767a\*.*")))
-    #data_files.append(("Microsoft.VC90.MFC", [r"scripts\Microsoft.VC90.MFC.manifest"])),
 
-setup(name='fluid_nexus',
+setup(name='fluid-nexus',
     version=FluidNexus.__version__,
     description='PyQt4 application that enables one to share messages and data independent of centralized data networks',
     author='Nicholas Knouf',
@@ -125,11 +137,11 @@ setup(name='fluid_nexus',
     packages=find_packages(),
     package_data={"FluidNexus.ui":["*.ui"]},
     data_files = data_files,
-    scripts=["scripts/fluid_nexus"],
-    setup_requires=["py2app"],
+    scripts=["scripts/fluid-nexus"],
+    setup_requires=setup_requires,
     zipfile = "lib/library.zip",
     windows=[{
-        "script": "scripts/fluid_nexus",
+        "script": "scripts/fluid-nexus",
         "icon_resources": [(1, "FluidNexus/ui/res/icons/fluid_nexus_icon.ico")]}],
     app=["FluidNexusApp.py"],
     options = {
@@ -154,5 +166,5 @@ setup(name='fluid_nexus',
     include_package_data=True,
     zip_safe=False,
     install_requires = requires,
-    cmdclass={"build_py": build_py}
+    cmdclass={"build_py": build_py, "build_manpage": build_manpage}
 )

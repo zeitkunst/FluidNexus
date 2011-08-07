@@ -17,4 +17,12 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from .version import __version__
+from optparse import OptionParser
+import version
+
+def get_optparser():
+    parser = OptionParser(
+        version="Fluid Nexus v%s" % version.__version__, 
+        description = """Fluid Nexus is an application for Android phones and desktop computers that exchanges messages without the need for centralized mobile networks. Messages hop from one device to another, being transferred by short-range networking technologies like bluetooth, as well as via the movement of people from one location to another.  For more information see http://fluidnexus.net.""")
+    parser.add_option("-v", "--verbose", dest = "verbosity", action = "count",  help = "How verbose to be.  Use up to 3 v's for full debug.")
+    return parser
