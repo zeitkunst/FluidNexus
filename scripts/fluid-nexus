@@ -24,6 +24,9 @@ import multiprocessing
 import os
 import sys
 
+import FluidNexus
+from FluidNexus.Cmdline import get_optparser
+
 def start(verbosity = 0, headless = False):
     if (verbosity >= 3):
         level = logging.DEBUG
@@ -58,13 +61,12 @@ def start(verbosity = 0, headless = False):
 
 if __name__ == "__main__":
     multiprocessing.freeze_support()
-    parser = OptionParser()
-    parser.add_option("-v", "--verbose", dest = "verbosity", action = "count",  help = "How verbose to be.  Use up to 3 v's for full debug.")
 
     # TODO
     # Better short option...
     # Disabling headless until we're able to figure out how to handle all of the threads, the sleeping, etc.
     #parser.add_option("-e", "--headless", dest = "headless", action = "store_true",  help = "Whether to run the network services without the GUI")
+    parser = get_optparser()
     (options, args) = parser.parse_args()
 
     #start(verbosity = options.verbosity, headless = options.headless)

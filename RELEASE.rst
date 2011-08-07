@@ -1,7 +1,23 @@
 Ubuntu
 ======
 
+PyPi
+++++
 
+1.  Edit version number
+
+2.  python setup.py sdist upload
+
+PPA
++++
+
+1.  cd debian; dch -i (Update changelog)
+
+2.  make builddeb
+
+3.  dput fluidnexus-ppa <packages_version_source.changes>
+
+4.  Wait for build
 
 Windows
 =======
