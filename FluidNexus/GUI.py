@@ -62,7 +62,7 @@ DEFAULTS = {
 }
 
 # build our oauth request token request
-URL_BASE = "http://dev.fluidnexus.net/api/01/"
+URL_BASE = "http://localhost:6543/api/01/"
 OAUTH_CALLBACK_URL = URL_BASE + "access_token"
 REQUEST_TOKEN_URL = URL_BASE + "request_token/desktop"
 
@@ -931,12 +931,15 @@ class FluidNexusNewMessageDialog(QtGui.QDialog):
         return response
 
     def saveButtonClicked(self):
-        message_hash = hashlib.sha256(unicode(self.ui.newMessageTitle.text()).encode("utf-8") + unicode(self.ui.newMessageBody.document().toPlainText()).encode("utf-8")).hexdigest()
+        title = unicode(self.ui.newMessageTitle.text())
+        # Strip any potential HTML tags
+        content = re.sub(r'<[^>]*?>', '', unicode(self.ui.newMessageBody.document().toPlainText()))
+        message_hash = hashlib.sha256(unicode(title).encode("utf-8") + unicode(content).encode("utf-8")).hexdigest()
         
         if (self.parent.getDatabase().checkForMessageByHash(message_hash)):
             self.sameDialog()
         else:
-            self.emit(QtCore.SIGNAL("saveButtonClicked"), self.ui.newMessageTitle.text(), self.ui.newMessageBody.document().toPlainText(), self.filename, self.ui.nexusCheckBox.isChecked())
+            self.emit(QtCore.SIGNAL("saveButtonClicked"), title, content, self.filename, self.ui.nexusCheckBox.isChecked())
             self.close()
 
 class FluidNexusPreferencesDialog(QtGui.QDialog):
