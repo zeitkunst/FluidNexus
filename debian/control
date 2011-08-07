@@ -1,0 +1,20 @@
+Source: fluid-nexus
+Section: python
+Priority: extra
+Maintainer: Nicholas Knouf <nknouf@zeitkunst.org>
+Build-Depends: debhelper (>= 7.0.50~), python-support, python (>=2.5), python-protobuf, python-bluez, python-sqlalchemy, python-qt4, python-simplejson,       pyqt4-dev-tools
+Standards-Version: 3.8.4
+Homepage: http://fluidnexus.net
+Vcs-Git: git://github.com/zeitkunst/FluidNexus.git
+Vcs-Browser: https://github.com/zeitkunst/FluidNexus
+XS-Python-Version: >= 2.5
+
+Package: fluid-nexus
+Architecture: all
+Depends: ${python:Depends}, ${misc:Depends}, python-protobuf, python-bluez, python-sqlalchemy, python-qt4, python-simplejson, python-textile, python-oauth2, pybonjour
+Description: sharing messages and data without centralized networks
+ Fluid Nexus is an application for Android phones and desktop computers 
+ that exchanges messages without the need for centralized mobile 
+ networks. Messages hop from one device to another, being transferred 
+ by short-range networking technologies like bluetooth, as well as via 
+ the movement of people from one location to another. 
