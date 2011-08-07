@@ -26,11 +26,9 @@ Windows
 
 2.  Update scripts/fluid_nexus.iss with latest version
 
-4.  Edit version number in fluid_nexus.iss script
-
-5.  Run makeWindowsSetup.sh from mingw prompt
+3.  mingw32-win make win
     
-6.  Upload to pypi and Fluid Nexus website
+4.  Upload installer to pypi and Fluid Nexus website
 
 Mac OS X
 ========
