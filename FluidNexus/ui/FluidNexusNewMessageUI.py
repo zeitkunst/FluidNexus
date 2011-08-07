@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'FluidNexus\ui\FluidNexusNewMessage.ui'
+# Form implementation generated from reading ui file 'FluidNexus/ui/FluidNexusNewMessage.ui'
 #
-# Created: Sun Aug 07 19:37:19 2011
-#      by: PyQt4 UI code generator 4.8.4
+# Created: Sun Aug  7 19:51:53 2011
+#      by: PyQt4 UI code generator 4.8.5
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -18,6 +18,7 @@ class Ui_FluidNexusNewMessage(object):
     def setupUi(self, FluidNexusNewMessage):
         FluidNexusNewMessage.setObjectName(_fromUtf8("FluidNexusNewMessage"))
         FluidNexusNewMessage.resize(384, 397)
+        FluidNexusNewMessage.setWindowTitle(QtGui.QApplication.translate("FluidNexusNewMessage", "New Message", None, QtGui.QApplication.UnicodeUTF8))
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(_fromUtf8(":/icons/icons/fluid_nexus_icon.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         FluidNexusNewMessage.setWindowIcon(icon)
@@ -27,6 +28,7 @@ class Ui_FluidNexusNewMessage(object):
         self.formLayout.setFieldGrowthPolicy(QtGui.QFormLayout.AllNonFixedFieldsGrow)
         self.formLayout.setObjectName(_fromUtf8("formLayout"))
         self.titleLabel = QtGui.QLabel(FluidNexusNewMessage)
+        self.titleLabel.setText(QtGui.QApplication.translate("FluidNexusNewMessage", "&Title:", None, QtGui.QApplication.UnicodeUTF8))
         self.titleLabel.setMargin(0)
         self.titleLabel.setObjectName(_fromUtf8("titleLabel"))
         self.formLayout.setWidget(0, QtGui.QFormLayout.LabelRole, self.titleLabel)
@@ -34,6 +36,7 @@ class Ui_FluidNexusNewMessage(object):
         self.newMessageTitle.setObjectName(_fromUtf8("newMessageTitle"))
         self.formLayout.setWidget(0, QtGui.QFormLayout.FieldRole, self.newMessageTitle)
         self.messageLabel = QtGui.QLabel(FluidNexusNewMessage)
+        self.messageLabel.setText(QtGui.QApplication.translate("FluidNexusNewMessage", "&Message:", None, QtGui.QApplication.UnicodeUTF8))
         self.messageLabel.setMargin(0)
         self.messageLabel.setObjectName(_fromUtf8("messageLabel"))
         self.formLayout.setWidget(1, QtGui.QFormLayout.LabelRole, self.messageLabel)
@@ -41,6 +44,7 @@ class Ui_FluidNexusNewMessage(object):
         self.newMessageBody.setObjectName(_fromUtf8("newMessageBody"))
         self.formLayout.setWidget(1, QtGui.QFormLayout.FieldRole, self.newMessageBody)
         self.attachmentLabel = QtGui.QLabel(FluidNexusNewMessage)
+        self.attachmentLabel.setText(QtGui.QApplication.translate("FluidNexusNewMessage", "Attachment:", None, QtGui.QApplication.UnicodeUTF8))
         self.attachmentLabel.setObjectName(_fromUtf8("attachmentLabel"))
         self.formLayout.setWidget(2, QtGui.QFormLayout.LabelRole, self.attachmentLabel)
         self.verticalLayout_3 = QtGui.QVBoxLayout()
@@ -51,6 +55,7 @@ class Ui_FluidNexusNewMessage(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.fileSelectionButton.sizePolicy().hasHeightForWidth())
         self.fileSelectionButton.setSizePolicy(sizePolicy)
+        self.fileSelectionButton.setText(QtGui.QApplication.translate("FluidNexusNewMessage", "Choose File...", None, QtGui.QApplication.UnicodeUTF8))
         self.fileSelectionButton.setObjectName(_fromUtf8("fileSelectionButton"))
         self.verticalLayout_3.addWidget(self.fileSelectionButton)
         self.fileRemoveButton = QtGui.QPushButton(FluidNexusNewMessage)
@@ -59,6 +64,7 @@ class Ui_FluidNexusNewMessage(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.fileRemoveButton.sizePolicy().hasHeightForWidth())
         self.fileRemoveButton.setSizePolicy(sizePolicy)
+        self.fileRemoveButton.setText(QtGui.QApplication.translate("FluidNexusNewMessage", "Remove File", None, QtGui.QApplication.UnicodeUTF8))
         self.fileRemoveButton.setObjectName(_fromUtf8("fileRemoveButton"))
         self.verticalLayout_3.addWidget(self.fileRemoveButton)
         self.fileSelectedLabel = QtGui.QLabel(FluidNexusNewMessage)
@@ -74,13 +80,16 @@ class Ui_FluidNexusNewMessage(object):
         spacerItem1 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout_3.addItem(spacerItem1)
         self.cancelButton = QtGui.QPushButton(FluidNexusNewMessage)
+        self.cancelButton.setText(QtGui.QApplication.translate("FluidNexusNewMessage", "Cancel", None, QtGui.QApplication.UnicodeUTF8))
         self.cancelButton.setObjectName(_fromUtf8("cancelButton"))
         self.horizontalLayout_3.addWidget(self.cancelButton)
         self.saveButton = QtGui.QPushButton(FluidNexusNewMessage)
+        self.saveButton.setText(QtGui.QApplication.translate("FluidNexusNewMessage", "Save", None, QtGui.QApplication.UnicodeUTF8))
         self.saveButton.setObjectName(_fromUtf8("saveButton"))
         self.horizontalLayout_3.addWidget(self.saveButton)
         self.formLayout.setLayout(4, QtGui.QFormLayout.FieldRole, self.horizontalLayout_3)
         self.nexusCheckBox = QtGui.QCheckBox(FluidNexusNewMessage)
+        self.nexusCheckBox.setText(QtGui.QApplication.translate("FluidNexusNewMessage", "Public (pust to Nexus?)", None, QtGui.QApplication.UnicodeUTF8))
         self.nexusCheckBox.setObjectName(_fromUtf8("nexusCheckBox"))
         self.formLayout.setWidget(3, QtGui.QFormLayout.FieldRole, self.nexusCheckBox)
         self.horizontalLayout.addLayout(self.formLayout)
@@ -92,14 +101,6 @@ class Ui_FluidNexusNewMessage(object):
         QtCore.QMetaObject.connectSlotsByName(FluidNexusNewMessage)
 
     def retranslateUi(self, FluidNexusNewMessage):
-        FluidNexusNewMessage.setWindowTitle(QtGui.QApplication.translate("FluidNexusNewMessage", "New Message", None, QtGui.QApplication.UnicodeUTF8))
-        self.titleLabel.setText(QtGui.QApplication.translate("FluidNexusNewMessage", "&Title:", None, QtGui.QApplication.UnicodeUTF8))
-        self.messageLabel.setText(QtGui.QApplication.translate("FluidNexusNewMessage", "&Message:", None, QtGui.QApplication.UnicodeUTF8))
-        self.attachmentLabel.setText(QtGui.QApplication.translate("FluidNexusNewMessage", "Attachment:", None, QtGui.QApplication.UnicodeUTF8))
-        self.fileSelectionButton.setText(QtGui.QApplication.translate("FluidNexusNewMessage", "Choose File...", None, QtGui.QApplication.UnicodeUTF8))
-        self.fileRemoveButton.setText(QtGui.QApplication.translate("FluidNexusNewMessage", "Remove File", None, QtGui.QApplication.UnicodeUTF8))
-        self.cancelButton.setText(QtGui.QApplication.translate("FluidNexusNewMessage", "Cancel", None, QtGui.QApplication.UnicodeUTF8))
-        self.saveButton.setText(QtGui.QApplication.translate("FluidNexusNewMessage", "Save", None, QtGui.QApplication.UnicodeUTF8))
-        self.nexusCheckBox.setText(QtGui.QApplication.translate("FluidNexusNewMessage", "Public (pust to Nexus?)", None, QtGui.QApplication.UnicodeUTF8))
+        pass
 
 import FluidNexus_rc
