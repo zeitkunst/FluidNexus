@@ -113,6 +113,8 @@ if (os_name == "windows"):
     data_files.append(("Microsoft.VC90.CRT", glob.glob(r"C:\WINDOWS\WinSxS\x86_Microsoft.VC90.CRT_1fc8b3b9a1e18e3b_9.0.21022.8_x-ww_d08d0375\*.*")))
     data_files.append(("Microsoft.VC90.CRT", [r"scripts\Microsoft.VC90.CRT.manifest"]))
 
+print find_packages()
+
 setup(name='fluid-nexus',
     version=FluidNexus.__version__,
     description='PyQt4 application that enables one to share messages and data independent of centralized data networks',
@@ -147,7 +149,7 @@ setup(name='fluid-nexus',
     options = {
         "py2exe": { 
             "includes": ["sip", "simplejson", "pysqlite2", "google.protobuf", "sqlalchemy"], 
-            "packages": ["sqlalchemy.dialects.sqlite"]
+            "packages": ["sqlalchemy.dialects.sqlite", "FluidNexus.ui"]
         },
         "py2app": {
             "argv_emulation": True,

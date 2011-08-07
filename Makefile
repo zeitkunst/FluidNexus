@@ -28,7 +28,7 @@ sdist: dist-clean
 
 win: dist-clean
 	$(PYTHON) setup.py py2exe
-	$(ISCC) scripts/fluid_nexus.iss
+	$(ISCC) scripts/fluid-nexus.iss
 
 osx: dist-clean
 	$(PYTHON) setup.py py2app
@@ -36,7 +36,6 @@ osx: dist-clean
 clean:
 	$(PYTHON) setup.py clean
 	rm -Rf build $(BUILDDIR)
-	find . -name '*.pyc' -delete
 
 dist-clean: clean
 	rm -Rf dist
