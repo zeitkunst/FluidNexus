@@ -1,7 +1,7 @@
 SOONER
 ======
 
-* Figure out how to make a debian package, upload to PPA; this necessitates making packages for pybonjour and oauth2 as well
+* Update manual code to find the file when the debian package is installed
 * Add created time to message display
 * Shutdown server/client threads properly on GUI exit
 * Present dialog instead of status message if bluetooth, zeroconf are not enabled

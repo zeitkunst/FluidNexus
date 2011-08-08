@@ -1,3 +1,9 @@
+fluid-nexus (0.2.3-0ubuntu3) maverick; urgency=low
+
+  * Updating search path for manual 
+
+ -- Nicholas Knouf <nknouf@zeitkunst.org>  Sun, 07 Aug 2011 20:15:22 -0400
+
 fluid-nexus (0.2.3-0ubuntu2) maverick; urgency=low
 
   * Updating dependencies

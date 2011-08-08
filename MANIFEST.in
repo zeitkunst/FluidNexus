@@ -8,8 +8,8 @@ include FluidNexus/ui/res/icons/32x32/*.png
 include FluidNexus/ui/*.ui
 include l10n/*.qm
 include l10n/*.ts
-include share/FluidNexus/manual/index.html
-include share/FluidNexus/manual/images/*.png
+include share/fluid-nexus/manual/index.html
+include share/fluid-nexus/manual/images/*.png
 include share/man/*
 prune *.pyc
 prune .gitignore

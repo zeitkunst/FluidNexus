@@ -1146,7 +1146,7 @@ class FluidNexusHelpDialog(QtGui.QDialog):
 
         if (sys.platform == "win32"):
             prefix = self.findAppDirWin()
-            manualPath = os.path.join(os.path.abspath(prefix), "share", "FluidNexus", "manual", "index.html")
+            manualPath = os.path.join(os.path.abspath(prefix), "share", "fluid-nexus", "manual", "index.html")
         else:
             # Get our current path
             #currentPath = os.path.dirname(os.path.abspath(sys.argv[0]))
@@ -1158,7 +1158,15 @@ class FluidNexusHelpDialog(QtGui.QDialog):
             #else:
             #    prefix = currentPath
 
-            manualPath = os.path.join(prefix, "share", "FluidNexus", "manual", "index.html")
+            manualPath = os.path.join(prefix, "share", "fluid-nexus", "manual", "index.html")
+
+            try:
+                os.stat(manualPath)
+            except OSError:
+                # We're installed as a deb, so get the file from the share dir
+                prefix = sys.prefix
+                manualPath = os.path.join(prefix, "share", "fluid-nexus", "manual", "index.html")
+
 
 
         try:

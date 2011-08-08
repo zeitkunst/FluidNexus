@@ -57,7 +57,7 @@ def get_messages():
 def get_manual_images():
     """Get all of the images in the manual."""
     manual_filenames = []
-    for dirpath, dirs, filenames in os.walk(os.path.join("share", "FluidNexus", "manual", "images")):
+    for dirpath, dirs, filenames in os.walk(os.path.join("share", "fluid-nexus", "manual", "images")):
         manual_filenames.extend([os.path.join(dirpath, filename) for filename in filenames])
         
     return manual_filenames
@@ -104,16 +104,14 @@ class build_py(_build_py):
 
 
 # Add in our manual and translation files
-data_files = [("share/FluidNexus/l10n", get_messages()), 
-              ("share/FluidNexus/manual", ["share/FluidNexus/manual/index.html"]),
-             ("share/FluidNexus/manual/images", get_manual_images())]
+data_files = [("share/fluid-nexus/l10n", get_messages()), 
+              ("share/fluid-nexus/manual", ["share/fluid-nexus/manual/index.html"]),
+             ("share/fluid-nexus/manual/images", get_manual_images())]
 
 # Add in Visual Studio runtime on windows
 if (os_name == "windows"):
     data_files.append(("Microsoft.VC90.CRT", glob.glob(r"C:\WINDOWS\WinSxS\x86_Microsoft.VC90.CRT_1fc8b3b9a1e18e3b_9.0.21022.8_x-ww_d08d0375\*.*")))
     data_files.append(("Microsoft.VC90.CRT", [r"scripts\Microsoft.VC90.CRT.manifest"]))
-
-print find_packages()
 
 setup(name='fluid-nexus',
     version=FluidNexus.__version__,
