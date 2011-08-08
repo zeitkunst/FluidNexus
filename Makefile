@@ -31,7 +31,7 @@ builddeb: dist-clean
 	mv $(BUILDDIR)/$(PROJECT)-$(VERSION).tar.gz $(BUILDDIR)/$(PROJECT)-$(VERSION)/
 	cp -R debian/* $(BUILDDIR)/$(PROJECT)-$(VERSION)/debian/
 	cd $(BUILDDIR)/$(PROJECT)-$(VERSION) && debuild -S $(DEBFLAGS)
-	cd $(BUILDDIR)/$(PROJECT)-$(VERSION) && debuild $(DEBFLAGS)
+	#cd $(BUILDDIR)/$(PROJECT)-$(VERSION) && debuild $(DEBFLAGS)
 
 sdist: dist-clean
 	$(PYTHON) setup.py sdist

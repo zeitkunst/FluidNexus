@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Fluid Nexus
+GenericName=
+Comment=sending data and messages without centralized networks
+Icon=fluid-nexus
+Exec=fluid-nexus
+Terminal=false
+Categories=Internet;

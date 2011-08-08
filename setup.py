@@ -105,6 +105,8 @@ class build_py(_build_py):
 
 # Add in our manual and translation files
 data_files = [("share/fluid-nexus/l10n", get_messages()), 
+              ("share/applications", ["share/applications/fluid-nexus.desktop"]),
+              ("share/pixmaps", ["share/pixmaps/fluid-nexus.png"]),
               ("share/fluid-nexus/manual", ["share/fluid-nexus/manual/index.html"]),
              ("share/fluid-nexus/manual/images", get_manual_images())]
 

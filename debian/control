@@ -2,7 +2,7 @@ Source: fluid-nexus
 Section: python
 Priority: extra
 Maintainer: Nicholas Knouf <nknouf@zeitkunst.org>
-Build-Depends: debhelper (>= 7.0.50~), python-support, python (>=2.5), python-protobuf, python-bluez, python-sqlalchemy, python-qt4, python-simplejson,       pyqt4-dev-tools
+Build-Depends: debhelper (>= 7.0.50~), python-support, python (>=2.5),       pyqt4-dev-tools, python-setuptools
 Standards-Version: 3.8.4
 Homepage: http://fluidnexus.net
 Vcs-Git: git://github.com/zeitkunst/FluidNexus.git

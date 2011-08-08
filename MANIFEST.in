@@ -3,6 +3,7 @@ include CHANGES.rst
 include LICENSE
 include FluidNexus/ui/res/FluidNexus.qrc
 include FluidNexus/ui/res/icons/*.png
+include FluidNexus/ui/res/icons/*.xpm
 include FluidNexus/ui/res/icons/*.ico
 include FluidNexus/ui/res/icons/32x32/*.png
 include FluidNexus/ui/*.ui
@@ -11,5 +12,7 @@ include l10n/*.ts
 include share/fluid-nexus/manual/index.html
 include share/fluid-nexus/manual/images/*.png
 include share/man/*
+include share/applications/*
+include share/pixmaps/*
 prune *.pyc
 prune .gitignore

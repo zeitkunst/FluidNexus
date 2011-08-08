@@ -11,13 +11,17 @@ PyPi
 PPA
 +++
 
-1.  cd debian; dch -i (Update changelog)
+1.  cd debian; dch -i (Update changelog; then, update manually for building maverick and natty releases, at least until we've created a recipe)
 
 2.  make builddeb
 
-3.  dput fluidnexus-ppa <packages_version_source.changes>
+3.  sudo pbuilder build builddeb/<package_version>.dsc (to test)
 
-4.  Wait for build
+4.  dput fluidnexus-ppa <packages_version_source.changes>
+
+5.  Wait for build on launchpad
+
+6.  To test in chroot: sudo schroot -c maverick -p; install package(s)
 
 Windows
 =======

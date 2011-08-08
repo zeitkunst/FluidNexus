@@ -1,7 +1,8 @@
 SOONER
 ======
 
-* Update manual code to find the file when the debian package is installed
+* Create recipe to allow for building on natty and maverick for the PPA
+* Figure out why app is being put in "Other" category rather than "Internet"
 * Add created time to message display
 * Shutdown server/client threads properly on GUI exit
 * Present dialog instead of status message if bluetooth, zeroconf are not enabled
