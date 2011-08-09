@@ -16,4 +16,5 @@ LATER
 * Start server/client threads in headless version; shutdown properly by catching interrupts
 * Implement ad-hoc wifi
 * Implement SSL/TLS option over the network modalities
+* Add rate limiting options: hashes to send, hashes to read, messages to send, hash to send bias (newest, oldest, random)
 

@@ -144,57 +144,57 @@
 <context>
     <name>FluidNexusDesktop</name>
     <message>
-        <location filename="GUI.py" line="1169"/>
+        <location filename="GUI.py" line="1258"/>
         <source>Messages loaded.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI.py" line="1372"/>
+        <location filename="GUI.py" line="1468"/>
         <source>Fluid Nexus: View All Messages</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI.py" line="1375"/>
+        <location filename="GUI.py" line="1471"/>
         <source>Fluid Nexus: View Public Messages</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI.py" line="1378"/>
+        <location filename="GUI.py" line="1474"/>
         <source>Fluid Nexus: View Outgoing Messages</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI.py" line="1381"/>
+        <location filename="GUI.py" line="1477"/>
         <source>Fluid Nexus: View Blacklisted Messages</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI.py" line="1541"/>
+        <location filename="GUI.py" line="1637"/>
         <source>New messages received.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI.py" line="1549"/>
+        <location filename="GUI.py" line="1645"/>
         <source>Bluetooth not enabled; shutting off bluetooth service.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI.py" line="1557"/>
+        <location filename="GUI.py" line="1653"/>
         <source>Zeroconf not enabled; shutting off zeroconf service.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI.py" line="1631"/>
+        <location filename="GUI.py" line="1727"/>
         <source>Do you really want to delete this message?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI.py" line="1658"/>
+        <location filename="GUI.py" line="1754"/>
         <source>Do you really want to unblacklist this message?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI.py" line="1660"/>
+        <location filename="GUI.py" line="1756"/>
         <source>Do you really want to blacklist this message?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -258,37 +258,37 @@
 <context>
     <name>FluidNexusNewMessageDialog</name>
     <message>
-        <location filename="GUI.py" line="845"/>
+        <location filename="GUI.py" line="908"/>
         <source>Yes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI.py" line="846"/>
+        <location filename="GUI.py" line="909"/>
         <source>No</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI.py" line="848"/>
+        <location filename="GUI.py" line="911"/>
         <source>Message has changed; do you want to save?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI.py" line="860"/>
+        <location filename="GUI.py" line="923"/>
         <source>Choose file for attachment</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI.py" line="876"/>
+        <location filename="GUI.py" line="939"/>
         <source>OK</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI.py" line="878"/>
+        <location filename="GUI.py" line="941"/>
         <source>This message already exists in the database.  Please change the title and/or the content.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI.py" line="879"/>
+        <location filename="GUI.py" line="942"/>
         <source>FluidNexus</source>
         <translation type="unfinished"></translation>
     </message>
@@ -459,12 +459,9 @@
 <context>
     <name>MessageTextBrowser</name>
     <message>
-        <location filename="GUI.py" line="741"/>
+        <location filename="GUI.py" line="804"/>
         <source>Edit Message</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>RequestAuthorizationDialog</name>
 </context>
 </TS>
