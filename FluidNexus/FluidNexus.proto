@@ -45,7 +45,13 @@ message FluidNexusMessage {
         VIDEO = 3;
     }
 
+    enum MessagePriority {
+        NORMAL = 0;
+        LIFE_OR_DEATH = 1;
+    }
+
     optional MessageType message_type = 7;
+    optional MessagePriority message_priority = 18;
     optional bytes message_attachment = 8;
     optional string message_attachment_original_filename = 9;
 }

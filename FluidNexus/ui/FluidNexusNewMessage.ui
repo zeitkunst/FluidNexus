@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>384</width>
-    <height>397</height>
+    <height>418</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -105,7 +105,7 @@
        </item>
       </layout>
      </item>
-     <item row="4" column="0">
+     <item row="5" column="0">
       <spacer name="horizontalSpacer_2">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -118,7 +118,7 @@
        </property>
       </spacer>
      </item>
-     <item row="4" column="1">
+     <item row="5" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout_3">
        <item>
         <spacer name="horizontalSpacer">
@@ -149,10 +149,31 @@
        </item>
       </layout>
      </item>
-     <item row="3" column="1">
+     <item row="4" column="1">
       <widget class="QCheckBox" name="nexusCheckBox">
        <property name="text">
         <string>Public (pust to Nexus?)</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QComboBox" name="priorityComboBox">
+       <item>
+        <property name="text">
+         <string comment="0" extracomment="0">Normal</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string comment="1" extracomment="1">Life or Death</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="priorityLabel">
+       <property name="text">
+        <string>Priority:</string>
        </property>
       </widget>
      </item>
@@ -172,7 +193,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>377</x>
-     <y>508</y>
+     <y>399</y>
     </hint>
     <hint type="destinationlabel">
      <x>379</x>
@@ -180,9 +201,26 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>priorityComboBox</sender>
+   <signal>activated(int)</signal>
+   <receiver>FluidNexusNewMessage</receiver>
+   <slot>priorityChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>152</x>
+     <y>329</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>39</x>
+     <y>304</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <signal>saveButtonSignal()</signal>
   <slot>saveButtonClicked()</slot>
+  <slot>priorityChanged(int)</slot>
  </slots>
 </ui>

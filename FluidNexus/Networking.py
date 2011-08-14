@@ -137,6 +137,22 @@ class Networking(object):
         3: FluidNexus_pb2.FluidNexusMessage.VIDEO,
     }
 
+    # Enum types
+    message_priorities = {
+        0: FluidNexus_pb2.FluidNexusMessage.NORMAL,
+        1: FluidNexus_pb2.FluidNexusMessage.LIFE_OR_DEATH,
+    }
+
+    # Thread types
+    TYPE_BLUETOOTH = 0x10
+    TYPE_ZEROCONF = 0x20
+    TYPE_NEXUS = 0x30
+    threadType = 0x00
+
+    # Bluetooth max filesize
+    BLUETOOTH_MAX_FILESIZE = 2000000
+    
+    # Structs for sending/receiving bytes
     commandStruct = struct.Struct('>H')
     sizeStruct = struct.Struct('>I')
     hashStruct = struct.Struct('>32s')
@@ -173,6 +189,14 @@ class Networking(object):
         """Return our current state."""
 
         return self.state
+
+    def setThreadType(self, threadType):
+        """Set our current thread type."""
+        self.threadType = threadType
+
+    def getThreadType(self):
+        """Return our thread type."""
+        return self.threadType
 
     def getHashesFromDatabase(self):
         """Get the current list of hashes from the database."""
@@ -277,29 +301,38 @@ class Networking(object):
 
         # Our output protobuf message
         messages = FluidNexus_pb2.FluidNexusMessages()
+        
+        # Fizesize accumulator
+        filesizeAccumulator = 0
 
         for currentHash in self.hashesToSend:
             m = messages.message.add()
             data = self.database.getMessageByHash(currentHash)
-            m.message_timestamp = data['time']
-            m.message_received_timestamp = data['received_time']
-            m.message_title = data['title']
-            m.message_content = data['content']
+            m.message_timestamp = data['message_timestamp']
+            m.message_received_timestamp = data['message_received_timestamp']
+            m.message_title = data['message_title']
+            m.message_content = data['message_content']
             m.message_type = self.message_types[data["message_type"]]
-            m.message_public = data["public"]
+            m.message_public = data["message_public"]
+            try:
+                m.message_priority = self.message_priorities[data["message_priority"]]
+            except KeyError:
+                m.message_priority = 0
 
-            if (data["public"]):
-                m.message_ttl = data["ttl"]
+            if (data["message_public"]):
+                m.message_ttl = data["message_ttl"]
 
-            if (data["attachment_path"] != ""):
-                m.message_attachment_original_filename = data["attachment_original_filename"]
-
-                # TODO
-                # Error handling :-)
-                attachmentDataFP = open(os.path.realpath(data["attachment_path"]), 'rb')
-                attachmentData = attachmentDataFP.read()
-                attachmentDataFP.close()
-                m.message_attachment = attachmentData
+            if (data["message_attachment_path"] != ""):
+                filesizeAccumulator += os.path.getsize(os.path.realpath(data["message_attachment_path"]))
+                
+                if (((self.getThreadType() == self.TYPE_BLUETOOTH) and (filesizeAccumulator <= self.BLUETOOTH_MAX_FILESIZE)) or (self.getThreadType() == self.TYPE_ZEROCONF) or (self.getThreadType() == self.TYPE_NEXUS)):
+                    # TODO
+                    # Error handling :-)
+                    attachmentDataFP = open(os.path.realpath(data["message_attachment_path"]), 'rb')
+                    m.message_attachment_original_filename = data["message_attachment_original_filename"]
+                    attachmentData = attachmentDataFP.read()
+                    attachmentDataFP.close()
+                    m.message_attachment = attachmentData
 
         #self.logger.debug("Sending messages: " + str(messages))
         self.logger.debug("Sending messages...")
@@ -354,6 +387,7 @@ class Networking(object):
         if (fields != []):
             for message in fields[0][1]: 
                 message_hash = hashlib.sha256(message.message_title.encode("utf-8") + message.message_content.encode("utf-8")).hexdigest()
+                self.addHash(message_hash)
 
                 if (message.message_attachment_original_filename != ""):
                     basename, ext = os.path.splitext(message.message_attachment_original_filename)
@@ -367,8 +401,8 @@ class Networking(object):
                         message.message_ttl = message.message_ttl - 1
 
                     if (not self.database.checkForMessageByHash(message_hash)):
-                        self.database.addReceived(message_type = message.message_type, timestamp = message.message_timestamp, received_timestamp = time.time(), title = message.message_title, content = message.message_content, attachment_path = message_attachment_path, attachment_original_filename = message.message_attachment_original_filename, public = message.message_public, ttl = message.message_ttl)
-                        newMessage = {"message_type": message.message_type, "message_hash": message_hash, "message_timestamp": message.message_timestamp, "message_received_timestamp": message.message_received_timestamp, "message_title": message.message_title, "message_content": message.message_content, "message_attachment_path": message_attachment_path, "message_attachment_original_filename": message.message_attachment_original_filename, "message_public": message.message_public, "message_ttl": message.message_ttl}
+                        newMessage = {"message_type": message.message_type, "message_hash": message_hash, "message_timestamp": message.message_timestamp, "message_received_timestamp": message.message_received_timestamp, "message_title": message.message_title, "message_content": message.message_content, "message_attachment_path": message_attachment_path, "message_attachment_original_filename": message.message_attachment_original_filename, "message_public": message.message_public, "message_ttl": message.message_ttl, "message_priority": message.message_priority, "message_mine": 0}
+                        self.database.addReceived(data = newMessage)
                         self.newMessages.append(newMessage)
                 else:
                     # Decrement TTL
@@ -376,8 +410,8 @@ class Networking(object):
                         message.message_ttl = message.message_ttl - 1
 
                     if (not self.database.checkForMessageByHash(message_hash)):
-                        self.database.addReceived(message_type = message.message_type, timestamp = message.message_timestamp, received_timestamp = time.time(), title = message.message_title, content = message.message_content, public = message.message_public, ttl = message.message_ttl)
-                        newMessage = {"message_type": message.message_type, "message_hash": message_hash, "message_timestamp": message.message_timestamp, "message_received_timestamp": message.message_received_timestamp, "message_title": message.message_title, "message_content": message.message_content, "message_attachment_path": "", "message_attachment_original_filename": "", "message_public": message.message_public, "message_ttl": message.message_ttl}
+                        newMessage = {"message_type": message.message_type, "message_hash": message_hash, "message_timestamp": message.message_timestamp, "message_received_timestamp": message.message_received_timestamp, "message_title": message.message_title, "message_content": message.message_content, "message_attachment_path": "", "message_attachment_original_filename": "", "message_public": message.message_public, "message_ttl": message.message_ttl, "message_priority": message.message_priority, "message_mine": 0}
+                        self.database.addReceived(data = newMessage)
                         self.newMessages.append(newMessage)
 
         self.getHashesFromDatabase()
@@ -394,6 +428,7 @@ class NexusNetworking(Networking):
         self.secret = secret
         self.token = token
         self.token_secret = token_secret
+        self.setThreadType(self.TYPE_NEXUS)
 
     def build_request(self, url, method="POST"):
         # TODO
@@ -416,7 +451,7 @@ class NexusNetworking(Networking):
         # TODO
         # Check that we can access internet
         for message in publicMessages:
-            if (not message["uploaded"]):
+            if (not message["message_uploaded"]):
                 try:
                     u = urllib2.urlopen(NEXUS_HASH_ENDPOINT % message["message_hash"])
                 except urllib2.URLError, e:
@@ -440,15 +475,12 @@ class NexusNetworking(Networking):
                     
                     uploadData = {}
                     if (message["attachment_original_filename"] == ""):
-                        messageJSON = {"message_title": message["title"], "message_content": message["content"], "message_hash": message["message_hash"], "message_time": message["time"], "message_type": message["message_type"]}
+                        messageJSON = {"message_title": message["message_title"], "message_content": message["message_content"], "message_hash": message["message_hash"], "message_time": message["message_timestamp"], "message_type": message["message_type"]}
                     else:
                         # TODO
                         # Error handling :-)
-                        attachmentDataFP = open(os.path.realpath(message["attachment_path"]), 'rb')
-                        #attachmentData = attachmentDataFP.read()
-                        #attachmentDataFP.close()
-                        #attachmentDataBase64 = base64.b64encode(attachmentData)
-                        messageJSON = {"message_title": message["title"], "message_content": message["content"], "message_hash": message["message_hash"], "message_time": message["time"], "message_type": message["message_type"], "message_attachment_original_filename": message["attachment_original_filename"]}
+                        attachmentDataFP = open(os.path.realpath(message["message_attachment_path"]), 'rb')
+                        messageJSON = {"message_title": message["message_title"], "message_content": message["message_content"], "message_hash": message["message_hash"], "message_time": message["message_timestamp"], "message_type": message["message_type"], "message_attachment_original_filename": message["message_attachment_original_filename"]}
                         uploadData["message_attachment"] = attachmentDataFP
 
                     request = self.build_request(NEXUS_NONCE_ENDPOINT)
@@ -509,6 +541,7 @@ TODO
         super(BluetoothServerVer3, self).__init__(databaseDir = databaseDir, databaseType = databaseType, attachmentsDir = attachmentsDir, logPath = logPath, level = level, sendBlacklist = sendBlacklist)
     
         self.numConnections = numConnections
+        self.setThreadType(self.TYPE_BLUETOOTH)
 
         if setup:
             # Do initial setup
@@ -664,6 +697,7 @@ TODO
     def __init__(self, databaseDir = ".", databaseType = "pysqlite2", attachmentsDir = ".", logPath = "FluidNexus.log", level = logging.DEBUG, numConnections = 5, sendBlacklist = False):
         super(BluetoothClientVer3, self).__init__(databaseDir = databaseDir, databaseType = databaseType, attachmentsDir = attachmentsDir, logPath = logPath, level = level, sendBlacklist = sendBlacklist)
         self.setState(self.STATE_START)
+        self.setThreadType(self.TYPE_BLUETOOTH)
 
     def testBluetooth(self):
         """Test the bluetooth connection."""
@@ -809,6 +843,7 @@ class ZeroconfServer(Networking):
         self.domain = ""
         self.text = ""
         self.numConnections = numConnections
+        self.setThreadType(self.TYPE_ZEROCONF)
 
         # Do initial setup
         #self.setupServerSockets(numConnections = numConnections)
@@ -984,6 +1019,7 @@ class ZeroconfClient(Networking):
         self.port = port
         self.loopType = loopType
         self.setState(self.STATE_START)
+        self.setThreadType(self.TYPE_ZEROCONF)
 
         self.openDatabase()
         self.getHashesFromDatabase()

@@ -10,7 +10,7 @@ from google.protobuf import descriptor_pb2
 DESCRIPTOR = descriptor.FileDescriptor(
   name='FluidNexus.proto',
   package='FluidNexus',
-  serialized_pb='\n\x10\x46luidNexus.proto\x12\nFluidNexus\"(\n\x10\x46luidNexusHashes\x12\x14\n\x0cmessage_hash\x18\x01 \x03(\t\"\xbb\x03\n\x11\x46luidNexusMessage\x12\x15\n\rmessage_title\x18\x01 \x01(\t\x12\x17\n\x0fmessage_content\x18\x02 \x01(\t\x12\x19\n\x11message_timestamp\x18\x03 \x01(\x02\x12\"\n\x1amessage_received_timestamp\x18\n \x01(\x02\x12\x14\n\x0cmessage_hash\x18\x04 \x01(\t\x12\x16\n\x0emessage_source\x18\x05 \x01(\t\x12\x14\n\x0cmessage_mine\x18\x06 \x01(\x08\x12\x16\n\x0emessage_public\x18\x10 \x01(\x08\x12\x16\n\x0bmessage_ttl\x18\x11 \x01(\x05:\x01\x30\x12?\n\x0cmessage_type\x18\x07 \x01(\x0e\x32).FluidNexus.FluidNexusMessage.MessageType\x12\x1a\n\x12message_attachment\x18\x08 \x01(\x0c\x12,\n$message_attachment_original_filename\x18\t \x01(\t\"8\n\x0bMessageType\x12\x08\n\x04TEXT\x10\x00\x12\t\n\x05\x41UDIO\x10\x01\x12\t\n\x05IMAGE\x10\x02\x12\t\n\x05VIDEO\x10\x03\"D\n\x12\x46luidNexusMessages\x12.\n\x07message\x18\x01 \x03(\x0b\x32\x1d.FluidNexus.FluidNexusMessageB,\n net.fluidnexus.FluidNexusAndroidB\x06ProtosH\x03')
+  serialized_pb='\n\x10\x46luidNexus.proto\x12\nFluidNexus\"(\n\x10\x46luidNexusHashes\x12\x14\n\x0cmessage_hash\x18\x01 \x03(\t\"\xb6\x04\n\x11\x46luidNexusMessage\x12\x15\n\rmessage_title\x18\x01 \x01(\t\x12\x17\n\x0fmessage_content\x18\x02 \x01(\t\x12\x19\n\x11message_timestamp\x18\x03 \x01(\x02\x12\"\n\x1amessage_received_timestamp\x18\n \x01(\x02\x12\x14\n\x0cmessage_hash\x18\x04 \x01(\t\x12\x16\n\x0emessage_source\x18\x05 \x01(\t\x12\x14\n\x0cmessage_mine\x18\x06 \x01(\x08\x12\x16\n\x0emessage_public\x18\x10 \x01(\x08\x12\x16\n\x0bmessage_ttl\x18\x11 \x01(\x05:\x01\x30\x12?\n\x0cmessage_type\x18\x07 \x01(\x0e\x32).FluidNexus.FluidNexusMessage.MessageType\x12G\n\x10message_priority\x18\x12 \x01(\x0e\x32-.FluidNexus.FluidNexusMessage.MessagePriority\x12\x1a\n\x12message_attachment\x18\x08 \x01(\x0c\x12,\n$message_attachment_original_filename\x18\t \x01(\t\"8\n\x0bMessageType\x12\x08\n\x04TEXT\x10\x00\x12\t\n\x05\x41UDIO\x10\x01\x12\t\n\x05IMAGE\x10\x02\x12\t\n\x05VIDEO\x10\x03\"0\n\x0fMessagePriority\x12\n\n\x06NORMAL\x10\x00\x12\x11\n\rLIFE_OR_DEATH\x10\x01\"D\n\x12\x46luidNexusMessages\x12.\n\x07message\x18\x01 \x03(\x0b\x32\x1d.FluidNexus.FluidNexusMessageB,\n net.fluidnexus.FluidNexusAndroidB\x06ProtosH\x03')
 
 
 
@@ -39,8 +39,29 @@ _FLUIDNEXUSMESSAGE_MESSAGETYPE = descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=462,
-  serialized_end=518,
+  serialized_start=535,
+  serialized_end=591,
+)
+
+_FLUIDNEXUSMESSAGE_MESSAGEPRIORITY = descriptor.EnumDescriptor(
+  name='MessagePriority',
+  full_name='FluidNexus.FluidNexusMessage.MessagePriority',
+  filename=None,
+  file=DESCRIPTOR,
+  values=[
+    descriptor.EnumValueDescriptor(
+      name='NORMAL', index=0, number=0,
+      options=None,
+      type=None),
+    descriptor.EnumValueDescriptor(
+      name='LIFE_OR_DEATH', index=1, number=1,
+      options=None,
+      type=None),
+  ],
+  containing_type=None,
+  options=None,
+  serialized_start=593,
+  serialized_end=641,
 )
 
 
@@ -150,14 +171,21 @@ _FLUIDNEXUSMESSAGE = descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='message_attachment', full_name='FluidNexus.FluidNexusMessage.message_attachment', index=10,
+      name='message_priority', full_name='FluidNexus.FluidNexusMessage.message_priority', index=10,
+      number=18, type=14, cpp_type=8, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    descriptor.FieldDescriptor(
+      name='message_attachment', full_name='FluidNexus.FluidNexusMessage.message_attachment', index=11,
       number=8, type=12, cpp_type=9, label=1,
       has_default_value=False, default_value="",
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='message_attachment_original_filename', full_name='FluidNexus.FluidNexusMessage.message_attachment_original_filename', index=11,
+      name='message_attachment_original_filename', full_name='FluidNexus.FluidNexusMessage.message_attachment_original_filename', index=12,
       number=9, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=unicode("", "utf-8"),
       message_type=None, enum_type=None, containing_type=None,
@@ -169,12 +197,13 @@ _FLUIDNEXUSMESSAGE = descriptor.Descriptor(
   nested_types=[],
   enum_types=[
     _FLUIDNEXUSMESSAGE_MESSAGETYPE,
+    _FLUIDNEXUSMESSAGE_MESSAGEPRIORITY,
   ],
   options=None,
   is_extendable=False,
   extension_ranges=[],
   serialized_start=75,
-  serialized_end=518,
+  serialized_end=641,
 )
 
 
@@ -201,13 +230,15 @@ _FLUIDNEXUSMESSAGES = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=520,
-  serialized_end=588,
+  serialized_start=643,
+  serialized_end=711,
 )
 
 
 _FLUIDNEXUSMESSAGE.fields_by_name['message_type'].enum_type = _FLUIDNEXUSMESSAGE_MESSAGETYPE
+_FLUIDNEXUSMESSAGE.fields_by_name['message_priority'].enum_type = _FLUIDNEXUSMESSAGE_MESSAGEPRIORITY
 _FLUIDNEXUSMESSAGE_MESSAGETYPE.containing_type = _FLUIDNEXUSMESSAGE;
+_FLUIDNEXUSMESSAGE_MESSAGEPRIORITY.containing_type = _FLUIDNEXUSMESSAGE;
 _FLUIDNEXUSMESSAGES.fields_by_name['message'].message_type = _FLUIDNEXUSMESSAGE
 
 class FluidNexusHashes(message.Message):
