@@ -124,20 +124,36 @@ class FluidNexusDatabase(object):
         content = u'[SAMPLE MESSAGE] Run against Bush in progress (just went through times sq).  media march starts at 7, 52nd and broadway'
         now = time.time()
         message_hash = hashlib.sha256(title + content).hexdigest()
-        self.session.add(Messages(title = title, content = content, time = now, received_time = now, message_hash = message_hash))
+        data = {}
+        data["message_title"] = title
+        data["message_content"] = content
+        data["message_timestamp"] = now
+        data["message_received_timestamp"] = now
+        data["message_hash"] = message_hash
+        self.addMine(data = data)
 
         title = u'Federal agents'
         content = u'[SAMPLE MESSAGE] Video dispatch. Federal agents trailing activists at 6th Ave and 9th St. Situation tense.'
         message_hash = hashlib.sha256(title + content).hexdigest()
         now = time.time()
-        self.session.add(Messages(title = title, content = content, time = now, received_time = now, message_hash = message_hash))
+        data["message_title"] = title
+        data["message_content"] = content
+        data["message_timestamp"] = now
+        data["message_received_timestamp"] = now
+        data["message_hash"] = message_hash
+        self.addReceived(data = data)
 
         title = u'Mobilize to dine'
         content = u'[SAMPLE MESSAGE] CT delegation @ Maison (7th Ave. & 53rd).  Outdoor dining area.  Try to get people there.'
         message_hash = hashlib.sha256(title + content).hexdigest()
         now = time.time()
-        self.session.add(Messages(title = title, content = content, time = now, received_time = now, message_hash = message_hash))
-        self.session.commit()
+        data["message_title"] = title
+        data["message_content"] = content
+        data["message_timestamp"] = now
+        data["message_received_timestamp"] = now
+        data["message_hash"] = message_hash
+
+        self.addReceived(data = data)
 
     def hashes(self):
         """Get a list of hashes from the database, ordered by time desc."""
@@ -287,14 +303,14 @@ class FluidNexusDatabase(object):
         """Return all of the items in the database,  with optional limit."""
         if (limit is not None):
             if (includeBlacklist):
-                rows = self.session.query(Messages).order_by(desc(Messages.message_received_timestamp)).all()[0:limit]
+                rows = self.session.query(Messages).order_by(desc(Messages.message_priority)).order_by(desc(Messages.message_received_timestamp)).all()[0:limit]
             else:
-                rows = self.session.query(Messages).filter(Messages.message_blacklist == False).order_by(desc(Messages.message_received_timestamp)).all()[0:limit]
+                rows = self.session.query(Messages).filter(Messages.message_blacklist == False).order_by(desc(Messages.message_priority)).order_by(desc(Messages.message_received_timestamp)).all()[0:limit]
         else:
             if (includeBlacklist):
-                rows = self.session.query(Messages).order_by(desc(Messages.message_received_timestamp)).all()
+                rows = self.session.query(Messages).order_by(desc(Messages.message_priority)).order_by(desc(Messages.message_received_timestamp)).all()
             else:
-                rows = self.session.query(Messages).filter(Messages.message_blacklist == False).order_by(desc(Messages.message_received_timestamp)).all()
+                rows = self.session.query(Messages).filter(Messages.message_blacklist == False).order_by(desc(Messages.message_priority)).order_by(desc(Messages.message_received_timestamp)).all()
 
         results = []
         for row in rows:
@@ -306,14 +322,14 @@ class FluidNexusDatabase(object):
         """Return all of the items in the database,  with optional limit."""
         if (limit is not None):
             if (includeBlacklist):
-                rows = self.session.query(Messages).filter(Messages.message_public == 1).order_by(desc(Messages.message_received_timestamp)).all()[0:limit]
+                rows = self.session.query(Messages).filter(Messages.message_public == 1).order_by(desc(Messages.message_priority)).order_by(desc(Messages.message_received_timestamp)).all()[0:limit]
             else:
-                rows = self.session.query(Messages).filter(Messages.message_public == 1).filter(Messages.message_blacklist == False).order_by(desc(Messages.message_received_timestamp)).all()[0:limit]
+                rows = self.session.query(Messages).filter(Messages.message_public == 1).filter(Messages.message_blacklist == False).order_by(desc(Messages.message_priority)).order_by(desc(Messages.message_received_timestamp)).all()[0:limit]
         else:
             if (includeBlacklist):
-                rows = self.session.query(Messages).filter(Messages.message_public == 1).order_by(desc(Messages.message_received_timestamp)).all()
+                rows = self.session.query(Messages).filter(Messages.message_public == 1).order_by(desc(Messages.message_priority)).order_by(desc(Messages.message_received_timestamp)).all()
             else:
-                rows = self.session.query(Messages).filter(Messages.message_public == 1).filter(Messages.message_blacklist == False).order_by(desc(Messages.message_received_timestamp)).all()
+                rows = self.session.query(Messages).filter(Messages.message_public == 1).filter(Messages.message_blacklist == False).order_by(desc(Messages.message_priority)).order_by(desc(Messages.message_received_timestamp)).all()
 
         results = []
         for row in rows:
@@ -344,9 +360,9 @@ class FluidNexusDatabase(object):
     def outgoing(self, limit = None):
         """Return outgoing items in the database,  with optional limit."""
         if (limit is not None):
-            rows = self.session.query(Messages).filter(Messages.message_mine == True).order_by(desc(Messages.message_received_timestamp)).all()[0:limit]
+            rows = self.session.query(Messages).filter(Messages.message_mine == True).order_by(desc(Messages.message_priority)).order_by(desc(Messages.message_received_timestamp)).all()[0:limit]
         else:
-            rows = self.session.query(Messages).filter(Messages.message_mine == True).order_by(desc(Messages.message_received_timestamp)).all()
+            rows = self.session.query(Messages).filter(Messages.message_mine == True).order_by(desc(Messages.message_priority)).order_by(desc(Messages.message_received_timestamp)).all()
 
         results = []
         for row in rows:
@@ -357,9 +373,9 @@ class FluidNexusDatabase(object):
     def blacklist(self, limit = None):
         """Return blacklisted items in the database,  with optional limit."""
         if (limit is not None):
-            rows = self.session.query(Messages).filter(Messages.message_blacklist == True).order_by(desc(Messages.message_received_timestamp)).all()[0:limit]
+            rows = self.session.query(Messages).filter(Messages.message_blacklist == True).order_by(desc(Messages.message_priority)).order_by(desc(Messages.message_received_timestamp)).all()[0:limit]
         else:
-            rows = self.session.query(Messages).filter(Messages.message_blacklist == True).order_by(desc(Messages.message_received_timestamp)).all()
+            rows = self.session.query(Messages).filter(Messages.message_blacklist == True).order_by(desc(Messages.message_priority)).order_by(desc(Messages.message_received_timestamp)).all()
 
         results = []
         for row in rows:

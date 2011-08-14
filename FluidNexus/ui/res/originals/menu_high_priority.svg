@@ -92,31 +92,37 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1">
-    <path
-       sodipodi:type="arc"
-       style="fill:#ec4642;fill-opacity:1;fill-rule:evenodd;stroke:none"
-       id="path2846"
-       sodipodi:cx="26.207867"
-       sodipodi:cy="18.353283"
-       sodipodi:rx="17.342297"
-       sodipodi:ry="6.3769879"
-       d="m 43.550163,18.353283 a 17.342297,6.3769879 0 1 1 -34.6845929,0 17.342297,6.3769879 0 1 1 34.6845929,0 z"
-       transform="matrix(15.602794,0,0,15.260627,-49.960876,199.42241)"
-       inkscape:export-filename="/home/nknouf/Documents/Research/Projects/FluidNexus/code/FluidNexus/FluidNexus/ui/res/icons/32x32/menu_blacklist.png"
-       inkscape:export-xdpi="5.3200002"
-       inkscape:export-ydpi="5.3200002" />
-    <path
-       sodipodi:type="arc"
-       style="fill:#ec4642;fill-opacity:1;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none"
-       id="path5482"
-       sodipodi:cx="-824.28571"
-       sodipodi:cy="665.2193"
-       sodipodi:rx="115.71429"
-       sodipodi:ry="115.71429"
-       d="m -708.57142,665.2193 a 115.71429,115.71429 0 1 1 -231.42857,0 115.71429,115.71429 0 1 1 231.42857,0 z"
-       transform="matrix(1.1728395,0,0,1.1728395,1325.7099,-300.69046)"
-       inkscape:export-filename="/home/nknouf/Documents/Research/Projects/FluidNexus/code/FluidNexus/FluidNexus/ui/res/icons/32x32/menu_blacklist.png"
-       inkscape:export-xdpi="5.3200002"
-       inkscape:export-ydpi="5.3200002" />
+    <g
+       id="g3844"
+       inkscape:export-filename="/home/nknouf/Documents/Research/Projects/FluidNexus/code/FluidNexusAndroid/res/drawable/menu_high_priority.png"
+       inkscape:export-xdpi="7.98"
+       inkscape:export-ydpi="7.98">
+      <path
+         inkscape:export-ydpi="5.3200002"
+         inkscape:export-xdpi="5.3200002"
+         inkscape:export-filename="/home/nknouf/Documents/Research/Projects/FluidNexus/code/FluidNexus/FluidNexus/ui/res/icons/32x32/menu_blacklist.png"
+         transform="matrix(15.602794,0,0,15.260627,-49.960876,199.42241)"
+         d="m 43.550163,18.353283 a 17.342297,6.3769879 0 1 1 -34.6845929,0 17.342297,6.3769879 0 1 1 34.6845929,0 z"
+         sodipodi:ry="6.3769879"
+         sodipodi:rx="17.342297"
+         sodipodi:cy="18.353283"
+         sodipodi:cx="26.207867"
+         id="path2846"
+         style="fill:#ec4642;fill-opacity:1;fill-rule:evenodd;stroke:none"
+         sodipodi:type="arc" />
+      <path
+         inkscape:export-ydpi="5.3200002"
+         inkscape:export-xdpi="5.3200002"
+         inkscape:export-filename="/home/nknouf/Documents/Research/Projects/FluidNexus/code/FluidNexus/FluidNexus/ui/res/icons/32x32/menu_blacklist.png"
+         transform="matrix(1.1728395,0,0,1.1728395,1325.7099,-300.69046)"
+         d="m -708.57142,665.2193 a 115.71429,115.71429 0 1 1 -231.42857,0 115.71429,115.71429 0 1 1 231.42857,0 z"
+         sodipodi:ry="115.71429"
+         sodipodi:rx="115.71429"
+         sodipodi:cy="665.2193"
+         sodipodi:cx="-824.28571"
+         id="path5482"
+         style="fill:#ec4642;fill-opacity:1;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none"
+         sodipodi:type="arc" />
+    </g>
   </g>
 </svg>

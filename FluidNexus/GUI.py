@@ -387,259 +387,50 @@ class FluidNexusClientQt(QtCore.QThread):
 class MessageTextBrowser(QtGui.QTextBrowser):
     """Wrapper around the text browser that adds some useful stuff for us."""
 
-    # TODO
-    # Need to figure out a way to streamline this...
-    mine_text = """
-    <table width='100%'>
+    mine_edit_template = """<a href='fluidnexus://editmessage' title='Edit Message'><img src=':/icons/icons/32x32/menu_edit.png' width='32'/></a>&nbsp;&nbsp;&nbsp;<a href='fluidnexus://deletemessage' title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a>"""
+    blacklist_template = """<a href="fluidnexus://blacklistmessage" title="Blacklist Message"><img src=":/icons/icons/32x32/menu_blacklist.png" width="32"/></a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage" title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a>"""
+    unblacklist_template = """<a href="fluidnexus://unblacklistmessage" title="Unblacklist Message"><img src=":/icons/icons/32x32/menu_all.png" width="32"/></a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage" title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a>"""
+
+    normal_template = """
+    <table width='100%%'>
         <tr>
-        <td width='40' rowspan='3'><img src=':/icons/icons/32x32/menu_outgoing.png' width='32'/></td>
-        <td><h3>%1</h3></td>
+        <td width='40' rowspan='3'><img src=':/icons/icons/32x32/%(icon)s' width='32'/></td>
+        <td><h3>%%1</h3></td>
         </tr>
         <tr>
             <td>
-                <p>%3</p>
-                <p>%2</p>
+                <p>%%3</p>
+                <p>%%4</p>
+                <p>%%2</p>
             </td>
         </tr>
         <tr>
-        <td align='right'><a href='fluidnexus://editmessage' title='Edit Message'><img src=':/icons/icons/32x32/menu_edit.png' width='32'/></a>&nbsp;&nbsp;&nbsp;<a href='fluidnexus://deletemessage' title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
+        <td align='right'>%(edit)s</td>
         </tr>
     </table>
     """
 
-    mine_text_public = """
-    <table width='100%'>
+    attachment_template = """
+    <table width='100%%'>
         <tr>
-        <td width='40' rowspan='3'><img src=':/icons/icons/32x32/menu_public.png' width='32'/></td>
-        <td><h3>%1</h3></td>
+        <td width='40' rowspan='4'><img src=':/icons/icons/32x32/%(icon)s' width='32' /></td>
+        <td><h3>%%1</h3></td>
         </tr>
         <tr>
             <td>
-                <p>%3</p>
-                <p>%2</p>
+                <p>%%3</p>
+                <p>%%6</p>
+                <p>%%2</p>
             </td>
         </tr>
         <tr>
-        <td align='right'><a href='fluidnexus://editmessage' title='Edit Message'><img src=':/icons/icons/32x32/menu_edit.png' width='32'/></a>&nbsp;&nbsp;&nbsp;<a href='fluidnexus://deletemessage' title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
+            <td align='right'><img src=':/icons/icons/32x32/attachment_icon.png'/>&nbsp;&nbsp;<a href='%%5'>%%4</a></td>
+        </tr>
+        <tr>
+            <td align='right'>%(edit)s</td>
         </tr>
     </table>
     """
-
-
-    mine_text_attachment = """
-    <table width='100%'>
-        <tr>
-        <td width='40' rowspan='4'><img src=':/icons/icons/32x32/menu_outgoing.png' width='32' /></td>
-        <td><h3>%1</h3></td>
-        </tr>
-        <tr>
-            <td>
-                <p>%3</p>
-                <p>%2</p>
-            </td>
-        </tr>
-        <tr>
-            <td align='right'><img src=':/icons/icons/32x32/attachment_icon.png'/>&nbsp;&nbsp;<a href='%5'>%4</a></td>
-        </tr>
-        <tr>
-            <td align='right'><a href="fluidnexus://editmessage" title='Edit Message'><img src=':/icons/icons/32x32/menu_edit.png' width='32'/></a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage" title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
-        </tr>
-    </table>
-    """
-
-    mine_text_attachment_public = """
-    <table width='100%'>
-        <tr>
-        <td width='40' rowspan='4'><img src=':/icons/icons/32x32/menu_public.png' width='32' /></td>
-        <td><h3>%1</h3></td>
-        </tr>
-        <tr>
-            <td>
-                <p>%3</p>
-                <p>%2</p>
-            </td>
-        </tr>
-        <tr>
-            <td align='right'><img src=':/icons/icons/32x32/attachment_icon.png'/>&nbsp;&nbsp;<a href='%5'>%4</a></td>
-        </tr>
-        <tr>
-            <td align='right'><a href="fluidnexus://editmessage" title='Edit Message'><img src=':/icons/icons/32x32/menu_edit.png' width='32'/></a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage" title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
-        </tr>
-    </table>
-    """
-
-
-    other_text = """
-    <table width='100%'>
-        <tr>
-        <td width='40' rowspan='3'><img src=':/icons/icons/32x32/menu_all.png' width='32'  /></td>
-            <td><h3>%1</h3></td>
-        </tr>
-        <tr>
-            <td>
-                <p>%3</p>
-                <p>%2</p>
-            </td>
-        </tr>
-        <tr>
-            <td align='right'><a href="fluidnexus://blacklistmessage" title="Blacklist Message"><img src=":/icons/icons/32x32/menu_blacklist.png" width="32"/></a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage" title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
-        </tr>
-
-    </table>
-    """
-
-    other_text_public = """
-    <table width='100%'>
-        <tr>
-        <td width='40' rowspan='3'><img src=':/icons/icons/32x32/menu_public_other.png' width='32'  /></td>
-            <td><h3>%1</h3></td>
-        </tr>
-        <tr>
-            <td>
-                <p>%3</p>
-                <p>%2</p>
-            </td>
-        </tr>
-        <tr>
-            <td align='right'><a href="fluidnexus://blacklistmessage" title="Blacklist Message"><img src=":/icons/icons/32x32/menu_blacklist.png" width="32"/></a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage" title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
-        </tr>
-
-    </table>
-    """
-
-
-    other_text_blacklist = """
-    <table width='100%'>
-        <tr>
-        <td width='40' rowspan='3'><img src=':/icons/icons/32x32/menu_all.png' width='32'  /></td>
-            <td><h3>%1</h3></td>
-        </tr>
-        <tr>
-            <td>
-                <p>%3</p>
-                <p>%2</p>
-            </td>
-        </tr>
-        <tr>
-            <td align='right'><a href="fluidnexus://unblacklistmessage" title="Unblacklist Message"><img src=":/icons/icons/32x32/menu_all.png" width="32"/></a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage" title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
-        </tr>
-
-    </table>
-    """
-
-    other_text_blacklist_public = """
-    <table width='100%'>
-        <tr>
-        <td width='40' rowspan='3'><img src=':/icons/icons/32x32/menu_public_other.png' width='32'  /></td>
-            <td><h3>%1</h3></td>
-        </tr>
-        <tr>
-            <td>
-                <p>%3</p>
-                <p>%2</p>
-            </td>
-        </tr>
-        <tr>
-            <td align='right'><a href="fluidnexus://unblacklistmessage" title="Unblacklist Message"><img src=":/icons/icons/32x32/menu_all.png" width="32"/></a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage" title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
-        </tr>
-
-    </table>
-    """
-
-
-
-    other_text_attachment = """
-    <table width='100%'>
-        <tr>
-        <td width='40' rowspan='4'><img src=':/icons/icons/32x32/menu_all.png' width='32' /></td>
-            <td><h3>%1</h3></td>
-        </tr>
-        <tr>
-            <td>
-                <p>%3</p>
-                <p>%2</p>
-            </td>
-        </tr>
-        <tr>
-        <td align='right'><img src=':/icons/icons/32x32/attachment_icon.png'/>&nbsp;&nbsp;<a href='%5'>%4</a></td>
-        </tr>
-        <tr>
-            <td align='right'><a href="fluidnexus://blacklistmessage" title="Blacklist Message"><img src=":/icons/icons/32x32/menu_blacklist.png" width="32"/></a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage" title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
-        </tr>
-
-    </table>
-    """
-
-    other_text_attachment_public = """
-    <table width='100%'>
-        <tr>
-        <td width='40' rowspan='4'><img src=':/icons/icons/32x32/menu_public_other.png' width='32' /></td>
-            <td><h3>%1</h3></td>
-        </tr>
-        <tr>
-            <td>
-                <p>%3</p>
-                <p>%2</p>
-            </td>
-
-        </tr>
-        <tr>
-        <td align='right'><img src=':/icons/icons/32x32/attachment_icon.png'/>&nbsp;&nbsp;<a href='%5'>%4</a></td>
-        </tr>
-        <tr>
-            <td align='right'><a href="fluidnexus://blacklistmessage" title="Blacklist Message"><img src=":/icons/icons/32x32/menu_blacklist.png" width="32"/></a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage" title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
-        </tr>
-
-    </table>
-    """
-
-
-    other_text_attachment_blacklist = """
-    <table width='100%'>
-        <tr>
-        <td width='40' rowspan='4'><img src=':/icons/icons/32x32/menu_all.png' width='32' /></td>
-            <td><h3>%1</h3></td>
-        </tr>
-        <tr>
-            <td>
-                <p>%3</p>
-                <p>%2</p>
-            </td>
-
-        </tr>
-        <tr>
-            <td align='right'><img src=':/icons/icons/32x32/attachment_icon.png'/>&nbsp;&nbsp;<a href='%5'>%4</a></td>
-        </tr>
-        <tr>
-            <td align='right'><a href="fluidnexus://unblacklistmessage" title="Unblacklist Message"><img src=":/icons/icons/32x32/menu_all.png" width="32"/></a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage" title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
-        </tr>
-
-    </table>
-    """
-
-    other_text_attachment_blacklist_public = """
-    <table width='100%'>
-        <tr>
-        <td width='40' rowspan='4'><img src=':/icons/icons/32x32/menu_public_other.png' width='32' /></td>
-            <td><h3>%1</h3></td>
-        </tr>
-        <tr>
-            <td>
-                <p>%3</p>
-                <p>%2</p>
-            </td>
-        </tr>
-        <tr>
-            <td align='right'><img src=':/icons/icons/32x32/attachment_icon.png'/>&nbsp;&nbsp;<a href='%5'>%4</a></td>
-        </tr>
-        <tr>
-            <td align='right'><a href="fluidnexus://unblacklistmessage" title="Unblacklist Message"><img src=":/icons/icons/32x32/menu_all.png" width="32"/></a>&nbsp;&nbsp;&nbsp;<a href="fluidnexus://deletemessage" title='Delete Message'><img src=':/icons/icons/32x32/menu_delete.png' width='32' /></a></td>
-        </tr>
-
-    </table>
-    """
-
-
 
     def __init__(self, parent = None, data = {}, logPath = "FluidNexus.log", level = logging.WARN, blacklist = False):
         QtGui.QWidget.__init__(self, parent)
@@ -681,41 +472,55 @@ class MessageTextBrowser(QtGui.QTextBrowser):
     def setTextBrowserHTML(self):
         """Set our HTML content with the instance values."""
         
+        # TODO
+        # Need to figure out a way to make this more readable...
         if (self.getMessageAttachmentPath() == ""):
             if (self.mine):
                 if (self.getMessagePublic()):
-                    s = QtCore.QString(self.mine_text_public).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()))
+                    s = self.normal_template % {"icon": "menu_public.png", "edit": self.mine_edit_template}
+                    s = QtCore.QString(s).arg(self.getMessageTitle(), self.getMessageContent(), "Received on: " + time.ctime(self.getMessageReceivedTimestamp()), "Created on: " + time.ctime(self.getMessageTimestamp()))
                 else:
-                    s = QtCore.QString(self.mine_text).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()))
+                    s = self.normal_template % {"icon": "menu_outgoing.png", "edit": self.mine_edit_template}
+                    s = QtCore.QString(s).arg(self.getMessageTitle(), self.getMessageContent(), "Received on: " + time.ctime(self.getMessageReceivedTimestamp()), "Created on: " + time.ctime(self.getMessageTimestamp()))
             else:
                 if (self.getMessagePublic()):
                     if (self.blacklist):
-                        s = QtCore.QString(self.other_text_blacklist_public).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()))
+                        s = self.normal_template % {"icon": "menu_public_other.png", "edit": self.unblacklist_template}
+                        s = QtCore.QString(s).arg(self.getMessageTitle(), self.getMessageContent(), "Received on: " + time.ctime(self.getMessageReceivedTimestamp()), "Created on: " + time.ctime(self.getMessageTimestamp()))
                     else:
-                        s = QtCore.QString(self.other_text_public).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()))
+                        s = self.normal_template % {"icon": "menu_public_other.png", "edit": self.blacklist_template}
+                        s = QtCore.QString(s).arg(self.getMessageTitle(), self.getMessageContent(), "Received on: " + time.ctime(self.getMessageReceivedTimestamp()), "Created on: " + time.ctime(self.getMessageTimestamp()))
                 else:
                     if (self.blacklist):
-                        s = QtCore.QString(self.other_text_blacklist).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()))
+                        s = self.normal_template % {"icon": "menu_all.png", "edit": self.unblacklist_template}
+                        s = QtCore.QString(s).arg(self.getMessageTitle(), self.getMessageContent(), "Received on: " + time.ctime(self.getMessageReceivedTimestamp()), "Created on: " + time.ctime(self.getMessageTimestamp()))
                     else:
-                        s = QtCore.QString(self.other_text).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()))
+                        s = self.normal_template % {"icon": "menu_all.png", "edit": self.blacklist_template}
+                        s = QtCore.QString(s).arg(self.getMessageTitle(), self.getMessageContent(), "Received on: " + time.ctime(self.getMessageReceivedTimestamp()), "Created on: " + time.ctime(self.getMessageTimestamp()))
         else:
             if (self.mine):
                 if (self.getMessagePublic()):
-                    s = QtCore.QString(self.mine_text_attachment_public).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()), self.getMessageAttachmentOriginalFilename(), "file:///" + self.getMessageAttachmentPath())
+                    s = self.attachment_template % {"icon": "menu_public.png", "edit": self.mine_edit_template}
+                    s = QtCore.QString(s).arg(self.getMessageTitle(), self.getMessageContent(), "Received on: " + time.ctime(self.getMessageReceivedTimestamp()), self.getMessageAttachmentOriginalFilename(), "file:///" + self.getMessageAttachmentPath(), "Created on: " + time.ctime(self.getMessageTimestamp()))
                 else:
-                    s = QtCore.QString(self.mine_text_attachment).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()), self.getMessageAttachmentOriginalFilename(), "file:///" + self.getMessageAttachmentPath())
+                    s = self.attachment_template % {"icon": "menu_outgoing.png", "edit": self.mine_edit_template}
+                    s = QtCore.QString(s).arg(self.getMessageTitle(), self.getMessageContent(), "Received on: " + time.ctime(self.getMessageReceivedTimestamp()), self.getMessageAttachmentOriginalFilename(), "file:///" + self.getMessageAttachmentPath(), "Created on: " + time.ctime(self.getMessageTimestamp()))
             else:
                 if (self.getMessagePublic()):
                     if (self.blacklist):
-                        s = QtCore.QString(self.other_text_attachment_blacklist_public).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()), self.getMessageAttachmentOriginalFilename(), "file:///" + self.getMessageAttachmentPath())
+                        s = self.attachment_template % {"icon": "menu_public_other.png", "edit": self.unblacklist_template}
+                        s = QtCore.QString(s).arg(self.getMessageTitle(), self.getMessageContent(), "Received on: " + time.ctime(self.getMessageReceivedTimestamp()), self.getMessageAttachmentOriginalFilename(), "file:///" + self.getMessageAttachmentPath(), "Created on: " + time.ctime(self.getMessageTimestamp()))
                     else:
-                        s = QtCore.QString(self.other_text_attachment_public).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()), self.getMessageAttachmentOriginalFilename(), "file:///" + self.getMessageAttachmentPath())
+                        s = self.attachment_template % {"icon": "menu_public_other.png", "edit": self.blacklist_template}
+                        s = QtCore.QString(s).arg(self.getMessageTitle(), self.getMessageContent(), "Received on: " + time.ctime(self.getMessageReceivedTimestamp()), self.getMessageAttachmentOriginalFilename(), "file:///" + self.getMessageAttachmentPath(), "Created on: " + time.ctime(self.getMessageTimestamp()))
                 else:
                     if (self.blacklist):
-                        s = QtCore.QString(self.other_text_attachment_blacklist).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()), self.getMessageAttachmentOriginalFilename(), "file:///" + self.getMessageAttachmentPath())
+                        s = self.attachment_template % {"icon": "menu_all.png", "edit": self.unblacklist_template}
+                        s = QtCore.QString(s).arg(self.getMessageTitle(), self.getMessageContent(), "Received on: " + time.ctime(self.getMessageReceivedTimestamp()), self.getMessageAttachmentOriginalFilename(), "file:///" + self.getMessageAttachmentPath(), "Created on: " + time.ctime(self.getMessageTimestamp()))
                     else:
-                        s = QtCore.QString(self.other_text_attachment).arg(self.getMessageTitle(), self.getMessageContent(), time.ctime(self.getMessageTimestamp()), self.getMessageAttachmentOriginalFilename(), "file:///" + self.getMessageAttachmentPath())
-
+                        s = self.attachment_template % {"icon": "menu_all.png", "edit": self.blacklist_template}
+                        s = QtCore.QString(s).arg(self.getMessageTitle(), self.getMessageContent(), "Received on: " + time.ctime(self.getMessageReceivedTimestamp()), self.getMessageAttachmentOriginalFilename(), "file:///" + self.getMessageAttachmentPath(), "Created on: " + time.ctime(self.getMessageTimestamp()))
+        
         self.setHtml(s)
         # Whether to open links automatically
         self.setOpenLinks(False)
@@ -1846,7 +1651,7 @@ class FluidNexusDesktop(QtGui.QMainWindow):
             # Guess type
             mimeType = mimetypes.guess_type(attachment_original_filename)
             
-            if (mimeType is None):
+            if (mimeType[0] is None):
                 message_type = 0
             else:
                 if ("image" in mimeType[0]):
