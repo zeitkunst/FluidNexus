@@ -42,8 +42,6 @@ else:
 import oauth2
 import simplejson as json
 
-# TODO
-# Modularize this for different platforms
 import pybonjour
 
 # My imports
@@ -78,9 +76,7 @@ NEXUS_MESSAGE_ENDPOINT = NEXUS_HOST + "/api/01/nexus/message/update.json"
 NEXUS_HASH_ENDPOINT = NEXUS_HOST + "/api/01/nexus/hashes/%s.json"
 
 # TODO
-# * Deal with settings/config better
 # * Better error checking, deal with socket timeouts, socket closing, etc
-# * * Basically need to wrap all "recv" with a "read" that takes in socket, amount to read, and captures error of "bluetooth.btcommon.BluetoothError: (104, 'Connection reset by peer')"
 
 class NexusError(Exception):
     def __init__(self, value):
@@ -533,7 +529,6 @@ class BluetoothServerVer3(Networking):
 
 TODO
 
-* Write client that can connect to other machines
 * Deal with different libraries such as lightblue."""
 
 
@@ -690,7 +685,6 @@ class BluetoothClientVer3(Networking):
 
 TODO
 
-* Write client that can connect to other machines
 * Deal with different libraries such as lightblue."""
 
 
@@ -845,12 +839,6 @@ class ZeroconfServer(Networking):
         self.numConnections = numConnections
         self.setThreadType(self.TYPE_ZEROCONF)
 
-        # Do initial setup
-        #self.setupServerSockets(numConnections = numConnections)
-        # TODO
-        # conver to avahi zeroconf
-        #self.setupService()
-
     def setupServerSockets(self, numConnections = 5, blocking = 0):
         """Setup the socket for accepting connections."""
         self.serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -868,26 +856,6 @@ class ZeroconfServer(Networking):
         """Setup the service for zeroconf."""
         self.sdRef = pybonjour.DNSServiceRegister(name = self.name, regtype = ZEROCONF_SERVICE_TYPE, port = self.port, callBack = self.serviceCallback)
 
-        """
-        bus = dbus.SystemBus()
-        server = dbus.Interface(
-                         bus.get_object(
-                                 avahi.DBUS_NAME,
-                                 avahi.DBUS_PATH_SERVER),
-                        avahi.DBUS_INTERFACE_SERVER)
-
-        g = dbus.Interface(
-                    bus.get_object(avahi.DBUS_NAME,
-                                   server.EntryGroupNew()),
-                    avahi.DBUS_INTERFACE_ENTRY_GROUP)
-
-        g.AddService(avahi.IF_UNSPEC, avahi.PROTO_UNSPEC,dbus.UInt32(0),
-                     self.name, ZEROCONF_SERVICE_TYPE, self.domain, self.host,
-                     dbus.UInt16(self.port), self.text)
-
-        g.Commit()
-        self.group = g
-        """
 
     def takedownService(self):
         """Stop the zeroconf service"""

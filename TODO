@@ -1,12 +1,10 @@
 SOONER
 ======
 
-* Create recipe to allow for building on natty and maverick for the PPA
-* Figure out why app is being put in "Other" category rather than "Internet"
 * Enable copying/selecting of text (crib from choqok)
-* Add created time to message display
 * Shutdown server/client threads properly on GUI exit
 * Present dialog instead of status message if bluetooth, zeroconf are not enabled
+* Figure out why app is being put in "Other" category rather than "Internet"
 
 LATER
 =====
@@ -18,4 +16,5 @@ LATER
 * Implement ad-hoc wifi
 * Implement SSL/TLS option over the network modalities
 * Add rate limiting options: hashes to send, hashes to read, messages to send, hash to send bias (newest, oldest, random)
+* Create recipe to allow for building on natty and maverick for the PPA
 

@@ -187,14 +187,6 @@ class FluidNexusDatabase(object):
 
         # TODO
         # Ensure new message is not already in the database
-        """
-        now = time.time()
-        if (attachment_path is not None):
-            message = Messages(message_type = message_type, title = title, content = content, message_hash = message_hash, time = now, received_time = now, attachment_path = attachment_path, attachment_original_filename = attachment_original_filename, mine = True, public = public, ttl = ttl)
-        else:
-            message = Messages(message_type = message_type, title = title, content = content, message_hash = message_hash, time = now, received_time = now, mine = True, public = public, ttl = ttl)
-            """
-
         self.session.add(message)
         self.session.commit()
         

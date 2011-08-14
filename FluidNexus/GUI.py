@@ -717,9 +717,6 @@ class FluidNexusNewMessageDialog(QtGui.QDialog):
         self.originalFilename = attachment_original_path
 
     def closeDialog(self):
-        # TODO
-        # Ask for confirmation if the data has changed
-
         if ((self.originalTitle != unicode(self.ui.newMessageTitle.text()).encode("utf-8")) or (self.originalContent != unicode(self.ui.newMessageBody.document().toPlainText()).encode("utf-8")) or (self.originalFilename != self.filename)):
             response = self.confirmSaveDialog()
             if (response == self.YES):
@@ -1267,9 +1264,8 @@ class FluidNexusDesktop(QtGui.QMainWindow):
     
                 self.zeroconfServerThread = ZeroconfServerQt(parent = self, databaseDir = self.dataDir, databaseType = "pysqlite2", attachmentsDir = self.attachmentsDir, logPath = self.logPath, level = self.logLevel, sendBlacklist = self.sendBlacklist)
                 self.zeroconfServerThread.start()
-            
-        # TODO
-        # enable configuration of nexus sending
+        
+        # Starting the Nexus thread
         if (self.nexusEnabled):
             key = self.settings.value("nexus/key", "").toString()
             secret = self.settings.value("nexus/secret", "").toString()
