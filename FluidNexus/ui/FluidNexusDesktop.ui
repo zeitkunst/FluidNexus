@@ -96,6 +96,7 @@
      <string>&amp;View</string>
     </property>
     <addaction name="actionViewAll"/>
+    <addaction name="actionViewHighPriority"/>
     <addaction name="actionViewPublic"/>
     <addaction name="actionViewOutgoing"/>
     <addaction name="actionViewBlacklist"/>
@@ -118,6 +119,7 @@
    <addaction name="actionNewMessage"/>
    <addaction name="separator"/>
    <addaction name="actionViewAll"/>
+   <addaction name="actionViewHighPriority"/>
    <addaction name="actionViewPublic"/>
    <addaction name="actionViewOutgoing"/>
    <addaction name="actionViewBlacklist"/>
@@ -234,6 +236,18 @@
    </property>
    <property name="toolTip">
     <string>Open the manual for Fluid Nexus</string>
+   </property>
+  </action>
+  <action name="actionViewHighPriority">
+   <property name="icon">
+    <iconset resource="res/FluidNexus.qrc">
+     <normaloff>:/icons/icons/32x32/menu_high_priority.png</normaloff>:/icons/icons/32x32/menu_high_priority.png</iconset>
+   </property>
+   <property name="text">
+    <string>View &amp;High Priority</string>
+   </property>
+   <property name="toolTip">
+    <string>View high priority messages</string>
    </property>
   </action>
  </widget>

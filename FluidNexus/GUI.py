@@ -1271,6 +1271,7 @@ class FluidNexusDesktop(QtGui.QMainWindow):
     VIEW_PUBLIC = 1
     VIEW_OUTGOING = 2
     VIEW_BLACKLIST = 3
+    VIEW_HIGH_PRIORITY = 4
 
     viewMode = VIEW_ALL
 
@@ -1501,6 +1502,10 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         elif (self.viewMode == self.VIEW_BLACKLIST):
             items = self.database.blacklist()
             self.setWindowTitle(self.trUtf8("Fluid Nexus: View Blacklisted Messages"))
+        elif (self.viewMode == self.VIEW_HIGH_PRIORITY):
+            items = self.database.highPriority()
+            self.setWindowTitle(self.trUtf8("Fluid Nexus: View High Priority Messages"))
+
         items.reverse()
 
         for item in items:
@@ -1531,6 +1536,7 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         self.connect(self.ui.actionViewPublic, QtCore.SIGNAL('triggered()'), self.handleViewPublic)
         self.connect(self.ui.actionViewOutgoing, QtCore.SIGNAL('triggered()'), self.handleViewOutgoing)
         self.connect(self.ui.actionViewBlacklist, QtCore.SIGNAL('triggered()'), self.handleViewBlacklist)
+        self.connect(self.ui.actionViewHighPriority, QtCore.SIGNAL('triggered()'), self.handleViewHighPriority)
 
     def setupSysTray(self):
         """Setup the systray."""
@@ -1606,6 +1612,13 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         self.deleteTextBrowserWidgets()
         self.setupDisplay()
 
+    def handleViewHighPriority(self):
+        self.changeToolbarCheckedState(self.viewMode, self.VIEW_HIGH_PRIORITY)
+        self.viewMode = self.VIEW_HIGH_PRIORITY
+        self.deleteTextBrowserWidgets()
+        self.setupDisplay()
+
+
     def closeEvent(self, event):
         """Handle the close event from the WM."""
         self.handleQuit()
@@ -1623,7 +1636,7 @@ class FluidNexusDesktop(QtGui.QMainWindow):
         """Change the checked state of the toolbar buttons from the old to the new."""
         # TODO
         # Perhaps a better way of doing this rather than hard-coding it?
-        actions = ["actionViewAll", "actionViewPublic", "actionViewOutgoing", "actionViewBlacklist"]
+        actions = ["actionViewAll", "actionViewPublic", "actionViewOutgoing", "actionViewBlacklist", "actionViewHighPriority"]
         oldAction = getattr(self.ui, actions[old])
         newAction = getattr(self.ui, actions[new])
         oldAction.setChecked(False)

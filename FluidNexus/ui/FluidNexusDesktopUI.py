@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'FluidNexus/ui/FluidNexusDesktop.ui'
 #
-# Created: Sat Aug 13 18:36:16 2011
+# Created: Sat Aug 13 22:02:45 2011
 #      by: PyQt4 UI code generator 4.8.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -109,6 +109,11 @@ class Ui_FluidNexus(object):
         icon7.addPixmap(QtGui.QPixmap(_fromUtf8(":/icons/icons/32x32/menu_help.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionHelp.setIcon(icon7)
         self.actionHelp.setObjectName(_fromUtf8("actionHelp"))
+        self.actionViewHighPriority = QtGui.QAction(FluidNexus)
+        icon8 = QtGui.QIcon()
+        icon8.addPixmap(QtGui.QPixmap(_fromUtf8(":/icons/icons/32x32/menu_high_priority.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionViewHighPriority.setIcon(icon8)
+        self.actionViewHighPriority.setObjectName(_fromUtf8("actionViewHighPriority"))
         self.menuFile.addAction(self.actionNewMessage)
         self.menuFile.addAction(self.actionPreferences)
         self.menuFile.addSeparator()
@@ -116,6 +121,7 @@ class Ui_FluidNexus(object):
         self.menuHelp.addAction(self.actionHelp)
         self.menuHelp.addAction(self.actionAbout)
         self.menu_View.addAction(self.actionViewAll)
+        self.menu_View.addAction(self.actionViewHighPriority)
         self.menu_View.addAction(self.actionViewPublic)
         self.menu_View.addAction(self.actionViewOutgoing)
         self.menu_View.addAction(self.actionViewBlacklist)
@@ -125,6 +131,7 @@ class Ui_FluidNexus(object):
         self.FluidNexusToolbar.addAction(self.actionNewMessage)
         self.FluidNexusToolbar.addSeparator()
         self.FluidNexusToolbar.addAction(self.actionViewAll)
+        self.FluidNexusToolbar.addAction(self.actionViewHighPriority)
         self.FluidNexusToolbar.addAction(self.actionViewPublic)
         self.FluidNexusToolbar.addAction(self.actionViewOutgoing)
         self.FluidNexusToolbar.addAction(self.actionViewBlacklist)
@@ -155,5 +162,7 @@ class Ui_FluidNexus(object):
         self.actionViewPublic.setToolTip(QtGui.QApplication.translate("FluidNexus", "View Public Messages", None, QtGui.QApplication.UnicodeUTF8))
         self.actionHelp.setText(QtGui.QApplication.translate("FluidNexus", "&Help", None, QtGui.QApplication.UnicodeUTF8))
         self.actionHelp.setToolTip(QtGui.QApplication.translate("FluidNexus", "Open the manual for Fluid Nexus", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionViewHighPriority.setText(QtGui.QApplication.translate("FluidNexus", "View &High Priority", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionViewHighPriority.setToolTip(QtGui.QApplication.translate("FluidNexus", "View high priority messages", None, QtGui.QApplication.UnicodeUTF8))
 
 import FluidNexus_rc

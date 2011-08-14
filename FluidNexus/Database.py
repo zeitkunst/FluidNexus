@@ -321,6 +321,25 @@ class FluidNexusDatabase(object):
 
         return results 
 
+    def highPriority(self, limit = None, includeBlacklist = False):
+        """Return all of the items in the database,  with optional limit."""
+        if (limit is not None):
+            if (includeBlacklist):
+                rows = self.session.query(Messages).filter(Messages.message_priority == 1).order_by(desc(Messages.message_received_timestamp)).all()[0:limit]
+            else:
+                rows = self.session.query(Messages).filter(Messages.message_priority == 1).filter(Messages.message_blacklist == False).order_by(desc(Messages.message_received_timestamp)).all()[0:limit]
+        else:
+            if (includeBlacklist):
+                rows = self.session.query(Messages).filter(Messages.message_priority == 1).order_by(desc(Messages.message_received_timestamp)).all()
+            else:
+                rows = self.session.query(Messages).filter(Messages.message_priority == 1).filter(Messages.message_blacklist == False).order_by(desc(Messages.message_received_timestamp)).all()
+
+        results = []
+        for row in rows:
+            results.append(instance_dict(row))
+
+        return results 
+
 
     def outgoing(self, limit = None):
         """Return outgoing items in the database,  with optional limit."""
