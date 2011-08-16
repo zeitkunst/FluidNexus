@@ -1,3 +1,9 @@
+fluid-nexus (0.2.3-0ubuntu4~maverickppa1) natty; urgency=low
+
+  * 
+
+ -- Nicholas Knouf <nknouf@zeitkunst.org>  Tue, 16 Aug 2011 17:52:41 -0400
+
 fluid-nexus (0.2.3-0ubuntu4~nattyppa2) natty; urgency=low
 
   * Adding .desktop file and pixmaps 
