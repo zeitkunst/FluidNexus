@@ -1,8 +1,16 @@
-fluid-nexus (0.2.3-0ubuntu4~maverickppa1) natty; urgency=low
+fluid-nexus (0.2.5-0ubuntu1~maverickppa1) maverick; urgency=low
 
-  * 
+  * Minor update to fix some manual infos 
 
- -- Nicholas Knouf <nknouf@zeitkunst.org>  Tue, 16 Aug 2011 17:52:41 -0400
+ -- Nicholas Knouf <nknouf@zeitkunst.org>  Tue, 16 Aug 2011 19:47:05 -0400
+
+fluid-nexus (0.2.4-0ubuntu1~maverickppa1) maverick; urgency=low
+
+  * First publicized release
+  * Added option for "high priority" messages
+  * Major code refactoring
+
+ -- Nicholas Knouf <nknouf@zeitkunst.org>  Tue, 16 Aug 2011 17:55:31 -0400
 
 fluid-nexus (0.2.3-0ubuntu4~nattyppa2) natty; urgency=low
 

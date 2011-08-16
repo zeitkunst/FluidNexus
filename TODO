@@ -4,7 +4,6 @@ SOONER
 * Enable copying/selecting of text (crib from choqok)
 * Shutdown server/client threads properly on GUI exit
 * Present dialog instead of status message if bluetooth, zeroconf are not enabled
-* Figure out why app is being put in "Other" category rather than "Internet"
 
 LATER
 =====

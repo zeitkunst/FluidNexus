@@ -11,7 +11,7 @@ PyPi
 PPA
 +++
 
-1.  cd debian; dch -i (Update changelog; then, update manually for building maverick and natty releases, at least until we've created a recipe)
+1.  cd debian; dch -i --check-dirname-level 0 (Update changelog; then, update manually for building maverick and natty releases, at least until we've created a recipe)
 
 2.  make builddeb
 

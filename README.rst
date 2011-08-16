@@ -43,7 +43,7 @@ Zeroconf
 
 * Linux will require the installation of a avahi-bonjour compatability library; on ubuntu this is libavahi-compat-libdnssd1.
 
-To run, type "fluid_nexus"; for help, type "fluid_nexus --help".
+To run, type "fluid-nexus"; for help, type "fluid-nexus --help".
 
 SECURITY NOTE
 =============
