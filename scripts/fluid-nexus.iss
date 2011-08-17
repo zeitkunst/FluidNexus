@@ -3,7 +3,7 @@
 
 #define MyAppName "Fluid Nexus"
 #define MyAppNameUnderscores "Fluid_Nexus"
-#define MyAppVersion "0.2.5"
+#define MyAppVersion "0.2.6"
 #define MyAppURL "http://fluidnexus.net"
 #define MyAppExeName "fluid-nexus.exe"
 

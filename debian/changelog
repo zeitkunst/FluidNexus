@@ -1,4 +1,10 @@
-fluid-nexus (0.2.5-0ubuntu1~maverickppa1) maverick; urgency=low
+fluid-nexus (0.2.6-0ubuntu1~nattyppa1) natty; urgency=low
+
+  * Updating to use correct API location 
+
+ -- Nicholas Knouf <nknouf@zeitkunst.org>  Tue, 16 Aug 2011 21:34:58 -0400
+
+fluid-nexus (0.2.5-0ubuntu1~nattyppa1) natty; urgency=low
 
   * Minor update to fix some manual infos 
 

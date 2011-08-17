@@ -70,7 +70,7 @@ SWITCH_DONE = 0x0041
 DONE_DONE = 0x00F0
 
 # Nexus constants
-NEXUS_HOST = "http://dev.fluidnexus.net"
+NEXUS_HOST = "http://fluidnexus.net"
 NEXUS_NONCE_ENDPOINT = NEXUS_HOST + "/api/01/nexus/message/nonce.json"
 NEXUS_MESSAGE_ENDPOINT = NEXUS_HOST + "/api/01/nexus/message/update.json"
 NEXUS_HASH_ENDPOINT = NEXUS_HOST + "/api/01/nexus/hashes/%s.json"
@@ -470,13 +470,14 @@ class NexusNetworking(Networking):
                         return False
                     
                     uploadData = {}
-                    if (message["attachment_original_filename"] == ""):
-                        messageJSON = {"message_title": message["message_title"], "message_content": message["message_content"], "message_hash": message["message_hash"], "message_time": message["message_timestamp"], "message_type": message["message_type"]}
+                    
+                    if (message["message_attachment_original_filename"] == ""):
+                        messageJSON = {"message_title": message["message_title"], "message_content": message["message_content"], "message_hash": message["message_hash"], "message_time": message["message_timestamp"], "message_type": message["message_type"], "message_priority": message["message_priority"]}
                     else:
                         # TODO
                         # Error handling :-)
                         attachmentDataFP = open(os.path.realpath(message["message_attachment_path"]), 'rb')
-                        messageJSON = {"message_title": message["message_title"], "message_content": message["message_content"], "message_hash": message["message_hash"], "message_time": message["message_timestamp"], "message_type": message["message_type"], "message_attachment_original_filename": message["message_attachment_original_filename"]}
+                        messageJSON = {"message_title": message["message_title"], "message_content": message["message_content"], "message_hash": message["message_hash"], "message_time": message["message_timestamp"], "message_type": message["message_type"], "message_attachment_original_filename": message["message_attachment_original_filename"], "message_priority": message["message_priority"]}
                         uploadData["message_attachment"] = attachmentDataFP
 
                     request = self.build_request(NEXUS_NONCE_ENDPOINT)

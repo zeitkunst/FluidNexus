@@ -78,7 +78,7 @@ DEFAULTS = {
 }
 
 # build our oauth request token request
-URL_BASE = "http://dev.fluidnexus.net/api/01/"
+URL_BASE = "http://fluidnexus.net/api/01/"
 OAUTH_CALLBACK_URL = URL_BASE + "access_token"
 REQUEST_TOKEN_URL = URL_BASE + "request_token/desktop"
 
