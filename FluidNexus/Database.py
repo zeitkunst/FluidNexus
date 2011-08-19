@@ -121,7 +121,7 @@ class FluidNexusDatabase(object):
         # Insert some dummy data
         # This is from text messages listed in the TxTMob CHI paper
         title = u'Run'
-        content = u'[SAMPLE MESSAGE] Run against Bush in progress (just went through times sq).  media march starts at 7, 52nd and broadway'
+        content = u'[SAMPLE MESSAGE] Run against Bush in progress (just went through times sq).  media march starts at 7, 52nd and broadway [This is an example taken from the txtmob documentation]'
         now = time.time()
         message_hash = hashlib.sha256(title + content).hexdigest()
         data = {}
@@ -133,7 +133,7 @@ class FluidNexusDatabase(object):
         self.addMine(data = data)
 
         title = u'Federal agents'
-        content = u'[SAMPLE MESSAGE] Video dispatch. Federal agents trailing activists at 6th Ave and 9th St. Situation tense.'
+        content = u'[SAMPLE MESSAGE] Video dispatch. Federal agents trailing activists at 6th Ave and 9th St. Situation tense.  [This is an example taken from the txtmob documentation]'
         message_hash = hashlib.sha256(title + content).hexdigest()
         now = time.time()
         data["message_title"] = title
@@ -144,7 +144,7 @@ class FluidNexusDatabase(object):
         self.addReceived(data = data)
 
         title = u'Mobilize to dine'
-        content = u'[SAMPLE MESSAGE] CT delegation @ Maison (7th Ave. & 53rd).  Outdoor dining area.  Try to get people there.'
+        content = u'[SAMPLE MESSAGE] CT delegation @ Maison (7th Ave. & 53rd).  Outdoor dining area.  Try to get people there.  [This is an example taken from the txtmob documentation]'
         message_hash = hashlib.sha256(title + content).hexdigest()
         now = time.time()
         data["message_title"] = title
