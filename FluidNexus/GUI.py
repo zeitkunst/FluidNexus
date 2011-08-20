@@ -61,9 +61,9 @@ DEFAULTS = {
     },
 
     "network": {
-        "bluetooth": 2,
-        "zeroconf": 2,
-        "nexus": 2,
+        "bluetooth": 0,
+        "zeroconf": 0,
+        "nexus": 0,
     },
 
     "bluetooth": {
@@ -813,9 +813,9 @@ class FluidNexusPreferencesDialog(QtGui.QDialog):
 
 
     def __networkPreferencesUpdate(self):
-        bluetooth = self.settings.value("network/bluetooth", 2).toInt()[0]
-        zeroconf = self.settings.value("network/zeroconf", 2).toInt()[0]
-        nexus = self.settings.value("network/nexus", 2).toInt()[0]
+        bluetooth = self.settings.value("network/bluetooth", 0).toInt()[0]
+        zeroconf = self.settings.value("network/zeroconf", 0).toInt()[0]
+        nexus = self.settings.value("network/nexus", 0).toInt()[0]
 
         if (bluetooth == 2):
             self.ui.bluetoothEnabled.setCheckState(QtCore.Qt.Checked)
@@ -1141,19 +1141,19 @@ class FluidNexusDesktop(QtGui.QMainWindow):
             self.sendBlacklist = False
 
         # Set our enabled/disabled network modalities; we'll refer to these values throughout the course of the program
-        bluetooth = self.settings.value("network/bluetooth", 2).toInt()[0]
+        bluetooth = self.settings.value("network/bluetooth", 0).toInt()[0]
         if (bluetooth == 2): 
             self.bluetoothEnabled = True
         else:
             self.bluetoothEnabled = False
 
-        zeroconf = self.settings.value("network/zeroconf", 2).toInt()[0]
+        zeroconf = self.settings.value("network/zeroconf", 0).toInt()[0]
         if (zeroconf == 2): 
             self.zeroconfEnabled = True
         else:
             self.zeroconfEnabled = False
 
-        nexus = self.settings.value("network/nexus", 2).toInt()[0]
+        nexus = self.settings.value("network/nexus", 0).toInt()[0]
         if (nexus == 2): 
             self.nexusEnabled = True
         else:
