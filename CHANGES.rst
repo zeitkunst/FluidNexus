@@ -1,6 +1,17 @@
 ChangeLog
 =========
 
+v0.3.1
+------
+
+* Enable direct SSL support for connections to Fluid Nexus website
+
+v0.3.0
+------
+
+* Update to make clear artistic intentions
+* First support of SQLCipher
+
 v0.2.6
 ------
 

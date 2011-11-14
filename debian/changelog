@@ -1,3 +1,9 @@
+fluid-nexus (0.3.1-0ubuntu1~nattyppa1) natty; urgency=low
+
+  * Enable direct SSL connections to Fluid Nexus website for the Nexus
+
+ -- Nicholas Knouf <nknouf@zeitkunst.org>  Mon, 14 Nov 2011 02:39:08 -0500
+
 fluid-nexus (0.3.0-0ubuntu1~nattyppa1) natty; urgency=low
 
   * Updating to make clear the artistic nature of the project
