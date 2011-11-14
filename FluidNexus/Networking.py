@@ -136,7 +136,7 @@ class Networking(object):
     # Enum types
     message_priorities = {
         0: FluidNexus_pb2.FluidNexusMessage.NORMAL,
-        1: FluidNexus_pb2.FluidNexusMessage.LIFE_OR_DEATH,
+        1: FluidNexus_pb2.FluidNexusMessage.HIGH,
     }
 
     # Thread types

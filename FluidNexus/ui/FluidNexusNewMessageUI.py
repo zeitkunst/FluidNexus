@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'FluidNexus/ui/FluidNexusNewMessage.ui'
 #
-# Created: Sat Aug 13 22:02:45 2011
-#      by: PyQt4 UI code generator 4.8.1
+# Created: Sun Nov 13 17:16:28 2011
+#      by: PyQt4 UI code generator 4.8.3
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -110,8 +110,8 @@ class Ui_FluidNexusNewMessage(object):
         self.cancelButton.setText(QtGui.QApplication.translate("FluidNexusNewMessage", "Cancel", None, QtGui.QApplication.UnicodeUTF8))
         self.saveButton.setText(QtGui.QApplication.translate("FluidNexusNewMessage", "Save", None, QtGui.QApplication.UnicodeUTF8))
         self.nexusCheckBox.setText(QtGui.QApplication.translate("FluidNexusNewMessage", "Public (pust to Nexus?)", None, QtGui.QApplication.UnicodeUTF8))
-        self.priorityComboBox.setItemText(0, QtGui.QApplication.translate("FluidNexusNewMessage", "Normal", None, QtGui.QApplication.UnicodeUTF8))
-        self.priorityComboBox.setItemText(1, QtGui.QApplication.translate("FluidNexusNewMessage", "Life or Death", None, QtGui.QApplication.UnicodeUTF8))
+        self.priorityComboBox.setItemText(0, QtGui.QApplication.translate("FluidNexusNewMessage", "Normal", "0", QtGui.QApplication.UnicodeUTF8))
+        self.priorityComboBox.setItemText(1, QtGui.QApplication.translate("FluidNexusNewMessage", "High", "1", QtGui.QApplication.UnicodeUTF8))
         self.priorityLabel.setText(QtGui.QApplication.translate("FluidNexusNewMessage", "Priority:", None, QtGui.QApplication.UnicodeUTF8))
 
 import FluidNexus_rc

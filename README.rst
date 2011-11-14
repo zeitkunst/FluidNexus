@@ -7,8 +7,6 @@ http://fluidnexus.net
 
 fluidnexus@fluidnexus.net
 
-This software is ALPHA QUALITY and should only be used at your own risk.  More detailed instructions about theory, motivation, installation, and use can be found on the website.
-
 The software has been testing on Ubuntu Maverick with python 2.6.6 and requires the following python modules: pyqt4, pybonjour, sqlalchemy, textile, pybluez, oauth2, protobuf (version 2.3.0 or higher).
 
 Installing on Ubuntu
@@ -50,9 +48,9 @@ SECURITY NOTE
 
 Data is stored unencrypted in a local sqlite database.  It is best that you take care of encryption yourself, such as by using ecryptfs home directories or LUKS encrypted devices on Linux.  On Windows, the database and received attachments are stored in the ``FluidNexusData`` folder in your home directory.  It ought to be possible to mount this folder from a TrueCrypt volume.
 
-Data is sent over bluetooth without any transport layer encryption.  This is something we plan on implementing in the future.
+Data is sent over Bluetooth using the standard encryption facilities of the Bluetooth stack.
 
-Data is sent over link-local wifi using zeroconf for service discovery without any transport layer encryption.  This is something we plan on implementing in the future.
+Data is sent over link-local wifi using zeroconf for service discovery without any transport layer encryption.
 
 Licenses
 ========

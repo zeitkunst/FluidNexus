@@ -47,7 +47,7 @@ message FluidNexusMessage {
 
     enum MessagePriority {
         NORMAL = 0;
-        LIFE_OR_DEATH = 1;
+        HIGH = 1;
     }
 
     optional MessageType message_type = 7;

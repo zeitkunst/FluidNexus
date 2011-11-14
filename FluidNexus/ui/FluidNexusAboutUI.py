@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'FluidNexus/ui/FluidNexusAbout.ui'
 #
-# Created: Sat Aug 13 22:02:45 2011
-#      by: PyQt4 UI code generator 4.8.1
+# Created: Sun Nov 13 17:16:26 2011
+#      by: PyQt4 UI code generator 4.8.3
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -27,6 +27,7 @@ class Ui_FluidNexusAbout(object):
         self.verticalLayoutWidget.setGeometry(QtCore.QRect(10, 10, 351, 470))
         self.verticalLayoutWidget.setObjectName(_fromUtf8("verticalLayoutWidget"))
         self.verticalLayout = QtGui.QVBoxLayout(self.verticalLayoutWidget)
+        self.verticalLayout.setMargin(0)
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
         self.horizontalLayout = QtGui.QHBoxLayout()
         self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))

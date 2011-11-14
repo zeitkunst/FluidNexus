@@ -1024,30 +1024,34 @@ class FluidNexusHelpDialog(QtGui.QDialog):
 class FluidNexusAboutDialog(QtGui.QDialog):
 
     aboutText = u"""<p>Copyfarleft 2008-2011 Nicholas A. Knouf.  Code is licensed under the GPLv3 and is available on <a href="https://github.com/zeitkunst/FluidNexus">github</a>.</p>
-    <p>In the second decade of the twenty-first century, networks continue to be defined by their stable topology represented in an image or graph. Peer-to-peer technologies promised new arrangements absent centralized control, but they still rely on stationary devices. Mobile phones remain wedded to conventional network providers.</p>
-    <p>Instead, the combination of peer-to-peer with mobility enables a new concept of an information transfer infrastructure that relies on fluid, temporary, ad-hoc networks. People and devices are at once implicated as mobile nodes in this network (known in computer science as a <a href="http://en.wikipedia.org/wiki/Sneakernet">sneakernet</a>).</p>
-    <p>Fluid Nexus bypasses Internet intermediaries' control over the identification and circulation of messages. This makes Fluid Nexus an important tool for activists. Access to the data stored by Fluid Nexus requires a search warrant for <em>your own</em> devices&mdash;or another device running the software. No identifying information regarding the sender is attached to a message, putting the sender in control. And in conjunction with other software such as <a href="https://guardianproject.info/apps/securecam/">ObscuraCam</a> identities can be further obfuscated as desired or necessary.</p>
-    <p>In the event that information needs to reach a broad audience, we've added another feature called the <a href="/nexus">Nexus</a>. The <a href="/nexus">Nexus</a> is a space on this site for "public" messages to be automatically uploaded by any Fluid Nexus user. The <a href="/nexus">Nexus</a> includes text, audio, images, and video capabilities. The sender has control whether the message will become public or not.</p>
-    <p>For more information on Fluid Nexus, see the paper <a href="http://localhost:6543/static/pdfs/DCM2009Submitted.pdf">"Transnetworks and the Fluid Nexus Project"</a>, forthcoming in Fall 2011 in the proceedings of dis/connecting/media 2009.</p>"""
+    <p>In the second decade of the twenty-first century, networks continue to be defined by their stable topology represented in an image or graph.  Peer-to-peer technologies promised new arrangements absent centralized control, but they still rely on stationary devices.  Mobile phones remain wedded to conventional network providers.</p>
+    <p>Instead, the combination of peer-to-peer with mobility enables a new concept of an information transfer infrastructure that relies on fluid, temporary, ad-hoc networks.  People and devices are at once implicated as mobile nodes in this network (known in computer science as a <a href="http://en.wikipedia.org/wiki/Sneakernet">sneakernet</a>).</p>
+    <p>Fluid Nexus is a demonstration of how one might design software to bypass Internet intermediaries' control over the identification and circulation of messages.  It is a piece of interrogative software art, of a piece with other attempts to rework network topology such as the Eternal Network used by mail artists or projects such as Dead Swap or netless.  We draw partial inspiration from the potential activist re-purposing of digital technologies without being subsumed by the same goals.</p>
+    <p>While Fluid Nexus is designed for non-Internet-based communications, we have also developed the <a href="/nexus">Nexus</a>, a space on this site for "public" messages to be automatically uploaded by any Fluid Nexus user.  The <a href="/nexus">Nexus</a> includes text, audio, images, and video capabilities, and the original sender has control whether the message will become public or not.  The Nexus extends the reach of the Fluid Nexus non-network beyond those using the software on their phone or laptop/desktop.</p>
+    <p>For more information on Fluid Nexus, see the paper <a href="${pdfs_static_url}/DCM2009Submitted.pdf" i18n:name="dcmsubmitted">"Transnetworks and the Fluid Nexus Project"</a>, forthcoming in Fall 2011 in the proceedings of dis/connecting/media 2009.</p>
+    <h2>Articles of Interest</h2>
+    <p><a href="http://www.actlab.utexas.edu/emma/Library/eternalnetwork.html">Eternal Network: A Mail Art Anthology</a></p>
+    <p><a href="http://www.stewarthomesociety.org/ass/ma.htm">Stewart Home, "Mail Art", in <em>The Assault on Culture</em></a></p>
+    <p><a href="https://www.nytimes.com/2011/06/12/world/12internet.html?pagewanted=1&_r=1&hp">"U.S. Underwrites Internet Detour Around Censors"</a></p>
+    <p><a href="http://techcrunch.com/2011/02/27/humans-are-the-routers/">"Humans Are The Routers"</a></p>
+    <p><a href="http://www.physorg.com/news198298057.html">"New project enables mobile phone use in areas with no reception"</a></p>
+    <p><a href="http://www.guardian.co.uk/world/2009/oct/04/man-arrested-twitter-g20-us?INTCMP=SRCH">"New York man accused of using Twitter to direct protesters during G20 summit"</a></p>"""
                                                                 
 
     creditsText = u"""<h2>Contact</h2>
-                <p>You can contact all of the members of the project at fluidnexus {{@}} fluidnexus [[.]] net.</p>
-                
-                            <p>If you prefer to send us a private, encrypted e-mail, you can use our web-form at PrivacyBox.de: <a href="http://privacybox.de/fluidnexus.msg">http://privacybox.de/fluidnexus.msg</a>. The contact form is also available using a Tor hidden service at <a href="http://c4wcxidkfhvmzhw6.onion/fluidnexus.msg">http://c4wcxidkfhvmzhw6.onion/fluidnexus.msg</a> or using an Invisible Internet Project node at <a href="http://privacybox.i2p/fluidnexus.msg">http://privacybox.i2p/fluidnexus.msg</a>.</p>
-                                        <p>Nicholas A. Knouf can be contacted at nknouf {{@}} zeitkunst [[.]] org; his <a href="http://pgp.mit.edu:11371/pks/lookup?op=get&search=0xA070C588A43C9CC9">pgp public key is also available</a>.</p>
-                                                    <h2>Updates</h2>
-                                                    
-                                                                <p>If you'd like to keep up-to-date with information about the software, please e-mail fluidnexus {{@}} fluidnexus [[.]] net.  <em>We will never share your e-mail address with anyone</em>.
-                                                                            <h2>Donate</h2>
-                                                                                        <p>You can donate to our bitcoin address: 18GD6vMjmXthGhDNDhNMEoEthoGkUXkQR3.  Even a fraction of a coin helps us know that our work is appreciated.  Thanks!</p>
-                                                                                                    <h2>Thanks</h2>
-                                                                                                                <p>Thanks to Niranjan Sivakumar for testing help. Thanks also to Claudia Costa Pederson for support during the writing of this software.</p>
-                                                                                                                            <h2>Inspiration</h2>
-                                                                                                                            
-                                                                                                                                        <p>Fluid Nexus has been inspired by the following projects: <a href="http://k0a1a.net/netless/">netless, by Danja Vasiliev</a>; <a href="http://www.deadswap.net/">Dead Swap, by Telekommunisten</a>; <a href="http://www.feraltrade.org/">Feral Trade, by Kate Rich</a>; and most importantly, <a href="http://www.appliedautonomy.com/txtmob.html">TXTmob, by the Institute for Applied Autonomy</a>.</p>
-                                                                                                                                                    <h2>Initial Version Credits</h2>
-                                                                                                                                                                <p>The initial version of Fluid Nexus for Series 60 Nokia phones running Python was written in conjunction with Bruno Vianna, Luis Ayuso; design help by Mónica Sánchez; and the support of <a href="http://medialab-prado.es">Medialab Prado</a> during the 2° Encuentro Inclusiva-net: redes digitales y espacio fisico.</p>"""
+    <p>You can contact all of the members of the project at fluidnexus {{@}} fluidnexus [[.]] net.</p>
+    <p>If you prefer to send us a private, encrypted e-mail, you can use our web-form at PrivacyBox.de: <a href="http://privacybox.de/fluidnexus.msg">http://privacybox.de/fluidnexus.msg</a>. The contact form is also available using a Tor hidden service at <a href="http://c4wcxidkfhvmzhw6.onion/fluidnexus.msg">http://c4wcxidkfhvmzhw6.onion/fluidnexus.msg</a> or using an Invisible Internet Project node at <a href="http://privacybox.i2p/fluidnexus.msg">http://privacybox.i2p/fluidnexus.msg</a>.</p>
+    <p>Nicholas A. Knouf can be contacted at nknouf {{@}} zeitkunst [[.]] org; his <a href="http://pgp.mit.edu:11371/pks/lookup?op=get&search=0xA070C588A43C9CC9">pgp public key is also available</a>.</p>
+    <h2>Updates</h2>
+    <p>If you'd like to keep up-to-date with information about the software, please e-mail fluidnexus {{@}} fluidnexus [[.]] net.  <em>We will never share your e-mail address with anyone</em>.
+    <h2>Donate</h2>
+    <p>You can donate to our bitcoin address: 18GD6vMjmXthGhDNDhNMEoEthoGkUXkQR3.  Even a fraction of a coin helps us know that our work is appreciated.  Thanks!</p>
+    <h2>Thanks</h2>
+    <p>Thanks to Niranjan Sivakumar for testing help. Thanks also to Claudia Costa Pederson for support during the writing of this software.</p>
+    <h2>Inspiration</h2>
+    <p>Fluid Nexus has been inspired by the following projects: <a href="http://k0a1a.net/netless/">netless, by Danja Vasiliev</a>; <a href="http://www.deadswap.net/">Dead Swap, by Telekommunisten</a>; <a href="http://www.feraltrade.org/">Feral Trade, by Kate Rich</a>; and most importantly, <a href="http://www.appliedautonomy.com/txtmob.html">TXTmob, by the Institute for Applied Autonomy</a>.</p>
+    <h2>Initial Version Credits</h2>
+    <p>The initial version of Fluid Nexus for Series 60 Nokia phones running Python was written in conjunction with Bruno Vianna, Luis Ayuso; design help by Mónica Sánchez; and the support of <a href="http://medialab-prado.es">Medialab Prado</a> during the 2° Encuentro Inclusiva-net: redes digitales y espacio fisico.</p>"""
 
     def __init__(self, parent=None, title = None, message = None):
         QtGui.QDialog.__init__(self, parent)
