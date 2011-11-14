@@ -1,3 +1,10 @@
+fluid-nexus (0.3.0-0ubuntu1~nattyppa1) natty; urgency=low
+
+  * Updating to make clear the artistic nature of the project
+  * Changes some of the wording in the UI
+
+ -- Nicholas Knouf <nknouf@zeitkunst.org>  Mon, 14 Nov 2011 00:22:34 -0500
+
 fluid-nexus (0.2.6-0ubuntu1~nattyppa1) natty; urgency=low
 
   * Updating to use correct API location 

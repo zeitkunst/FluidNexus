@@ -70,7 +70,7 @@ SWITCH_DONE = 0x0041
 DONE_DONE = 0x00F0
 
 # Nexus constants
-NEXUS_HOST = "http://fluidnexus.net"
+NEXUS_HOST = "https://fluidnexus.net"
 NEXUS_NONCE_ENDPOINT = NEXUS_HOST + "/api/01/nexus/message/nonce.json"
 NEXUS_MESSAGE_ENDPOINT = NEXUS_HOST + "/api/01/nexus/message/update.json"
 NEXUS_HASH_ENDPOINT = NEXUS_HOST + "/api/01/nexus/hashes/%s.json"
